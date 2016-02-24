@@ -17,10 +17,14 @@ public class TileGenerator : MonoBehaviour
 
     private Tile[,] tiles;
 
-    void Start()
+    void Awake()
     {
         tiles = new Tile[mapWidth, mapHeight];
         CreateMap();
+    }
+
+    void Start()
+    {
     }
 
     void Update()
@@ -40,7 +44,7 @@ public class TileGenerator : MonoBehaviour
         int x = Random.Range(0, mapWidth);
         int z = Random.Range(0, mapHeight);
 
-        player.transform.position = new Vector3(x, 0f, z);
+        //player.transform.position = new Vector3(x, 0f, z);
     }
 
     public Tile[,] Tiles

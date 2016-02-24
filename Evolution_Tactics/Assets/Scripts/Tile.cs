@@ -14,6 +14,8 @@ public class Tile : MonoBehaviour
     public GameObject player;
 
     public List<Tile> neighbours;
+    public float costSoFar, heuristicValue, totalEstimatedValue;
+    public Tile prevNode;
 
     void Start()
     {
