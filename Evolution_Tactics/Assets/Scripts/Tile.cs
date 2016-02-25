@@ -28,6 +28,8 @@ public class Tile : MonoBehaviour
 	
     }
 
+    // Get its neighbours
+    // TODO Will need to add more checkers, for instance to see if neighbour can be visited
     private void GetNeighbours()
     {
         Tile[,] tiles = GameObject.Find("TileGenerator").GetComponent<TileGenerator>().Tiles;

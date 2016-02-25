@@ -2,6 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
+// Started by: Lukas
+// Modified by:
+
 public class Pathfinding : MonoBehaviour
 {
     public Tile startNode, endNode;
@@ -12,104 +15,98 @@ public class Pathfinding : MonoBehaviour
     public List<Tile> closedList = new List<Tile>();
 
     public Player player;
-    public int pathCounter = 0;
+    public int counter = 0;
+    public bool goalAttained = false;
 
     void Start()
     {
-        GameObject[] povs = GameObject.FindGameObjectsWithTag("Tile");
-
-        foreach (GameObject o in povs)
+        // Find all tiles and add them to the global list
+        GameObject[] node = GameObject.FindGameObjectsWithTag("Tile");
+        foreach (GameObject n in node)
         {
-            nodeList.Add(o.GetComponent<Tile>());
+            nodeList.Add(n.GetComponent<Tile>());
         }
 
+        // TODO REMOVED
+        //Randomize start and end nodes and place player at start
         startNode = nodeList[Random.Range(0, nodeList.Count - 1)];
         endNode = nodeList[Random.Range(0, nodeList.Count - 1)];
-
         player.transform.position = new Vector3(startNode.transform.position.x, player.transform.position.y, startNode.transform.position.z);
-
         startNode.GetComponent<Renderer>().material.color = Color.green;
         endNode.GetComponent<Renderer>().material.color = Color.red;
 
-        ClearPov();
-        CalculateNewPovPath();
+        ClearLists();
+        CalculateNewPath();
     }
 
     void Update()
     {
-        //If the NPC is in the middle of a pathfinding journey, let it continue
-        if (pathList.Count > pathCounter && endNode == pathList[pathList.Count - 1])
+        // if path has been calculated
+        if (!goalAttained && pathList.Count > counter && endNode == pathList[pathList.Count - 1])
         {
-            if (Vector3.Angle(player.transform.forward, (pathList[pathCounter].transform.position - player.transform.position)) > 35)
-            {
-                player.ArriveAndLookWhereYoureGoing(pathList[pathCounter].transform.position);
-            }
-            else
-            {
-                player.ArriveAndLookWhereYoureGoing(pathList[pathCounter].transform.position);
-            }
-            bool nodeAttained = false;
-            Collider[] collisionArray = Physics.OverlapSphere(player.transform.position, 0.2f);
+            bool tileCollision = false;
+
+            player.ArriveAndLookWhereYoureGoing(pathList[counter].transform.position);
+
+            //Check for tile collision
+            Collider[] collisionArray = Physics.OverlapSphere(player.transform.position, 0.3f);
             for (int i = 0; i < collisionArray.Length; i++)
-            {
-                if (collisionArray[i].GetComponent(typeof(Tile)) == pathList[pathCounter])
+            {          
+                // Check if arrived
+                if (collisionArray[i].GetComponent(typeof(Tile)) == endNode)
                 {
-                    nodeAttained = true;
+                    goalAttained = true;
+                }
+                else if (collisionArray[i].GetComponent(typeof(Tile)) == pathList[counter])
+                {
+                    tileCollision = true;
                 }
             }
 
-            if (nodeAttained)
+            if (goalAttained || tileCollision)
             {
-                pathCounter++;
+                counter++;
             }
         }
         else
         {
-            CalculateNewPovPath();
+            CalculateNewPath();
         }
     }
 
-    private void CalculateNewPovPath()
+    // Calculate a new path with dijkstra algorithm
+    private void CalculateNewPath()
     {
         openList.Clear();
         closedList.Clear();
         pathList.Clear();
 
-        pathCounter = 0;
+        counter = 0;
         startNode = nodeList[0];
         startNode.costSoFar = 0;
 
         foreach (Tile n in nodeList)
         {
-            if (Cost(player.transform, n.transform) < Cost(player.transform, startNode.transform))
+            if (Cost(player.transform.position, n.transform.position) < Cost(player.transform.position, startNode.transform.position))
             {
                 startNode = n;
             }
         }
 
-        /*switch (mode)
-        {
-            case Modes.CLUSTER:
-                calculateCluster_Pov();
-                break;
-            case Modes.DIJKSTRA:
-                calculateDijkstra_Pov();
-                break;
-            case Modes.EUCLIDEAN:
-                calculateEuclidean_Pov();
-                break;
-        }*/
-        calculateDijkstra_Pov();
+        DijkstraPathfinding();
     }
 
-    void calculateDijkstra_Pov()
+    // Dijsktra pathfinding algorithm
+    private void DijkstraPathfinding()
     {
         openList.Add(startNode);
 
+        //while open list is open or closed list does not include all nodes
         while (openList.Count > 0 || closedList.Count != nodeList.Count)
         {
             Tile currentNode = openList[0];
 
+            // Bunch of cost calculations and logic
             foreach (Tile candidateNode in openList)
             {
                 if (candidateNode.totalEstimatedValue < currentNode.totalEstimatedValue)
@@ -121,9 +118,9 @@ public class Pathfinding : MonoBehaviour
             openList.Remove(currentNode);
             closedList.Add(currentNode);
 
-            foreach (Tile neighbor in currentNode.neighbours)
+            foreach (Tile neighbour in currentNode.neighbours)
             {
-                if (neighbor == null)
+                if (neighbour == null)
                 {
                     continue;
                 }
@@ -131,35 +128,35 @@ public class Pathfinding : MonoBehaviour
                 bool inOpenList = false;
                 bool inClosedList = false;
 
-                if (closedList.Contains(neighbor))
+                if (closedList.Contains(neighbour))
                     inClosedList = true;
-                else if (openList.Contains(neighbor))
+                else if (openList.Contains(neighbour))
                     inOpenList = true;
 
 
-                float newCost = (currentNode.costSoFar + Cost(currentNode.transform, neighbor.transform));
+                float newCost = (currentNode.costSoFar + Cost(currentNode.transform.position, neighbour.transform.position));
 
-                if (closedList.Contains(neighbor) && newCost < neighbor.costSoFar)
+                if (closedList.Contains(neighbour) && newCost < neighbour.costSoFar)
                 {
-                    neighbor.costSoFar = newCost;
-                    neighbor.totalEstimatedValue = neighbor.costSoFar + neighbor.heuristicValue;
-                    neighbor.prevNode = currentNode;
-                    closedList.Remove(neighbor);
-                    openList.Add(neighbor);
+                    neighbour.costSoFar = newCost;
+                    neighbour.totalEstimatedValue = neighbour.costSoFar + neighbour.heuristicValue;
+                    neighbour.prevNode = currentNode;
+                    closedList.Remove(neighbour);
+                    openList.Add(neighbour);
 
                 }
-                else if (inOpenList && newCost < neighbor.costSoFar)
+                else if (inOpenList && newCost < neighbour.costSoFar)
                 {
-                    neighbor.costSoFar = newCost;
-                    neighbor.totalEstimatedValue = neighbor.costSoFar + neighbor.heuristicValue;
-                    neighbor.prevNode = currentNode;
+                    neighbour.costSoFar = newCost;
+                    neighbour.totalEstimatedValue = neighbour.costSoFar + neighbour.heuristicValue;
+                    neighbour.prevNode = currentNode;
                 }
                 else if (!inClosedList && !inOpenList)
                 {
-                    neighbor.costSoFar = newCost;
-                    neighbor.totalEstimatedValue = neighbor.costSoFar + neighbor.heuristicValue;
-                    neighbor.prevNode = currentNode;
-                    openList.Add(neighbor);
+                    neighbour.costSoFar = newCost;
+                    neighbour.totalEstimatedValue = neighbour.costSoFar + neighbour.heuristicValue;
+                    neighbour.prevNode = currentNode;
+                    openList.Add(neighbour);
                 }
 
             }
@@ -184,12 +181,14 @@ public class Pathfinding : MonoBehaviour
 
     }
 
-    private float Cost(Transform currentNode, Transform neighbor)
+    // Calculate the cost
+    private float Cost(Vector3 currentNode, Vector3 neighbor)
     {
-        return (currentNode.position - neighbor.position).magnitude;
+        return (currentNode - neighbor).magnitude;
     }
 
-    private void ClearPov()
+    // Clear all lists and tile's variables
+    private void ClearLists()
     {
         openList.Clear();
         closedList.Clear();
