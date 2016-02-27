@@ -41,10 +41,6 @@ public class TileGenerator : MonoBehaviour
                 tiles[i, j] = Instantiate(tilePrefab, new Vector3(i, 0f, j), Quaternion.identity) as Tile;
             }
         }
-        int x = Random.Range(0, mapWidth);
-        int z = Random.Range(0, mapHeight);
-
-        //player.transform.position = new Vector3(x, 0f, z);
     }
 
     public Tile[,] Tiles

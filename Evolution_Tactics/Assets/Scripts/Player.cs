@@ -4,11 +4,11 @@ using System.Collections;
 public class Player : MonoBehaviour
 {
     private Rigidbody rb;
-    public float targetRadius = 0.1f;
-    public float slowRadius = 1f;
-    public float timeToTarget = 0.01f;
-    public float maxAcceleration = 5f;
-    public float turnSpeed = 2f;
+    public float targetRadius;
+    public float slowRadius;
+    public float timeToTarget;
+    public float maxAcceleration;
+    public float turnSpeed;
 
     void Start()
     {
@@ -24,7 +24,6 @@ public class Player : MonoBehaviour
     public void ArriveAndLookWhereYoureGoing(Vector3 target)
     {
         Vector3 accel = Arrive(target);
-        Debug.Log(accel);
         Steer(accel);
         LookWhereYoureGoing();
     }
@@ -41,18 +40,7 @@ public class Player : MonoBehaviour
             return Vector2.zero;
         }
 
-        //Calculate speed according to distance to target
-        /*float targetSpeed;
-        if (targetVel.magnitude > slowRadius)
-        {
-            targetSpeed = player.Speed;
-        }
-        else
-        {
-            targetSpeed = player.Speed * (targetVel.magnitude / slowRadius);
-        }*/
         targetVel.Normalize();
-        // targetVel *= targetSpeed;
 
         Vector3 acceleration = (targetVel - new Vector3(rb.velocity.x, rb.velocity.y, rb.velocity.z)) * 1 / timeToTarget;
         if (acceleration.magnitude > maxAcceleration)
@@ -77,11 +65,6 @@ public class Player : MonoBehaviour
     private void Steer(Vector3 linearAcceleration)
     {
         rb.velocity += linearAcceleration * Time.deltaTime;
-
-        /*if (rb.velocity.magnitude > player.Speed)
-        {
-            rb.velocity = rb.velocity.normalized * player.Speed;
-        }*/
     }
 
     //Align to a target
