@@ -8,7 +8,10 @@ public class Player : MonoBehaviour
     public float slowRadius;
     public float timeToTarget;
     public float maxAcceleration;
+    public float maxVelocity;
+
     public float turnSpeed;
+    public float kinematicSpeed;
 
     void Start()
     {
@@ -19,7 +22,13 @@ public class Player : MonoBehaviour
     {
 	
     }
-       
+
+    public void KinematicMovement(Vector3 target)
+    {
+        MoveTowards(target);
+        Rotate(target);
+    }
+
     // Arrive to target and Look Where You're going
     public void ArriveAndLookWhereYoureGoing(Vector3 target)
     {
@@ -42,14 +51,7 @@ public class Player : MonoBehaviour
 
         targetVel.Normalize();
 
-        Vector3 acceleration = (targetVel - new Vector3(rb.velocity.x, rb.velocity.y, rb.velocity.z)) * 1 / timeToTarget;
-        if (acceleration.magnitude > maxAcceleration)
-        {
-            acceleration.Normalize();
-            acceleration *= maxAcceleration;
-        }
-
-        return acceleration;
+        return maxAcceleration * targetVel;
     }
 
     //Look in the diestion you are going
@@ -65,6 +67,13 @@ public class Player : MonoBehaviour
     private void Steer(Vector3 linearAcceleration)
     {
         rb.velocity += linearAcceleration * Time.deltaTime;
+
+        Debug.Log(rb.velocity.magnitude);
+        if (rb.velocity.magnitude > maxVelocity)
+        {
+            rb.velocity.Normalize();
+            rb.velocity *= maxVelocity;
+        }
     }
 
     //Align to a target
@@ -75,5 +84,26 @@ public class Player : MonoBehaviour
         float rotation = Mathf.LerpAngle(transform.rotation.eulerAngles.y, toRotation, Time.deltaTime * turnSpeed * 2);
 
         return Quaternion.Euler(0, rotation, 0);
+    }
+
+    //Move towards a point
+    private void MoveTowards(Vector3 location)
+    {
+        transform.position = Vector3.MoveTowards(transform.position, location, kinematicSpeed * Time.deltaTime);
+    }
+
+    public bool Rotate(Vector3 location)
+    {
+        Quaternion prevRotation = transform.rotation;
+
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, 
+            Quaternion.LookRotation(location - transform.localPosition),
+            turnSpeed * Time.deltaTime);
+
+        if (transform.rotation == prevRotation)
+        {
+            return true;
+        }
+        return false;
     }
 }

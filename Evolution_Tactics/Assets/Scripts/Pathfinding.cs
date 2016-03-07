@@ -46,6 +46,7 @@ public class Pathfinding : MonoBehaviour
         {
             bool tileCollision = false;
 
+            //player.KinematicMovement(pathList[counter].transform.position);
             player.ArriveAndLookWhereYoureGoing(pathList[counter].transform.position);
 
             //Check for tile collision
