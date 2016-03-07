@@ -4,6 +4,8 @@ using System.Collections;
 public class Player : MonoBehaviour
 {
     private Rigidbody rb;
+    private Animator animator;
+
     public float targetRadius;
     public float slowRadius;
     public float timeToTarget;
@@ -13,14 +15,19 @@ public class Player : MonoBehaviour
     public float turnSpeed;
     public float kinematicSpeed;
 
-    void Start()
+    void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        animator = GetComponent<Animator>();
+    }
+
+    void Start()
+    {
     }
 
     void Update()
     {
-	
+        animator.SetFloat("Walk", rb.velocity.magnitude);
     }
 
     public void KinematicMovement(Vector3 target)
