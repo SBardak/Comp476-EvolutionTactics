@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Tile_Selector : Selector {
+public class Tile_Selector : Selector
+{
 
     private Tile _myTile;
     private Pathfinding _pathFinder;
@@ -18,15 +19,15 @@ public class Tile_Selector : Selector {
         // No selected units
 
         // Selected unit
-            // Reachable terrain
+        // Reachable terrain
         {
             if (_pathFinder == null)
                 _pathFinder = GameObject.Find("PathFinding").GetComponent<Pathfinding>();
-            _pathFinder.endNode = _myTile;
-            _pathFinder.PathFind();
+            _pathFinder._endNode = _myTile;
+            _pathFinder.CalculateNewPath();
         }
 
-            // Unreachable terrain (further than walkable)
+        // Unreachable terrain (further than walkable)
     }
 
     protected override void OnMouseOver()

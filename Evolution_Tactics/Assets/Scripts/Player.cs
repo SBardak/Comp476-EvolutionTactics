@@ -75,7 +75,6 @@ public class Player : MonoBehaviour
     {
         rb.velocity += linearAcceleration * Time.deltaTime;
 
-        Debug.Log(rb.velocity.magnitude);
         if (rb.velocity.magnitude > maxVelocity)
         {
             rb.velocity.Normalize();
