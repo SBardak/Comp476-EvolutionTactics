@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 public class Pathfinding : MonoBehaviour
 {
-    public Tile startNode, endNode;
+    public Tile startNode, _endNode;
 
     public List<Tile> nodeList = new List<Tile>();
     public List<Tile> pathList = new List<Tile>();
@@ -30,25 +30,18 @@ public class Pathfinding : MonoBehaviour
         // TODO REMOVED
         //Randomize start and end nodes and place player at start
         startNode = nodeList[Random.Range(0, nodeList.Count - 1)];
-        endNode = nodeList[Random.Range(0, nodeList.Count - 1)];
+        _endNode = nodeList[Random.Range(0, nodeList.Count - 1)];
         player.transform.position = new Vector3(startNode.transform.position.x, player.transform.position.y, startNode.transform.position.z);
         startNode.GetComponent<Renderer>().material.color = Color.green;
-        endNode.GetComponent<Renderer>().material.color = Color.red;
+        _endNode.GetComponent<Renderer>().material.color = Color.red;
 
-        ClearLists();
-        CalculateNewPath();
-    }
-
-    public void PathFind()
-    {
-        ClearLists();
         CalculateNewPath();
     }
 
     void Update()
     {
         // if path has been calculated
-        if (!goalAttained && pathList.Count > counter && endNode == pathList[pathList.Count - 1])
+        if (!goalAttained && pathList.Count > counter && _endNode == pathList[pathList.Count - 1])
         {
             bool tileCollision = false;
 
@@ -60,7 +53,7 @@ public class Pathfinding : MonoBehaviour
             for (int i = 0; i < collisionArray.Length; i++)
             {          
                 // Check if arrived
-                if (collisionArray[i].GetComponent(typeof(Tile)) == endNode)
+                if (collisionArray[i].GetComponent(typeof(Tile)) == _endNode)
                 {
                     goalAttained = true;
                 }
@@ -82,11 +75,9 @@ public class Pathfinding : MonoBehaviour
     }
 
     // Calculate a new path with dijkstra algorithm
-    private void CalculateNewPath()
+    public void CalculateNewPath()
     {
-        openList.Clear();
-        closedList.Clear();
-        pathList.Clear();
+        ClearLists();
 
         counter = 0;
         startNode = nodeList[0];
@@ -170,7 +161,7 @@ public class Pathfinding : MonoBehaviour
 
         }
 
-        pathList.Add(endNode);
+        pathList.Add(_endNode);
         while (true)
         {
 
