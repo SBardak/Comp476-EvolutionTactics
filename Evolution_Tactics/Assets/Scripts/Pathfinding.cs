@@ -39,6 +39,12 @@ public class Pathfinding : MonoBehaviour
         CalculateNewPath();
     }
 
+    public void PathFind()
+    {
+        ClearLists();
+        CalculateNewPath();
+    }
+
     void Update()
     {
         // if path has been calculated
