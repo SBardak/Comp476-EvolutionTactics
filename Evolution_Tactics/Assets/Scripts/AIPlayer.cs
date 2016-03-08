@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class AIPlayer : GamePlayer {
+public class AIPlayer : Player {
     public override void StartTurn()
     {
         // Reactivate all units

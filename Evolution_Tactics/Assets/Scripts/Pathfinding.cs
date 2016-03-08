@@ -14,7 +14,7 @@ public class Pathfinding : MonoBehaviour
     public List<Tile> openList = new List<Tile>();
     public List<Tile> closedList = new List<Tile>();
 
-    public Player player;
+    public Character player;
     public int counter = 0;
     public bool goalAttained = false;
 

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class HumanPlayer : GamePlayer {
+public class HumanPlayer : Player {
     public override void StartTurn()
     {
         // Reactivate all units

@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour {
     public int CurrentPlayer = 0;
     public static GameManager Instance;
 
-    public List<GamePlayer> _players;
+    public List<Player> _players;
 
     void Awake()
     {
@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviour {
 
     void GeneratePlayers()
     {
-        _players = new List<GamePlayer>();
+        _players = new List<Player>();
         StartTurn();
     }
 }
