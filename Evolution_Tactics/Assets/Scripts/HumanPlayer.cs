@@ -14,6 +14,12 @@ public class HumanPlayer : Player {
     void Update()
     {
         if (Input.GetKeyDown("e"))
-            GameManager.Instance.NextTurn();
+            EndTurn();
+    }
+
+    void EndTurn()
+    {
+        Debug.Log("Human end turn");
+        GameManager.Instance.NextTurn();
     }
 }

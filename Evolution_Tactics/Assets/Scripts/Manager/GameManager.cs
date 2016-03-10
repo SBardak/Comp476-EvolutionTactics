@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour {
     public int CurrentPlayer = 0;
     public static GameManager Instance;
 
-    public List<Player> _players;
+    public Player[] _players;
 
     void Awake()
     {
@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour {
 	
     public void NextTurn()
     {
-        CurrentPlayer = CurrentPlayer >= _players.Count - 1 ? 0 : ++CurrentPlayer;
+        CurrentPlayer = CurrentPlayer >= _players.Length - 1 ? 0 : ++CurrentPlayer;
         StartTurn();
     }
 
@@ -30,7 +30,11 @@ public class GameManager : MonoBehaviour {
 
     void GeneratePlayers()
     {
-        _players = new List<Player>();
+        //_players = new List<Player>();
+
+        //_players.Add(new HumanPlayer());
+        //_players.Add(new AIPlayer());
+
         StartTurn();
     }
 }
