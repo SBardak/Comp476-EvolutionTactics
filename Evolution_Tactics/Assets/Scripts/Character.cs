@@ -32,8 +32,8 @@ public class Character : MonoBehaviour
 
     public void KinematicMovement(Vector3 target)
     {
-        MoveTowards(target);
         Rotate(target);
+        MoveTowards(target);
     }
 
     // Arrive to target and Look Where You're going
@@ -75,7 +75,6 @@ public class Character : MonoBehaviour
     {
         rb.velocity += linearAcceleration * Time.deltaTime;
 
-        Debug.Log(rb.velocity.magnitude);
         if (rb.velocity.magnitude > maxVelocity)
         {
             rb.velocity.Normalize();
@@ -94,9 +93,17 @@ public class Character : MonoBehaviour
     }
 
     //Move towards a point
-    private void MoveTowards(Vector3 location)
+    private void MoveTowards(Vector3 target)
     {
-        transform.position = Vector3.MoveTowards(transform.position, location, kinematicSpeed * Time.deltaTime);
+        Vector3 velocity = KinematicSeek(target);
+        transform.position += velocity * Time.deltaTime;
+    }
+
+    private Vector3 KinematicSeek(Vector3 target)
+    {
+        Vector3 direction = target - transform.position;
+        direction.Normalize();
+        return maxVelocity * direction;
     }
 
     public bool Rotate(Vector3 location)
@@ -104,7 +111,7 @@ public class Character : MonoBehaviour
         Quaternion prevRotation = transform.rotation;
 
         transform.rotation = Quaternion.RotateTowards(transform.rotation, 
-            Quaternion.LookRotation(location - transform.localPosition),
+            Quaternion.LookRotation(location - transform.position),
             turnSpeed * Time.deltaTime);
 
         if (transform.rotation == prevRotation)

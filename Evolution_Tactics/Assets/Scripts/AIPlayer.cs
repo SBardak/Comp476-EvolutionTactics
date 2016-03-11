@@ -15,10 +15,13 @@ using System.Collections.Generic;
 /// Once completed, it lets the game manager know that it completed its
 /// turn.
 /// </summary>
-public class AIPlayer : Player {
+public class AIPlayer : Player
+{
     [SerializeField]
     Squad[] _squads;
     int _selectedSquad = 0;
+
+    bool _isPlaying;
 
     void Start()
     { 
@@ -32,12 +35,15 @@ public class AIPlayer : Player {
     /// </summary>
     public override void StartTurn()
     {
+        Debug.Log("Ai Start turn");
         // This shouldn't happen
         if (_squads.Length == 0)
         {
             EndTurn();
             return;
         }
+
+        _isPlaying = true;
 
         // Reactivate all units
         foreach (var s in _squads)
@@ -87,6 +93,7 @@ public class AIPlayer : Player {
     void EndTurn()
     {
         Debug.Log("AI finished turn");
+        _isPlaying = false;
         GameManager.Instance.NextTurn();
     }
 
@@ -105,4 +112,12 @@ public class AIPlayer : Player {
 
     //    //GameManager.Instance.NextTurn();
     //}
+
+    public bool IsPlaying
+    {
+        get
+        {
+            return _isPlaying;
+        }
+    }
 }

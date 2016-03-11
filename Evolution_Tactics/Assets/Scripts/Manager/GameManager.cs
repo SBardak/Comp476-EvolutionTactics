@@ -2,25 +2,30 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class GameManager : MonoBehaviour {
+public class GameManager : MonoBehaviour
+{
     public int CurrentPlayer = 0;
     public static GameManager Instance;
 
     public Player[] _players;
+    private UIManager _uiManager;
 
     void Awake()
     {
         GameManager.Instance = this;
+        _uiManager = GameObject.Find("UIManager").GetComponent<UIManager>();
     }
 
-	void Start () {
+    void Start()
+    {
         GeneratePlayers();
-	}
-	
+    }
+
     public void NextTurn()
     {
         CurrentPlayer = CurrentPlayer >= _players.Length - 1 ? 0 : ++CurrentPlayer;
         StartTurn();
+        _uiManager.ActivateUI();
     }
 
     void StartTurn()
