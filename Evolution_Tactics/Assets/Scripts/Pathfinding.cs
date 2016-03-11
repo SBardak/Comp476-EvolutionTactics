@@ -14,7 +14,7 @@ public class Pathfinding : MonoBehaviour
     public List<Tile> openList = new List<Tile>();
     public List<Tile> closedList = new List<Tile>();
 
-    public Character player;
+    private Character player;
     public int counter = 0;
     public bool goalAttained = false;
 
@@ -22,6 +22,8 @@ public class Pathfinding : MonoBehaviour
     {
         // Find all tiles and add them to the global list
         GameObject[] node = GameObject.FindGameObjectsWithTag("Tile");
+        player = GetComponentInParent<Character>();
+
         foreach (GameObject n in node)
         {
             nodeList.Add(n.GetComponent<Tile>());
@@ -41,36 +43,40 @@ public class Pathfinding : MonoBehaviour
     void Update()
     {
         // if path has been calculated
-        if (!goalAttained && pathList.Count > counter && _endNode == pathList[pathList.Count - 1])
+        if (!goalAttained)
         {
-            bool tileCollision = false;
-
-            //player.KinematicMovement(pathList[counter].transform.position);
-            player.ArriveAndLookWhereYoureGoing(pathList[counter].transform.position);
-
-            //Check for tile collision
-            Collider[] collisionArray = Physics.OverlapSphere(player.transform.position, 0.3f);
-            for (int i = 0; i < collisionArray.Length; i++)
-            {          
-                // Check if arrived
-                if (collisionArray[i].GetComponent(typeof(Tile)) == _endNode)
-                {
-                    goalAttained = true;
-                }
-                else if (collisionArray[i].GetComponent(typeof(Tile)) == pathList[counter])
-                {
-                    tileCollision = true;
-                }
-            }
-
-            if (goalAttained || tileCollision)
+            if (pathList.Count > counter && _endNode == pathList[pathList.Count - 1])
             {
-                counter++;
+                bool tileCollision = false;
+
+                //player.KinematicMovement(pathList[counter].transform.position);
+                player.ArriveAndLookWhereYoureGoing(pathList[counter].transform.position);
+
+                //Check for tile collision
+                Collider[] collisionArray = Physics.OverlapSphere(player.transform.position, 0.3f);
+                for (int i = 0; i < collisionArray.Length; i++)
+                {          
+                    // Check if arrived
+                    if (collisionArray[i].GetComponent(typeof(Tile)) == _endNode)
+                    {
+                        GoalAttained = true;
+                    }
+                    else if (collisionArray[i].GetComponent(typeof(Tile)) == pathList[counter])
+                    {
+                        tileCollision = true;
+                        player.SetCurrentTile(pathList[counter]);
+                    }
+                }
+
+                if (goalAttained || tileCollision)
+                {
+                    counter++;
+                }
             }
-        }
-        else
-        {
-            CalculateNewPath();
+            else
+            {
+                CalculateNewPath();
+            }
         }
     }
 
@@ -191,12 +197,26 @@ public class Pathfinding : MonoBehaviour
         openList.Clear();
         closedList.Clear();
         pathList.Clear();
+        GoalAttained = false;
 
         foreach (Tile node in nodeList)
         {
             node.costSoFar = 0;
             node.totalEstimatedValue = 0;
             node.heuristicValue = 0;
+        }
+    }
+
+    public bool GoalAttained
+    {
+        set
+        {
+            Debug.Log(value);
+            if (value)
+                GameObject.Find("UIManager").GetComponent<UIManager>().CreateHumanPlayerActionUI(player);
+            else
+                GameObject.Find("UIManager").GetComponent<UIManager>().DeleteHumanPlayerActionUI();
+            goalAttained = value;
         }
     }
 }

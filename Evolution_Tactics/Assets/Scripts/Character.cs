@@ -3,22 +3,28 @@ using System.Collections;
 
 public class Character : MonoBehaviour
 {
-    private Rigidbody rb;
-    private Animator animator;
+    private Rigidbody _rb;
+    private Animator _animator;
 
-    public float targetRadius;
-    public float slowRadius;
-    public float timeToTarget;
-    public float maxAcceleration;
-    public float maxVelocity;
+    public float _targetRadius;
+    public float _slowRadius;
+    public float _timeToTarget;
+    public float _maxAcceleration;
+    public float _maxVelocity;
 
-    public float turnSpeed;
-    public float kinematicSpeed;
+    public float _turnSpeed;
+    public float _kinematicSpeed;
+
+    public Tile _currentTile;
+    public bool _isTravelling;
+
+    private UIManager _uiManager;
 
     void Awake()
     {
-        rb = GetComponent<Rigidbody>();
-        animator = GetComponent<Animator>();
+        _rb = GetComponent<Rigidbody>();
+        _animator = GetComponent<Animator>();
+        _uiManager = GameObject.Find("UIManager").GetComponent<UIManager>();
     }
 
     void Start()
@@ -27,7 +33,7 @@ public class Character : MonoBehaviour
 
     void Update()
     {
-        animator.SetFloat("Walk", rb.velocity.magnitude);
+        _animator.SetFloat("Walk", _rb.velocity.magnitude);
     }
 
     public void KinematicMovement(Vector3 target)
@@ -50,21 +56,21 @@ public class Character : MonoBehaviour
         Vector3 targetVel = target - transform.position;
 
         // if close enough to target
-        if (targetVel.magnitude < targetRadius)
+        if (targetVel.magnitude < _targetRadius)
         {
-            rb.velocity = Vector2.zero;
+            _rb.velocity = Vector2.zero;
             return Vector2.zero;
         }
 
         targetVel.Normalize();
 
-        return maxAcceleration * targetVel;
+        return _maxAcceleration * targetVel;
     }
 
     //Look in the diestion you are going
     private void LookWhereYoureGoing()
     {
-        Vector3 direction = rb.velocity;
+        Vector3 direction = _rb.velocity;
         direction.Normalize();
         // Align
         transform.rotation = Align(direction);
@@ -73,12 +79,12 @@ public class Character : MonoBehaviour
     // Steer given an acceleration
     private void Steer(Vector3 linearAcceleration)
     {
-        rb.velocity += linearAcceleration * Time.deltaTime;
+        _rb.velocity += linearAcceleration * Time.deltaTime;
 
-        if (rb.velocity.magnitude > maxVelocity)
+        if (_rb.velocity.magnitude > _maxVelocity)
         {
-            rb.velocity.Normalize();
-            rb.velocity *= maxVelocity;
+            _rb.velocity.Normalize();
+            _rb.velocity *= _maxVelocity;
         }
     }
 
@@ -87,7 +93,7 @@ public class Character : MonoBehaviour
     {
         float toRotation = (Mathf.Atan2(target.x, target.z) * Mathf.Rad2Deg);
         // rotate along y axis
-        float rotation = Mathf.LerpAngle(transform.rotation.eulerAngles.y, toRotation, Time.deltaTime * turnSpeed * 2);
+        float rotation = Mathf.LerpAngle(transform.rotation.eulerAngles.y, toRotation, Time.deltaTime * _turnSpeed * 2);
 
         return Quaternion.Euler(0, rotation, 0);
     }
@@ -103,7 +109,7 @@ public class Character : MonoBehaviour
     {
         Vector3 direction = target - transform.position;
         direction.Normalize();
-        return maxVelocity * direction;
+        return _maxVelocity * direction;
     }
 
     public bool Rotate(Vector3 location)
@@ -112,7 +118,7 @@ public class Character : MonoBehaviour
 
         transform.rotation = Quaternion.RotateTowards(transform.rotation, 
             Quaternion.LookRotation(location - transform.position),
-            turnSpeed * Time.deltaTime);
+            _turnSpeed * Time.deltaTime);
 
         if (transform.rotation == prevRotation)
         {
@@ -120,4 +126,27 @@ public class Character : MonoBehaviour
         }
         return false;
     }
+
+    public bool HasEnemyNeighbours()
+    {
+        foreach (Tile neighbour in _currentTile.neighbours)
+        {
+            Character neighbourCharacter = neighbour.player;
+            if (neighbourCharacter != null && neighbourCharacter.tag == "AI")
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void SetCurrentTile(Tile tile)
+    {
+        if (_currentTile != null)
+            _currentTile.player = null;
+        
+        tile.player = this;
+        _currentTile = tile;
+    }
+
 }

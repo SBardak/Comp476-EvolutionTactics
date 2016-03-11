@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 public class Tile : MonoBehaviour
 {
-    public GameObject player;
+    public Character player;
 
     public List<Tile> neighbours;
     public float costSoFar, heuristicValue, totalEstimatedValue;
