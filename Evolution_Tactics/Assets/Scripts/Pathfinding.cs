@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 public class Pathfinding : MonoBehaviour
 {
-    public Tile startNode, _endNode;
+    public Tile _startNode, _endNode;
 
     public List<Tile> nodeList = new List<Tile>();
     public List<Tile> pathList = new List<Tile>();
@@ -31,10 +31,11 @@ public class Pathfinding : MonoBehaviour
 
         // TODO REMOVED
         //Randomize start and end nodes and place player at start
-        startNode = nodeList[Random.Range(0, nodeList.Count - 1)];
+        _startNode = nodeList[Random.Range(0, nodeList.Count - 1)];
         _endNode = nodeList[Random.Range(0, nodeList.Count - 1)];
-        player.transform.position = new Vector3(startNode.transform.position.x, player.transform.position.y, startNode.transform.position.z);
-        startNode.GetComponent<Renderer>().material.color = Color.green;
+
+        player.transform.position = new Vector3(_startNode.transform.position.x, player.transform.position.y, _startNode.transform.position.z);
+        _startNode.GetComponent<Renderer>().material.color = Color.green;
         _endNode.GetComponent<Renderer>().material.color = Color.red;
 
         CalculateNewPath();
@@ -86,14 +87,14 @@ public class Pathfinding : MonoBehaviour
         ClearLists();
 
         counter = 0;
-        startNode = nodeList[0];
-        startNode.costSoFar = 0;
+        _startNode = nodeList[0];
+        _startNode.costSoFar = 0;
 
         foreach (Tile n in nodeList)
         {
-            if (Cost(player.transform.position, n.transform.position) < Cost(player.transform.position, startNode.transform.position))
+            if (Cost(player.transform.position, n.transform.position) < Cost(player.transform.position, _startNode.transform.position))
             {
-                startNode = n;
+                _startNode = n;
             }
         }
 
@@ -103,7 +104,7 @@ public class Pathfinding : MonoBehaviour
     // Dijsktra pathfinding algorithm
     private void DijkstraPathfinding()
     {
-        openList.Add(startNode);
+        openList.Add(_startNode);
 
         //while open list is open or closed list does not include all nodes
         while (openList.Count > 0 || closedList.Count != nodeList.Count)
@@ -171,7 +172,7 @@ public class Pathfinding : MonoBehaviour
         while (true)
         {
 
-            if (pathList[pathList.Count - 1].prevNode == startNode)
+            if (pathList[pathList.Count - 1].prevNode == _startNode)
             {
                 pathList.Add(pathList[pathList.Count - 1].prevNode);
                 pathList.Reverse();
@@ -211,11 +212,13 @@ public class Pathfinding : MonoBehaviour
     {
         set
         {
-            Debug.Log(value);
-            if (value)
-                GameObject.Find("UIManager").GetComponent<UIManager>().CreateHumanPlayerActionUI(player);
-            else
-                GameObject.Find("UIManager").GetComponent<UIManager>().DeleteHumanPlayerActionUI();
+            if (transform.parent.tag == "Human")
+            {
+                if (value)
+                    GameObject.Find("UIManager").GetComponent<UIManager>().CreateHumanPlayerActionUI(player);
+                else
+                    GameObject.Find("UIManager").GetComponent<UIManager>().DeleteHumanPlayerActionUI();
+            }
             goalAttained = value;
         }
     }

@@ -51,6 +51,7 @@ public class UIManager : MonoBehaviour
     {
         if (buttonList == null)
         {
+            int yPosition = 0;
             buttonList = new List<Button>();
             Transform canvas = GameObject.Find("Canvas").transform;
 
@@ -58,12 +59,14 @@ public class UIManager : MonoBehaviour
             {
                 Button actionButton = Instantiate(_attackButton, new Vector3(0, 0, 0), Quaternion.identity) as Button;
                 actionButton.transform.SetParent(canvas);
+                actionButton.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, yPosition, 0);
+                yPosition -= 30;
                 buttonList.Add(actionButton);
             }
 
             Button waitButton = Instantiate(_waitButton, new Vector3(0, 0, 0), Quaternion.identity) as Button;
             waitButton.transform.SetParent(canvas);
-            waitButton.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, 0, 0);
+            waitButton.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, yPosition, 0);
             buttonList.Add(waitButton);
         }
     }
