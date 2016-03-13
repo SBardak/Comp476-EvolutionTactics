@@ -38,6 +38,7 @@ public class HumanPlayer : Player
         // For now, deactivate
         FinishCharacterMove();
     }
+
     /// <summary>
     /// Finish the active character's move
     /// Call from UI or after attacking ?
@@ -107,6 +108,7 @@ public class HumanPlayer : Player
     {
         _pickerScript.enabled = true;
     }
+
     /// <summary>
     /// Disables picking
     /// </summary>
