@@ -94,6 +94,19 @@ public class Pathfinding : MonoBehaviour
     // Calculate a new path with dijkstra algorithm
     public void CalculateNewPath()
     {
+        // If player select current node
+        if (_startNode == _endNode)
+        {
+            // might add more behaviour
+            return;
+        }
+        // if player select a non-empty tile
+        if (_endNode.player != null)
+        {
+            Debug.Log("Need to select empty tile");
+            return;
+        }
+        
         ClearLists();
 
         counter = 0;

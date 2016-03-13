@@ -11,6 +11,7 @@ public class Selector : MonoBehaviour
 
     void Start()
     {
+        // _initialColor isn't set because Start is never called
         _initialColor = GetComponent<Renderer>().material.color;
     }
 

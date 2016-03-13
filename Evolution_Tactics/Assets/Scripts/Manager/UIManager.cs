@@ -24,19 +24,20 @@ public class UIManager : MonoBehaviour
 
     public void OnClickEndHumanTurn()
     {
-        _human.EndTurn();
+        GameObject.Find("Human").GetComponent<HumanPlayer>().EndTurn();
     }
 
     public void OnClickEndSelectedCharacterTurn()
     {
         //Only works for one human character for now
         // We should add that it works only with selected character
-
+        Debug.Log("Wait button not yet implemented");
     }
 
-    public void Attack()
+    public void OnClickAttack()
     {
         // Select next nearby enemy to attack
+        Debug.Log("Attack button not yet implemented");
     }
 
     public void ActivateUI()
