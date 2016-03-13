@@ -13,7 +13,8 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         GameManager.Instance = this;
-        _uiManager = GameObject.Find("UIManager").GetComponent<UIManager>();
+        if (GameObject.Find("UIManager") != null)
+            _uiManager = GameObject.Find("UIManager").GetComponent<UIManager>();
     }
 
     void Start()
@@ -23,6 +24,7 @@ public class GameManager : MonoBehaviour
 
     public void NextTurn()
     {
+        Debug.Log("Next Turn");
         CurrentPlayer = CurrentPlayer >= _players.Length - 1 ? 0 : ++CurrentPlayer;
         StartTurn();
         _uiManager.ActivateUI();

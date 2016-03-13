@@ -16,7 +16,6 @@ public class Character : MonoBehaviour
     public float _kinematicSpeed;
 
     public Tile _currentTile;
-    public bool _isTravelling;
 
     private UIManager _uiManager;
 
@@ -24,7 +23,8 @@ public class Character : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody>();
         _animator = GetComponent<Animator>();
-        _uiManager = GameObject.Find("UIManager").GetComponent<UIManager>();
+        if (GameObject.Find("UIManager") != null)
+            _uiManager = GameObject.Find("UIManager").GetComponent<UIManager>();
     }
 
     void Start()

@@ -22,7 +22,10 @@ public class Tile_Selector : Selector
         // Reachable terrain
         {
             if (_pathFinder == null)
-                _pathFinder = GameObject.Find("PathFinding").GetComponent<Pathfinding>();
+            {
+                //_pathFinder = GameObject.Find("PathFinding").GetComponent<Pathfinding>();
+                _pathFinder = GameObject.FindGameObjectWithTag("Human").GetComponentInChildren<Pathfinding>();
+            }
             _pathFinder._endNode = _myTile;
             _pathFinder.CalculateNewPath();
         }

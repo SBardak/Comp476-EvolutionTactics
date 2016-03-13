@@ -22,9 +22,21 @@ public class UIManager : MonoBehaviour
     {
     }
 
-    public void OnClickEndTurn()
+    public void OnClickEndHumanTurn()
     {
         _human.EndTurn();
+    }
+
+    public void OnClickEndSelectedCharacterTurn()
+    {
+        //Only works for one human character for now
+        // We should add that it works only with selected character
+
+    }
+
+    public void Attack()
+    {
+        // Select next nearby enemy to attack
     }
 
     public void ActivateUI()
@@ -77,7 +89,7 @@ public class UIManager : MonoBehaviour
         {
             foreach (Button b in buttonList)
             {
-                Destroy(b);
+                Destroy(b.gameObject);
             }
         }
         buttonList = null;

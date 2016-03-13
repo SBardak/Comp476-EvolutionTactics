@@ -17,6 +17,7 @@ public class Pathfinding : MonoBehaviour
     private Character player;
     public int counter = 0;
     public bool goalAttained = false;
+    public bool hasPath = false;
 
     void Start()
     {
@@ -31,20 +32,20 @@ public class Pathfinding : MonoBehaviour
 
         // TODO REMOVED
         //Randomize start and end nodes and place player at start
-        _startNode = nodeList[Random.Range(0, nodeList.Count - 1)];
-        _endNode = nodeList[Random.Range(0, nodeList.Count - 1)];
+        StartNode = nodeList[Random.Range(0, nodeList.Count - 1)];
+        //_endNode = nodeList[Random.Range(0, nodeList.Count - 1)];
 
         player.transform.position = new Vector3(_startNode.transform.position.x, player.transform.position.y, _startNode.transform.position.z);
-        _startNode.GetComponent<Renderer>().material.color = Color.green;
-        _endNode.GetComponent<Renderer>().material.color = Color.red;
+        // _startNode.GetComponent<Renderer>().material.color = Color.green;
+        //_endNode.GetComponent<Renderer>().material.color = Color.red;
 
-        CalculateNewPath();
+        //CalculateNewPath();
     }
 
     void Update()
     {
         // if path has been calculated
-        if (!goalAttained)
+        if (!goalAttained && hasPath)
         {
             if (pathList.Count > counter && _endNode == pathList[pathList.Count - 1])
             {
@@ -61,12 +62,13 @@ public class Pathfinding : MonoBehaviour
                     if (collisionArray[i].GetComponent(typeof(Tile)) == _endNode)
                     {
                         GoalAttained = true;
+                        hasPath = false;
                     }
                     else if (collisionArray[i].GetComponent(typeof(Tile)) == pathList[counter])
                     {
                         tileCollision = true;
-                        player.SetCurrentTile(pathList[counter]);
                     }
+                    player.SetCurrentTile(pathList[counter]);
                 }
 
                 if (goalAttained || tileCollision)
@@ -81,20 +83,28 @@ public class Pathfinding : MonoBehaviour
         }
     }
 
+    public void RandomPath()
+    {
+        StartNode = player._currentTile;
+        _endNode = nodeList[Random.Range(0, nodeList.Count - 1)];
+
+        CalculateNewPath();
+    }
+
     // Calculate a new path with dijkstra algorithm
     public void CalculateNewPath()
     {
         ClearLists();
 
         counter = 0;
-        _startNode = nodeList[0];
+        StartNode = nodeList[0];
         _startNode.costSoFar = 0;
 
         foreach (Tile n in nodeList)
         {
             if (Cost(player.transform.position, n.transform.position) < Cost(player.transform.position, _startNode.transform.position))
             {
-                _startNode = n;
+                StartNode = n;
             }
         }
 
@@ -199,6 +209,7 @@ public class Pathfinding : MonoBehaviour
         closedList.Clear();
         pathList.Clear();
         GoalAttained = false;
+        hasPath = true;
 
         foreach (Tile node in nodeList)
         {
@@ -212,7 +223,7 @@ public class Pathfinding : MonoBehaviour
     {
         set
         {
-            if (transform.parent.tag == "Human")
+            if (transform.tag == "Human")
             {
                 if (value)
                     GameObject.Find("UIManager").GetComponent<UIManager>().CreateHumanPlayerActionUI(player);
@@ -220,6 +231,19 @@ public class Pathfinding : MonoBehaviour
                     GameObject.Find("UIManager").GetComponent<UIManager>().DeleteHumanPlayerActionUI();
             }
             goalAttained = value;
+        }
+        get
+        {
+            return goalAttained;
+        }
+    }
+
+    public Tile StartNode
+    {
+        set
+        {
+            player.SetCurrentTile(value);
+            _startNode = value;
         }
     }
 }

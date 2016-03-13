@@ -36,4 +36,5 @@ public class HumanPlayer : Player
             return _isPlaying;
         }
     }
+
 }
