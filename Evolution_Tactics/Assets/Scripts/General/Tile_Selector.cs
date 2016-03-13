@@ -16,21 +16,16 @@ public class Tile_Selector : Selector
     {
         /* Couple of scenarios */
 
-        // No selected units
-
-        // Selected unit
-        // Reachable terrain
+        // Not a human player's turn
+        var player = GameManager.Instance.GetActivePlayer();
+        if (!(player is HumanPlayer))
         {
-            if (_pathFinder == null)
-            {
-                //_pathFinder = GameObject.Find("PathFinding").GetComponent<Pathfinding>();
-                _pathFinder = GameObject.FindGameObjectWithTag("Human").GetComponentInChildren<Pathfinding>();
-            }
-            _pathFinder._endNode = _myTile;
-            _pathFinder.CalculateNewPath();
+            Debug.Log("Not human");
+            return;
         }
+        var human = (HumanPlayer)player;
 
-        // Unreachable terrain (further than walkable)
+        human.HandleSelection(_myTile);
     }
 
     protected override void OnMouseOver()

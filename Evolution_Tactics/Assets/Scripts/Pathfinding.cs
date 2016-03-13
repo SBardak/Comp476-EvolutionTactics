@@ -7,6 +7,9 @@ using System.Collections.Generic;
 
 public class Pathfinding : MonoBehaviour
 {
+    public delegate void PathFindingHandler();
+    public event PathFindingHandler OnReachEnd;
+
     public Tile _startNode, _endNode;
 
     public List<Tile> nodeList = new List<Tile>();
@@ -20,6 +23,11 @@ public class Pathfinding : MonoBehaviour
     public bool hasPath = false;
 
     void Start()
+    {
+        Graph();
+    }
+
+    void Graph()
     {
         // Find all tiles and add them to the global list
         GameObject[] node = GameObject.FindGameObjectsWithTag("Tile");
@@ -44,6 +52,13 @@ public class Pathfinding : MonoBehaviour
 
     void Update()
     {
+        // TODO: Change
+        if (nodeList.Count == 0)
+        {
+            Debug.LogError("REMOVE ME. PROBLEM: Start comes too soon, tiles not generated");
+            Graph();
+        }
+
         // if path has been calculated
         if (!goalAttained && hasPath)
         {
@@ -61,8 +76,13 @@ public class Pathfinding : MonoBehaviour
                     // Check if arrived
                     if (collisionArray[i].GetComponent(typeof(Tile)) == _endNode)
                     {
+                        // TODO: Walk towards center of tile
+
                         GoalAttained = true;
                         hasPath = false;
+
+                        if (OnReachEnd != null)
+                            OnReachEnd();
                     }
                     else if (collisionArray[i].GetComponent(typeof(Tile)) == pathList[counter])
                     {
@@ -239,9 +259,9 @@ public class Pathfinding : MonoBehaviour
             if (transform.tag == "Human")
             {
                 if (value)
-                    GameObject.Find("UIManager").GetComponent<UIManager>().CreateHumanPlayerActionUI(player);
+                    UIManager.Instance.CreateHumanPlayerActionUI(player);
                 else
-                    GameObject.Find("UIManager").GetComponent<UIManager>().DeleteHumanPlayerActionUI();
+                    UIManager.Instance.DeleteHumanPlayerActionUI();
             }
             goalAttained = value;
         }

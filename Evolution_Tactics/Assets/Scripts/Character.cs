@@ -149,4 +149,22 @@ public class Character : MonoBehaviour
         _currentTile = tile;
     }
 
+
+
+    /* ADDED BY FRANCIS. RELOCATE WHEN DONE */
+    public void ResetPosition()
+    {
+        // Maybe?
+    }
+    public void Activate()
+    {
+        IsActivated = true;
+        Moved = false;
+    }
+    public void Deactivate()
+    {
+        IsActivated = false;
+    }
+    public bool Moved;
+    public bool IsActivated;
 }
