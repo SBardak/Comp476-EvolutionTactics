@@ -32,7 +32,12 @@ public class GameManager : MonoBehaviour
 
     void StartTurn()
     {
-        _players[CurrentPlayer].StartTurn();
+        GetActivePlayer().StartTurn();
+    }
+
+    public Player GetActivePlayer()
+    {
+        return _players[CurrentPlayer];
     }
 
     void GeneratePlayers()

@@ -17,6 +17,8 @@ public class TileGenerator : MonoBehaviour
 
     private Tile[,] tiles;
 
+    private GameObject map;
+
     void Awake()
     {
         tiles = new Tile[mapWidth, mapHeight];
@@ -34,11 +36,15 @@ public class TileGenerator : MonoBehaviour
 
     private void CreateMap()
     {
+        map = new GameObject();
+        map.name = "Map";
+
         for (int i = 0; i < mapWidth; i++)
         {
             for (int j = 0; j < mapHeight; j++)
             {
                 tiles[i, j] = Instantiate(tilePrefab, new Vector3(i, 0f, j), Quaternion.identity) as Tile;
+                tiles[i, j].transform.parent = map.transform;
             }
         }
     }

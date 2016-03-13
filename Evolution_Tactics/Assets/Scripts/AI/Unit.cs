@@ -5,7 +5,6 @@ public class Unit : MonoBehaviour
 {
 
     public delegate void MovementCompleteHandler(Unit u);
-
     public event MovementCompleteHandler MovementComplete;
 
     Character _char;
@@ -16,6 +15,7 @@ public class Unit : MonoBehaviour
         if (GetComponent<Pathfinding>() != null)
         {
             _pathfinding = GetComponent < Pathfinding>();
+            _pathfinding.OnReachEnd += ReachedDestination;
         }
         // Link char events to handlers
         // Change names?
@@ -33,7 +33,7 @@ public class Unit : MonoBehaviour
         _pathfinding.RandomPath();
 
         // if (!_char.IsActivated)
-        FinishedMove();
+        //FinishedMove();
 
         // Decide where to move
 

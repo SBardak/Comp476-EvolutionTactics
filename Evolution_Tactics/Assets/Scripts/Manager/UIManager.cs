@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
+    public static UIManager Instance;
+
     private HumanPlayer _human;
     private bool _activateUI = false;
     private GameObject[] _humanUI;
@@ -14,6 +16,8 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
+        Instance = this;
+
         _human = GameObject.Find("Human").GetComponent<HumanPlayer>();
         _humanUI = GameObject.FindGameObjectsWithTag("HumanUI");
     }
