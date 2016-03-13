@@ -3,8 +3,6 @@ using System.Collections;
 
 public class Selector : MonoBehaviour
 {
-    Color _initialColor;
-
     //public delegate void SelectorEventHandler(object sender);
     //public event SelectorEventHandler OnClick;
     //public event SelectorEventHandler OnHover;
@@ -12,7 +10,6 @@ public class Selector : MonoBehaviour
     void Start()
     {
         // _initialColor isn't set because Start is never called
-        _initialColor = GetComponent<Renderer>().material.color;
     }
 
     public virtual void RayHit(int number)
@@ -22,16 +19,14 @@ public class Selector : MonoBehaviour
 
     protected virtual void OnMouseOver()
     {
-        SetColor(Color.red);
     }
 
-    protected void OnMouseExit()
+    protected virtual void OnMouseExit()
     {
-        SetColor(_initialColor);
     }
 
     protected void SetColor(Color c)
     {
-        GetComponent<Renderer>().material.color = c;
+        //GetComponent<Renderer>().material.color = c;
     }
 }

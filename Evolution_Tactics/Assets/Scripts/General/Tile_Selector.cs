@@ -31,6 +31,12 @@ public class Tile_Selector : Selector
     protected override void OnMouseOver()
     {
         Debug.LogWarning("Fire element, +10 evade, etc");
-        base.OnMouseOver();
+
+        _myTile.OnHover();
+        //base.OnMouseOver();
+    }
+    protected override void OnMouseExit()
+    {
+        _myTile.ResetHover();
     }
 }

@@ -7,6 +7,7 @@ public class HumanPlayer : Player
     private bool _isPlaying;
 
     public Character SelectedCharacter;
+    private Tile _selectedTile;
     [SerializeField]
     private Character[] _characters;
 
@@ -43,18 +44,14 @@ public class HumanPlayer : Player
     /// </summary>
     public void FinishCharacterMove()
     {
-        if (SelectedCharacter == null)
-            return;
-
-        SelectedCharacter.Deactivate();
-        SelectedCharacter = null;
+        ClearSelection();
     }
 
     public override void StartTurn()
     {
         EnablePicker();
 
-        SelectedCharacter = null;
+        ClearSelection();
 
         Debug.Log("Human Start turn");
 
@@ -66,6 +63,17 @@ public class HumanPlayer : Player
         _isPlaying = true;
 
         base.StartTurn();
+    }
+
+    void ClearSelection()
+    {
+        if (SelectedCharacter == null)
+            return;
+
+        _selectedTile.ClearMovementUI(SelectedCharacter.GetComponent<MovementRange>().Range);
+        _selectedTile = null;
+        SelectedCharacter.Deactivate();
+        SelectedCharacter = null;
     }
 
     void Update()
@@ -140,6 +148,9 @@ public class HumanPlayer : Player
 
                     // TODO: Notify UI
                     Debug.Log("SELECTED MINE");
+
+                    _selectedTile = t;
+                    _selectedTile.MovementUI(SelectedCharacter.GetComponent<MovementRange>().Range);
                 }
                 // Not mine, check stats?
                 else
@@ -165,6 +176,14 @@ public class HumanPlayer : Player
                 // Check if already moved
                 if (SelectedCharacter.Moved)
                     return;
+
+                // Check movement range
+                // TODO: Change
+                if (!t.IsMovementTile())
+                {
+                    Debug.Log("INVALID MOVE");
+                    return;
+                }
 
                 DisablePicker();
 
