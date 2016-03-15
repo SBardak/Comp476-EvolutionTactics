@@ -137,10 +137,16 @@ public class Pathfinding : MonoBehaviour
     // Calculate a new path with dijkstra algorithm
     public void CalculateNewPath()
     {
+        counter = 0;
+        StartNode = player._currentTile;
+        _startNode.costSoFar = 0;
+
+        
         // If player select current node
         if (_startNode == _endNode)
         {
             // might add more behaviour
+            Debug.Log("SAME TILE");
             return;
         }
         // if player select a non-empty tile
@@ -152,17 +158,13 @@ public class Pathfinding : MonoBehaviour
         
         ResetPath();
 
-        counter = 0;
-        StartNode = nodeList[0];
-        _startNode.costSoFar = 0;
-
-        foreach (Tile n in nodeList)
-        {
-            if (Cost(player.transform.position, n.transform.position) < Cost(player.transform.position, _startNode.transform.position))
-            {
-                StartNode = n;
-            }
-        }
+        //foreach (Tile n in nodeList)
+        //{
+        //    if (Cost(player.transform.position, n.transform.position) < Cost(player.transform.position, _startNode.transform.position))
+        //    {
+        //        StartNode = n;
+        //    }
+        //}
 
         DijkstraPathfinding();
     }

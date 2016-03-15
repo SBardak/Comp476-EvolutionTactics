@@ -45,6 +45,7 @@ public class HumanPlayer : Player
     /// </summary>
     public void FinishCharacterMove()
     {
+        SelectedCharacter.Deactivate();
         ClearSelection();
     }
 
@@ -73,7 +74,6 @@ public class HumanPlayer : Player
 
         _selectedTile.ClearMovementUI(SelectedCharacter.GetComponent<MovementRange>().Range);
         _selectedTile = null;
-        SelectedCharacter.Deactivate();
         SelectedCharacter = null;
     }
 
@@ -81,6 +81,24 @@ public class HumanPlayer : Player
     {
         if (Input.GetKeyDown("e"))
             EndTurn();
+        if (Input.GetMouseButtonDown(1))
+            HandleRightMouse();
+    }
+
+    public void HandleRightMouse()
+    {
+        Debug.Log("Right mouse");
+        if (SelectedCharacter != null)
+        {
+            if (SelectedCharacter.Moved)
+            {
+                // Possibly reset to initial position?   
+            }
+            else
+            {
+                ClearSelection();
+            }
+        }
     }
 
     public void EndTurn()
