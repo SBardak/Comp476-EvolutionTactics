@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Character : MonoBehaviour
 {
-    private Rigidbody _rb;
+    public Rigidbody _rb;
     private Animator _animator;
 
     public float _targetRadius;
@@ -36,10 +36,20 @@ public class Character : MonoBehaviour
         _animator.SetFloat("Walk", _rb.velocity.magnitude);
     }
 
-    public void KinematicMovement(Vector3 target)
+    public void MoveTo(Vector3 location)
     {
+        transform.position = location;  
+    }
+
+    public bool KinematicMovement(Vector3 target)
+    {
+        _rb.velocity = Vector3.zero;
         Rotate(target);
-        MoveTowards(target);
+        if (MoveTowards(target))
+        {
+            return true;
+        }
+        return false;
     }
 
     // Arrive to target and Look Where You're going
@@ -99,10 +109,14 @@ public class Character : MonoBehaviour
     }
 
     //Move towards a point
-    private void MoveTowards(Vector3 target)
+    private bool MoveTowards(Vector3 target)
     {
+        Vector3 oldPosition = transform.position;
+
         Vector3 velocity = KinematicSeek(target);
         transform.position += velocity * Time.deltaTime;
+
+        return Vector3.Distance(transform.position, oldPosition) < 0.1f;
     }
 
     private Vector3 KinematicSeek(Vector3 target)
@@ -116,9 +130,14 @@ public class Character : MonoBehaviour
     {
         Quaternion prevRotation = transform.rotation;
 
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, 
+        /*transform.rotation = Quaternion.RotateTowards(transform.rotation, 
             Quaternion.LookRotation(location - transform.position),
-            _turnSpeed * Time.deltaTime);
+            _turnSpeed * Time.deltaTime);*/
+
+        Vector3 targetDir = location - transform.position;
+        float step = _turnSpeed * Time.deltaTime;
+        Vector3 newDir = Vector3.RotateTowards(transform.forward, targetDir, step, 0.0F);
+        transform.rotation = Quaternion.LookRotation(newDir);
 
         if (transform.rotation == prevRotation)
         {
@@ -154,9 +173,7 @@ public class Character : MonoBehaviour
         }
         
     }
-
-
-
+        
     /* ADDED BY FRANCIS. RELOCATE WHEN DONE */
     public void ResetPosition()
     {

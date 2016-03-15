@@ -71,7 +71,6 @@ public class Pathfinding : MonoBehaviour
                 {
                     bool tileCollision = false;
 
-                    //player.KinematicMovement(pathList[counter].transform.position);
                     player.ArriveAndLookWhereYoureGoing(pathList[counter].transform.position);
 
                     //Check for tile collision
@@ -84,7 +83,6 @@ public class Pathfinding : MonoBehaviour
                             // TODO: Walk towards center of tile
 
                             GoalAttained = true;
-                            _hasPath = false;
 
                             if (OnReachEnd != null)
                                 OnReachEnd();
@@ -109,11 +107,10 @@ public class Pathfinding : MonoBehaviour
             // if not in the middle of the end node
             else if (!_middleOfTheNodeAttained)
             {
-                Debug.Log("Bonjour");
                 if (GoToMiddleOfTile())
                 {
                     _middleOfTheNodeAttained = true;
-                    Debug.Log("Allo");
+                    _hasPath = false;
                 }
             }
         }
@@ -122,8 +119,9 @@ public class Pathfinding : MonoBehaviour
     private bool GoToMiddleOfTile()
     {
         Vector3 oldPosition = transform.position;
+        player._rb.velocity = Vector3.zero;
 
-        transform.position = Vector3.MoveTowards(transform.position, _endNode.transform.position, 2 * Time.deltaTime);
+        transform.position = Vector3.MoveTowards(transform.position, _endNode.transform.position, Time.deltaTime);
 
         return oldPosition == transform.position;
     }
