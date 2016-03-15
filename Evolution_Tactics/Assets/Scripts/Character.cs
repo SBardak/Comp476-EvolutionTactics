@@ -93,7 +93,7 @@ public class Character : MonoBehaviour
     {
         float toRotation = (Mathf.Atan2(target.x, target.z) * Mathf.Rad2Deg);
         // rotate along y axis
-        float rotation = Mathf.LerpAngle(transform.rotation.eulerAngles.y, toRotation, Time.deltaTime * _turnSpeed * 2);
+        float rotation = Mathf.LerpAngle(transform.rotation.eulerAngles.y, toRotation, Time.deltaTime * _turnSpeed * 40);
 
         return Quaternion.Euler(0, rotation, 0);
     }
@@ -131,7 +131,7 @@ public class Character : MonoBehaviour
     {
         foreach (Tile neighbour in _currentTile.neighbours)
         {
-            Character neighbourCharacter = neighbour.player;
+            Character neighbourCharacter = neighbour._player;
             if (neighbourCharacter != null && neighbourCharacter.tag == "AI")
             {
                 return true;
@@ -143,10 +143,16 @@ public class Character : MonoBehaviour
     public void SetCurrentTile(Tile tile)
     {
         if (_currentTile != null)
-            _currentTile.player = null;
+        {
+            _currentTile._player = null;
+        }
+
+        if (tile._player == null)
+        {
+            tile._player = this;
+            _currentTile = tile;
+        }
         
-        tile.player = this;
-        _currentTile = tile;
     }
 
 
@@ -156,15 +162,18 @@ public class Character : MonoBehaviour
     {
         // Maybe?
     }
+
     public void Activate()
     {
         IsActivated = true;
         Moved = false;
     }
+
     public void Deactivate()
     {
         IsActivated = false;
     }
+
     public bool Moved;
     public bool IsActivated;
 }

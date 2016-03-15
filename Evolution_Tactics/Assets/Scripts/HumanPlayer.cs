@@ -128,7 +128,7 @@ public class HumanPlayer : Player
         if (SelectedCharacter == null)
         {
             // Nothing on tile
-            if (t.player == null)
+            if (t._player == null)
             {
                 // TODO: Something
                 Debug.Log("NO CHARACTER");
@@ -136,17 +136,17 @@ public class HumanPlayer : Player
             else
             {
                 // Check if mine or not
-                if (IsMine(t.player))
+                if (IsMine(t._player))
                 {
                     // Activated?
-                    if (!t.player.IsActivated)
+                    if (!t._player.IsActivated)
                     {
                         Debug.Log("DEACTIVATED");
                         return;
                     }
 
                     // Select
-                    SelectedCharacter = t.player;
+                    SelectedCharacter = t._player;
 
                     // TODO: Notify UI
                     Debug.Log("SELECTED MINE");
@@ -167,7 +167,7 @@ public class HumanPlayer : Player
         {
             // Selected tile contains something
             // TODO: Add more, check for chars only right now
-            if (t.player != null)
+            if (t._player != null)
             {
                 Debug.Log("CONTAINS CHARACTER");
                 return;

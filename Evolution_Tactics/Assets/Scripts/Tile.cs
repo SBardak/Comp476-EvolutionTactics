@@ -10,12 +10,15 @@ using System.Collections.Generic;
   */
 public enum TileDecorationType
 {
-    NORMAL, HOVER, ATTACK, MOVE
+    NORMAL,
+    HOVER,
+    ATTACK,
+    MOVE
 }
 
 public class Tile : MonoBehaviour
 {
-    public Character player;
+    public Character _player;
 
     public List<Tile> neighbours;
     public float costSoFar, heuristicValue, totalEstimatedValue;
@@ -60,6 +63,7 @@ public class Tile : MonoBehaviour
         if (Active != null)
             Active.SetActive(true);
     }
+
     /// <summary>
     /// Is the tile a movement tile?
     /// </summary>
@@ -68,6 +72,7 @@ public class Tile : MonoBehaviour
     {
         return GetDecoration() == TileDecorationType.MOVE;
     }
+
     /// <summary>
     /// Get current tile decoration
     /// </summary>
@@ -142,6 +147,7 @@ public class Tile : MonoBehaviour
         _prevDecoration = _decoration;
         SetDecoration(TileDecorationType.HOVER);
     }
+
     /// <summary>
     /// Resets the hover
     /// </summary>
