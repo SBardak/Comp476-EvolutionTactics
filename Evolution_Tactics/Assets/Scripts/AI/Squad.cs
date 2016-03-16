@@ -14,6 +14,12 @@ public class Squad : MonoBehaviour {
     Unit[] _units;
     int _selectedUnit = 0;
 
+    public void SetControllingPlayer(Player p)
+    {
+        foreach (var u in _units)
+            u.SetControllingPlayer(p);
+    }
+
     void Start()
     {
         // Move this somewhere else probably

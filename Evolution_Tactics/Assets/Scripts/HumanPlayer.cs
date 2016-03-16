@@ -21,6 +21,7 @@ public class HumanPlayer : Player
         foreach (var c in _characters)
         {
             c.GetComponent<Pathfinding>().OnReachEnd += HumanPlayer_OnReachEnd;
+            c.ControllingPlayer = this;
         }
 
         // TODO: Make a hashtable with the characters?
@@ -34,9 +35,7 @@ public class HumanPlayer : Player
         SelectedCharacter.Moved = true;
         EnablePicker();
 
-        // TODO: Remove
-        // For now, deactivate
-        FinishCharacterMove();
+        EndMovement();
     }
 
     /// <summary>
@@ -45,6 +44,9 @@ public class HumanPlayer : Player
     /// </summary>
     public void FinishCharacterMove()
     {
+        isInMovement = false;
+
+        SelectedCharacter.Deactivate();
         ClearSelection();
     }
 
@@ -66,21 +68,28 @@ public class HumanPlayer : Player
         base.StartTurn();
     }
 
-    void ClearSelection()
-    {
-        if (SelectedCharacter == null)
-            return;
-
-        ClearCharacterRange(_selectedTile, SelectedCharacter.GetComponent<MovementRange>().Range);
-        _selectedTile = null;
-        SelectedCharacter.Deactivate();
-        SelectedCharacter = null;
-    }
-
     void Update()
     {
         if (Input.GetKeyDown("e"))
             EndTurn();
+        if (Input.GetMouseButtonDown(1))
+            HandleRightMouse();
+    }
+
+    public void HandleRightMouse()
+    {
+        Debug.Log("Right mouse");
+        if (SelectedCharacter != null)
+        {
+            if (SelectedCharacter.Moved)
+            {
+                // Possibly reset to initial position?   
+            }
+            else
+            {
+                ClearSelection();
+            }
+        }
     }
 
     public void EndTurn()
@@ -117,6 +126,11 @@ public class HumanPlayer : Player
         _pickerScript.enabled = false;
     }
 
+
+
+
+
+    #region Tile stuff
     /// <summary>
     /// Handles selection of a tile
     /// Maybe move to another script
@@ -128,7 +142,7 @@ public class HumanPlayer : Player
         if (SelectedCharacter == null)
         {
             // Nothing on tile
-            if (t.player == null)
+            if (t._player == null)
             {
                 // TODO: Something
                 Debug.Log("NO CHARACTER");
@@ -136,24 +150,24 @@ public class HumanPlayer : Player
             else
             {
                 // Check if mine or not
-                if (IsMine(t.player))
+                if (IsMine(t._player))
                 {
                     // Activated?
-                    if (!t.player.IsActivated)
+                    if (!t._player.IsActivated)
                     {
                         Debug.Log("DEACTIVATED");
                         return;
                     }
 
                     // Select
-                    SelectedCharacter = t.player;
+                    SelectedCharacter = t._player;
 
                     // TODO: Notify UI
                     Debug.Log("SELECTED MINE");
 
                     _selectedTile = t;
                     _selectedTile.SetSelected();
-                    ShowCharacterRange(_selectedTile, SelectedCharacter.GetComponent<MovementRange>().Range);
+                    ShowCharacterRange(_selectedTile);
                 }
                 // Not mine, check stats?
                 else
@@ -168,43 +182,60 @@ public class HumanPlayer : Player
         {
             // Selected tile contains something
             // TODO: Add more, check for chars only right now
-            if (t.player != null)
+            if (t._player != null)
             {
                 Debug.Log("CONTAINS CHARACTER");
                 return;
             }
-            // Reachable terrain
             else
             {
                 // Check if already moved
                 if (SelectedCharacter.Moved)
                     return;
 
-                // Check movement range
                 // TODO: Change
+                // Check movement range
                 if (!t.IsMovementTile())
                 {
+                    // Unreachable terrain (further than walkable)
                     Debug.Log("INVALID MOVE");
                     return;
                 }
 
-                _selectedTile.Deselect();
-                DisablePicker();
-
-                var pathFinder = SelectedCharacter.GetComponent<Pathfinding>();
-                pathFinder._endNode = t;
-                pathFinder.CalculateNewPath();
+                // Reachable terrain
+                BeginMovement(t);
             }
-            //else if (_pathFinder == null)
-            //{
-            //    //_pathFinder = GameObject.Find("PathFinding").GetComponent<Pathfinding>();
-            //    _pathFinder = GameObject.FindGameObjectWithTag("Human").GetComponentInChildren<Pathfinding>();
-            //}
-            //_pathFinder._endNode = _myTile;
-            //_pathFinder.CalculateNewPath();
         }
+    }
 
-        // Unreachable terrain (further than walkable)
+    bool isInMovement = false;
+    void BeginMovement(Tile t)
+    {
+        isInMovement = true;
+
+        _selectedTile.Deselect();
+        ClearCharacterRange(_selectedTile);
+        DisablePicker();
+
+        var pathFinder = SelectedCharacter.GetComponent<Pathfinding>();
+        pathFinder._endNode = t;
+        pathFinder.CalculateNewPath();
+    }
+
+    /// <summary>
+    /// Options when movement end:
+    /// Cancel movement
+    /// Attack player
+    /// End character turn
+    /// </summary>
+    void EndMovement()
+    {
+        // Activate reached tile
+        SelectedCharacter._currentTile.SetSelected();
+
+        // TODO: Remove
+        // For now, deactivate
+        FinishCharacterMove();
     }
 
     public bool IsMine(Character o)
@@ -221,31 +252,46 @@ public class HumanPlayer : Player
         return mine;
     }
 
-    public void ShowCharacterRange(Tile t, int range)
+    public void ShowCharacterRange(Tile t)
     {
         if (t == null) return;
-        t.MovementUI(range);
+        t.MovementUI();
     }
-    public void ClearCharacterRange(Tile t, int range)
+    public void ClearCharacterRange(Tile t)
     {
         if (t == null) return;
-        t.ClearMovementUI(range);
+        t.ClearMovementUI();
     }
 
     public void HandleHover(Tile t)
     {
-        if (t.player == null) return;
+        if (isInMovement || t._player == null) return;
 
         if (SelectedCharacter != null)
-            ClearCharacterRange(_selectedTile, SelectedCharacter.GetComponent<MovementRange>().Range);
-        ShowCharacterRange(t, t.player.GetComponent<MovementRange>().Range);
+            ClearCharacterRange(_selectedTile);
+        ShowCharacterRange(t);
     }
     public void HandleHoverOut(Tile t)
     {
-        if (t.player == null) return;
+        if (isInMovement || t._player == null) return;
 
-        ClearCharacterRange(t, t.player.GetComponent<MovementRange>().Range);
+        ClearCharacterRange(t);
         if (SelectedCharacter != null)
-            ShowCharacterRange(_selectedTile, SelectedCharacter.GetComponent<MovementRange>().Range);
+            ShowCharacterRange(_selectedTile);
     }
+
+    void ClearSelection()
+    {
+        if (SelectedCharacter == null)
+            return;
+
+        ClearCharacterRange(_selectedTile);
+        _selectedTile.Deselect();
+        _selectedTile = null;
+        SelectedCharacter._currentTile.Deselect();
+        SelectedCharacter = null;
+    }
+    #endregion
+
+
 }

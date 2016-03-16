@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Character : MonoBehaviour
 {
-    private Rigidbody _rb;
+    public Rigidbody _rb;
     private Animator _animator;
 
     public float _targetRadius;
@@ -18,6 +18,7 @@ public class Character : MonoBehaviour
     public Tile _currentTile;
 
     private UIManager _uiManager;
+    public Player ControllingPlayer;
 
     void Awake()
     {
@@ -36,10 +37,20 @@ public class Character : MonoBehaviour
         _animator.SetFloat("Walk", _rb.velocity.magnitude);
     }
 
-    public void KinematicMovement(Vector3 target)
+    public void MoveTo(Vector3 location)
     {
+        transform.position = location;  
+    }
+
+    public bool KinematicMovement(Vector3 target)
+    {
+        _rb.velocity = Vector3.zero;
         Rotate(target);
-        MoveTowards(target);
+        if (MoveTowards(target))
+        {
+            return true;
+        }
+        return false;
     }
 
     // Arrive to target and Look Where You're going
@@ -93,16 +104,20 @@ public class Character : MonoBehaviour
     {
         float toRotation = (Mathf.Atan2(target.x, target.z) * Mathf.Rad2Deg);
         // rotate along y axis
-        float rotation = Mathf.LerpAngle(transform.rotation.eulerAngles.y, toRotation, Time.deltaTime * _turnSpeed * 2);
+        float rotation = Mathf.LerpAngle(transform.rotation.eulerAngles.y, toRotation, Time.deltaTime * _turnSpeed * 40);
 
         return Quaternion.Euler(0, rotation, 0);
     }
 
     //Move towards a point
-    private void MoveTowards(Vector3 target)
+    private bool MoveTowards(Vector3 target)
     {
+        Vector3 oldPosition = transform.position;
+
         Vector3 velocity = KinematicSeek(target);
         transform.position += velocity * Time.deltaTime;
+
+        return Vector3.Distance(transform.position, oldPosition) < 0.1f;
     }
 
     private Vector3 KinematicSeek(Vector3 target)
@@ -116,9 +131,14 @@ public class Character : MonoBehaviour
     {
         Quaternion prevRotation = transform.rotation;
 
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, 
+        /*transform.rotation = Quaternion.RotateTowards(transform.rotation, 
             Quaternion.LookRotation(location - transform.position),
-            _turnSpeed * Time.deltaTime);
+            _turnSpeed * Time.deltaTime);*/
+
+        Vector3 targetDir = location - transform.position;
+        float step = _turnSpeed * Time.deltaTime;
+        Vector3 newDir = Vector3.RotateTowards(transform.forward, targetDir, step, 0.0F);
+        transform.rotation = Quaternion.LookRotation(newDir);
 
         if (transform.rotation == prevRotation)
         {
@@ -131,7 +151,7 @@ public class Character : MonoBehaviour
     {
         foreach (Tile neighbour in _currentTile.neighbours)
         {
-            Character neighbourCharacter = neighbour.player;
+            Character neighbourCharacter = neighbour._player;
             if (neighbourCharacter != null && neighbourCharacter.tag == "AI")
             {
                 return true;
@@ -143,28 +163,35 @@ public class Character : MonoBehaviour
     public void SetCurrentTile(Tile tile)
     {
         if (_currentTile != null)
-            _currentTile.player = null;
+        {
+            _currentTile._player = null;
+        }
+
+        if (tile._player == null)
+        {
+            tile._player = this;
+            _currentTile = tile;
+        }
         
-        tile.player = this;
-        _currentTile = tile;
     }
-
-
-
+        
     /* ADDED BY FRANCIS. RELOCATE WHEN DONE */
     public void ResetPosition()
     {
         // Maybe?
     }
+
     public void Activate()
     {
         IsActivated = true;
         Moved = false;
     }
+
     public void Deactivate()
     {
         IsActivated = false;
     }
+
     public bool Moved;
     public bool IsActivated;
 }

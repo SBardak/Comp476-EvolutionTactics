@@ -15,7 +15,7 @@ public enum TileDecorationType
 
 public class Tile : MonoBehaviour
 {
-    public Character player;
+    public Character _player;
 
     public List<Tile> neighbours;
     public float costSoFar, heuristicValue, totalEstimatedValue;
@@ -76,11 +76,17 @@ public class Tile : MonoBehaviour
     /// <summary>
     /// TODO: Change when we get more attacks
     /// </summary>
-    /// <param name="reach"></param>
-    /// <param name="t"></param>
-    public void MovementUI(int reach)
+    public void MovementUI()
     {
-        if (reach < 0)
+        if (_player == null) return;
+
+        int maxAttackRange = 1;
+        int movementRange = _player.GetComponent<MovementRange>().Range + maxAttackRange;
+        MovementUIRecursive(movementRange, maxAttackRange, _player.ControllingPlayer);
+    }
+    void MovementUIRecursive(int reach, int min, Player p)
+    {
+        if (reach < min || ContainsEnemy(this, p))
         {
             if (_decoration != TileDecorationType.MOVE)
                 SetDecoration(TileDecorationType.ATTACK);
@@ -90,22 +96,37 @@ public class Tile : MonoBehaviour
         // Draw self
         SetDecoration(TileDecorationType.MOVE);
 
+        // REMOVE THIS LINE TO KEEP INITIAL REACH
         foreach (var n in neighbours)
-            n.MovementUI(reach - 1);
+            if (ContainsEnemy(n, p)) --reach;
+
+        foreach (var n in neighbours)
+            n.MovementUIRecursive(reach - 1, min, p);
+    }
+    bool ContainsEnemy(Tile t, Player p)
+    {
+        return t._player != null && t._player.ControllingPlayer != p;
     }
 
     /// <summary>
     /// Clear all movement/attack UI
     /// </summary>
-    /// <param name="reach">How far to go</param>
-    public void ClearMovementUI(int reach)
+    public void ClearMovementUI()
     {
-        if (reach < -1)
+        if (_player == null) return;
+
+        int maxAttackRange = 1;
+        int movementRange = _player.GetComponent<MovementRange>().Range + maxAttackRange;
+        ClearMovementUIRecursive(movementRange);
+    }
+    void ClearMovementUIRecursive(int reach)
+    {
+        if (reach < 0)
             return;
 
         ResetDecoration();
         foreach (var n in neighbours)
-            n.ClearMovementUI(reach - 1);
+            n.ClearMovementUIRecursive(reach - 1);
     }
 
     /// <summary>

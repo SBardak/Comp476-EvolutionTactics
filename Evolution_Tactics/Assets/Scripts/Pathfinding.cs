@@ -8,6 +8,7 @@ using System.Collections.Generic;
 public class Pathfinding : MonoBehaviour
 {
     public delegate void PathFindingHandler();
+
     public event PathFindingHandler OnReachEnd;
 
     public Tile _startNode, _endNode;
@@ -19,8 +20,9 @@ public class Pathfinding : MonoBehaviour
 
     private Character player;
     public int counter = 0;
-    public bool goalAttained = false;
-    public bool hasPath = false;
+    public bool _goalAttained = false;
+    public bool _middleOfTheNodeAttained = false;
+    public bool _hasPath = false;
 
     void Start()
     {
@@ -60,47 +62,68 @@ public class Pathfinding : MonoBehaviour
         }
 
         // if path has been calculated
-        if (!goalAttained && hasPath)
+        if (_hasPath)
         {
-            if (pathList.Count > counter && _endNode == pathList[pathList.Count - 1])
+            // if end node attained
+            if (!_goalAttained)
             {
-                bool tileCollision = false;
-
-                //player.KinematicMovement(pathList[counter].transform.position);
-                player.ArriveAndLookWhereYoureGoing(pathList[counter].transform.position);
-
-                //Check for tile collision
-                Collider[] collisionArray = Physics.OverlapSphere(player.transform.position, 0.3f);
-                for (int i = 0; i < collisionArray.Length; i++)
-                {          
-                    // Check if arrived
-                    if (collisionArray[i].GetComponent(typeof(Tile)) == _endNode)
-                    {
-                        // TODO: Walk towards center of tile
-
-                        GoalAttained = true;
-                        hasPath = false;
-
-                        if (OnReachEnd != null)
-                            OnReachEnd();
-                    }
-                    else if (collisionArray[i].GetComponent(typeof(Tile)) == pathList[counter])
-                    {
-                        tileCollision = true;
-                    }
-                    player.SetCurrentTile(pathList[counter]);
-                }
-
-                if (goalAttained || tileCollision)
+                if (pathList.Count > counter && _endNode == pathList[pathList.Count - 1])
                 {
-                    counter++;
+                    bool tileCollision = false;
+
+                    player.ArriveAndLookWhereYoureGoing(pathList[counter].transform.position);
+
+                    //Check for tile collision
+                    Collider[] collisionArray = Physics.OverlapSphere(player.transform.position, 0.05f);
+                    for (int i = 0; i < collisionArray.Length; i++)
+                    {          
+                        // Check if arrived
+                        if (collisionArray[i].GetComponent(typeof(Tile)) == _endNode)
+                        {
+                            // TODO: Walk towards center of tile
+
+                            GoalAttained = true;
+
+                            if (OnReachEnd != null)
+                                OnReachEnd();
+                        }
+                        else if (collisionArray[i].GetComponent(typeof(Tile)) == pathList[counter])
+                        {
+                            tileCollision = true;
+                        }
+                        player.SetCurrentTile(pathList[counter]);
+                    }
+
+                    if (_goalAttained || tileCollision)
+                    {
+                        counter++;
+                    }
+                }
+                else
+                {
+                    CalculateNewPath();
                 }
             }
-            else
+            // if not in the middle of the end node
+            else if (!_middleOfTheNodeAttained)
             {
-                CalculateNewPath();
+                if (GoToMiddleOfTile())
+                {
+                    _middleOfTheNodeAttained = true;
+                    _hasPath = false;
+                }
             }
         }
+    }
+
+    private bool GoToMiddleOfTile()
+    {
+        Vector3 oldPosition = transform.position;
+        player._rb.velocity = Vector3.zero;
+
+        transform.position = Vector3.MoveTowards(transform.position, _endNode.transform.position, Time.deltaTime);
+
+        return oldPosition == transform.position;
     }
 
     public void RandomPath()
@@ -114,32 +137,34 @@ public class Pathfinding : MonoBehaviour
     // Calculate a new path with dijkstra algorithm
     public void CalculateNewPath()
     {
+        counter = 0;
+        StartNode = player._currentTile;
+        _startNode.costSoFar = 0;
+
+        
         // If player select current node
         if (_startNode == _endNode)
         {
             // might add more behaviour
+            Debug.Log("SAME TILE");
             return;
         }
         // if player select a non-empty tile
-        if (_endNode.player != null)
+        if (_endNode._player != null)
         {
             Debug.Log("Need to select empty tile");
             return;
         }
         
-        ClearLists();
+        ResetPath();
 
-        counter = 0;
-        StartNode = nodeList[0];
-        _startNode.costSoFar = 0;
-
-        foreach (Tile n in nodeList)
-        {
-            if (Cost(player.transform.position, n.transform.position) < Cost(player.transform.position, _startNode.transform.position))
-            {
-                StartNode = n;
-            }
-        }
+        //foreach (Tile n in nodeList)
+        //{
+        //    if (Cost(player.transform.position, n.transform.position) < Cost(player.transform.position, _startNode.transform.position))
+        //    {
+        //        StartNode = n;
+        //    }
+        //}
 
         DijkstraPathfinding();
     }
@@ -236,13 +261,14 @@ public class Pathfinding : MonoBehaviour
     }
 
     // Clear all lists and tile's variables
-    private void ClearLists()
+    private void ResetPath()
     {
         openList.Clear();
         closedList.Clear();
         pathList.Clear();
         GoalAttained = false;
-        hasPath = true;
+        _middleOfTheNodeAttained = false;
+        _hasPath = true;
 
         foreach (Tile node in nodeList)
         {
@@ -263,11 +289,11 @@ public class Pathfinding : MonoBehaviour
                 else
                     UIManager.Instance.DeleteHumanPlayerActionUI();
             }
-            goalAttained = value;
+            _goalAttained = value;
         }
         get
         {
-            return goalAttained;
+            return _goalAttained;
         }
     }
 

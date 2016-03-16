@@ -45,6 +45,7 @@ public class TileGenerator : MonoBehaviour
             {
                 tiles[i, j] = Instantiate(tilePrefab, new Vector3(i, 0f, j), Quaternion.identity) as Tile;
                 tiles[i, j].transform.parent = map.transform;
+                tiles[i, j].name = "TILE " + (i * mapWidth + j);
             }
         }
     }

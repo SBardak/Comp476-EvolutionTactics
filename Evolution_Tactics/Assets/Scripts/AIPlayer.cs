@@ -23,11 +23,14 @@ public class AIPlayer : Player
 
     bool _isPlaying;
 
-    void Start()
+    void Awake()
     { 
         // Move this somewhere else probably
         foreach (var s in _squads)
             s.MovementComplete += MovedSquad;
+
+        foreach (var s in _squads)
+            s.SetControllingPlayer(this);
     }
 
     /// <summary>

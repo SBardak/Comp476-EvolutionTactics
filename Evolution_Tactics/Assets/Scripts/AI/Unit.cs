@@ -10,6 +10,19 @@ public class Unit : MonoBehaviour
     Character _char;
     Pathfinding _pathfinding;
 
+    Character Character {
+        get {
+            if (_char == null)
+               _char = GetComponent<Character>();
+            return _char;
+        }
+    }
+
+    public void SetControllingPlayer(Player p)
+    {
+        Character.ControllingPlayer = p;
+    }
+
     void Awake()
     { 
         if (GetComponent<Pathfinding>() != null)
