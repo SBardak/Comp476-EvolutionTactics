@@ -10,7 +10,7 @@ using System.Collections.Generic;
   */
 public enum TileDecorationType
 {
-    NORMAL, HOVER, ATTACK, MOVE
+    NORMAL, ATTACK, MOVE
 }
 
 public class Tile : MonoBehaviour
@@ -21,10 +21,9 @@ public class Tile : MonoBehaviour
     public float costSoFar, heuristicValue, totalEstimatedValue;
     public Tile prevNode;
 
-    public GameObject Attack, Hover, Move;
-    private GameObject Active;
-    private TileDecorationType _decoration = TileDecorationType.NORMAL,
-        _prevDecoration = TileDecorationType.NORMAL;
+    public GameObject _Attack, _Hover, _Move, _Selected;
+    private GameObject _ActiveDecoration;
+    private TileDecorationType _decoration = TileDecorationType.NORMAL;
 
     void Start()
     {
@@ -43,22 +42,19 @@ public class Tile : MonoBehaviour
         _decoration = t;
         switch (t)
         {
-            case TileDecorationType.HOVER:
-            default:
-                Active = Hover;
-                break;
             case TileDecorationType.MOVE:
-                Active = Move;
+                _ActiveDecoration = _Move;
                 break;
             case TileDecorationType.ATTACK:
-                Active = Attack;
+                _ActiveDecoration = _Attack;
                 break;
             case TileDecorationType.NORMAL:
-                Active = null;
+            default:
+                _ActiveDecoration = null;
                 break;
         }
-        if (Active != null)
-            Active.SetActive(true);
+        if (_ActiveDecoration != null)
+            _ActiveDecoration.SetActive(true);
     }
     /// <summary>
     /// Is the tile a movement tile?
@@ -74,7 +70,7 @@ public class Tile : MonoBehaviour
     /// <returns></returns>
     public TileDecorationType GetDecoration()
     {
-        return _prevDecoration != TileDecorationType.NORMAL ? _prevDecoration : _decoration;
+        return _decoration;
     }
 
     /// <summary>
@@ -113,12 +109,11 @@ public class Tile : MonoBehaviour
     }
 
     /// <summary>
-    /// Resets a tile (removed previous decoration)
+    /// Resets a tile
     /// </summary>
     private void ResetDecoration()
     {
         ClearDecoration();
-        _prevDecoration = _decoration;
     }
 
     /// <summary>
@@ -127,28 +122,36 @@ public class Tile : MonoBehaviour
     private void ClearDecoration()
     {
         _decoration = TileDecorationType.NORMAL;
-        if (Active != null)
-            Active.SetActive(false);
+        if (_ActiveDecoration != null)
+            _ActiveDecoration.SetActive(false);
     }
 
+    #region Selection
     /// <summary>
     /// Used for hovering the tile
     /// </summary>
     public void OnHover()
     {
-        if (_decoration == TileDecorationType.HOVER)
-            return;
-
-        _prevDecoration = _decoration;
-        SetDecoration(TileDecorationType.HOVER);
+        if (!_Selected.activeSelf)
+            _Hover.SetActive(true);
     }
     /// <summary>
     /// Resets the hover
     /// </summary>
     public void ResetHover()
     {
-        SetDecoration(_prevDecoration);    
+        _Hover.SetActive(false);
     }
+
+    public void SetSelected()
+    {
+        _Selected.SetActive(true);
+    }
+    public void Deselect()
+    {
+        _Selected.SetActive(false);
+    }
+    #endregion Selection
 
     // Get its neighbours
     // TODO Will need to add more checkers, for instance to see if neighbour can be visited

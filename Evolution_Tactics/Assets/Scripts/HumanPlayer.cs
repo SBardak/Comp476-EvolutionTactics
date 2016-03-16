@@ -71,7 +71,7 @@ public class HumanPlayer : Player
         if (SelectedCharacter == null)
             return;
 
-        _selectedTile.ClearMovementUI(SelectedCharacter.GetComponent<MovementRange>().Range);
+        ClearCharacterRange(_selectedTile, SelectedCharacter.GetComponent<MovementRange>().Range);
         _selectedTile = null;
         SelectedCharacter.Deactivate();
         SelectedCharacter = null;
@@ -152,7 +152,8 @@ public class HumanPlayer : Player
                     Debug.Log("SELECTED MINE");
 
                     _selectedTile = t;
-                    _selectedTile.MovementUI(SelectedCharacter.GetComponent<MovementRange>().Range);
+                    _selectedTile.SetSelected();
+                    ShowCharacterRange(_selectedTile, SelectedCharacter.GetComponent<MovementRange>().Range);
                 }
                 // Not mine, check stats?
                 else
@@ -187,6 +188,7 @@ public class HumanPlayer : Player
                     return;
                 }
 
+                _selectedTile.Deselect();
                 DisablePicker();
 
                 var pathFinder = SelectedCharacter.GetComponent<Pathfinding>();
@@ -219,4 +221,31 @@ public class HumanPlayer : Player
         return mine;
     }
 
+    public void ShowCharacterRange(Tile t, int range)
+    {
+        if (t == null) return;
+        t.MovementUI(range);
+    }
+    public void ClearCharacterRange(Tile t, int range)
+    {
+        if (t == null) return;
+        t.ClearMovementUI(range);
+    }
+
+    public void HandleHover(Tile t)
+    {
+        if (t.player == null) return;
+
+        if (SelectedCharacter != null)
+            ClearCharacterRange(_selectedTile, SelectedCharacter.GetComponent<MovementRange>().Range);
+        ShowCharacterRange(t, t.player.GetComponent<MovementRange>().Range);
+    }
+    public void HandleHoverOut(Tile t)
+    {
+        if (t.player == null) return;
+
+        ClearCharacterRange(t, t.player.GetComponent<MovementRange>().Range);
+        if (SelectedCharacter != null)
+            ShowCharacterRange(_selectedTile, SelectedCharacter.GetComponent<MovementRange>().Range);
+    }
 }

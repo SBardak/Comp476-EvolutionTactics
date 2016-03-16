@@ -33,10 +33,30 @@ public class Tile_Selector : Selector
         Debug.LogWarning("Fire element, +10 evade, etc");
 
         _myTile.OnHover();
+
+        // Not a human player's turn
+        var player = GameManager.Instance.GetActivePlayer();
+        if (!(player is HumanPlayer))
+        {
+            Debug.Log("Not human");
+            return;
+        }
+        var human = (HumanPlayer)player;
+        human.HandleHover(_myTile);
         //base.OnMouseOver();
     }
     protected override void OnMouseExit()
     {
         _myTile.ResetHover();
+
+        // Not a human player's turn
+        var player = GameManager.Instance.GetActivePlayer();
+        if (!(player is HumanPlayer))
+        {
+            Debug.Log("Not human");
+            return;
+        }
+        var human = (HumanPlayer)player;
+        human.HandleHoverOut(_myTile);
     }
 }
