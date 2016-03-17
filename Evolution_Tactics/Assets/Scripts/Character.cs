@@ -37,10 +37,19 @@ public class Character : MonoBehaviour
         _animator.SetFloat("Walk", _rb.velocity.magnitude);
     }
 
-    public void MoveTo(Vector3 location)
+    public bool MoveTo(Vector3 location, Vector3 previousLocation)
     {
-        transform.position = location;  
+        Vector3 oldPosition = transform.position;
+        _rb.velocity = Vector3.zero;
+
+        Vector3 rotationDirection = location - previousLocation;
+
+        transform.position = Vector3.MoveTowards(transform.position, location, Time.deltaTime); 
+        transform.rotation = Quaternion.LookRotation(rotationDirection);
+
+        return oldPosition == transform.position;
     }
+
 
     public bool KinematicMovement(Vector3 target)
     {

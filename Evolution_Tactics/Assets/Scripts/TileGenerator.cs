@@ -57,7 +57,9 @@ public class TileGenerator : MonoBehaviour
         var s = TestMap.text;
         int i, a;
         GetIndex(s, 0, out i, out a);
-        if (i == 0) return false;
+
+        if (i == 0)
+            return false;
 
         var fl = s.Substring(0, i);
         if (fl != "Evo_Map")
@@ -112,6 +114,7 @@ public class TileGenerator : MonoBehaviour
         }
         return true;
     }
+
     /// <summary>
     /// Get dimensions from file
     /// </summary>
@@ -135,6 +138,7 @@ public class TileGenerator : MonoBehaviour
                 h = t;
         }
     }
+
     /// <summary>
     /// Helper method
     /// </summary>
@@ -150,8 +154,9 @@ public class TileGenerator : MonoBehaviour
         var i = s.IndexOf("\r\n", start);
         var a = 2;
 
+
         // Not windows
-        if (i == 0)
+        if (i == -1)
         {
             a = 1;
             char[] chars = new char[2];
@@ -159,13 +164,14 @@ public class TileGenerator : MonoBehaviour
             chars[1] = '\n';
 
             i = s.IndexOfAny(chars, start);
-            if (i == 0)
+            if (i == -1)
                 return;
         }
 
         index = i;
         extra = a;
     }
+
     /// <summary>
     /// Get tile indicated by char
     /// </summary>

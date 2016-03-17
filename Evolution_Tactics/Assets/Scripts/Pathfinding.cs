@@ -118,13 +118,9 @@ public class Pathfinding : MonoBehaviour
 
     private bool GoToMiddleOfTile()
     {
-        Vector3 oldPosition = transform.position;
-        player._rb.velocity = Vector3.zero;
-
-        transform.position = Vector3.MoveTowards(transform.position, _endNode.transform.position, Time.deltaTime);
-
-        return oldPosition == transform.position;
+        return player.MoveTo(_endNode.transform.position, pathList[pathList.Count - 2].transform.position);
     }
+
 
     public void RandomPath()
     {
@@ -146,13 +142,15 @@ public class Pathfinding : MonoBehaviour
         if (_startNode == _endNode)
         {
             // might add more behaviour
-            Debug.Log("SAME TILE");
+            Debug.Log("SAME TILE");       
+            RandomPath();
             return;
         }
         // if player select a non-empty tile
         if (_endNode._player != null)
         {
             Debug.Log("Need to select empty tile");
+            RandomPath();
             return;
         }
         
