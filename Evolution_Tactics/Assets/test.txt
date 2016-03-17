@@ -1,0 +1,8 @@
+Evo_Map
+w:10;h:6
+ttttggtttt
+tttttttttt
+tttttttttt
+tttttttttt
+tttttttttt
+gttttttttg
