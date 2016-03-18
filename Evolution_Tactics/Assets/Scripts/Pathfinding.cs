@@ -209,11 +209,18 @@ public class Pathfinding : MonoBehaviour
 
                 if (closedList.Contains(neighbour) && newCost < neighbour.costSoFar)
                 {
-                    neighbour.costSoFar = newCost;
-                    neighbour.totalEstimatedValue = neighbour.costSoFar + neighbour.heuristicValue;
-                    neighbour.prevNode = currentNode;
-                    closedList.Remove(neighbour);
-                    openList.Add(neighbour);
+                    if (neighbour._player == null || (neighbour._player != null && neighbour._player.tag == gameObject.tag))
+                    {
+                        neighbour.costSoFar = newCost;
+                        neighbour.totalEstimatedValue = neighbour.costSoFar + neighbour.heuristicValue;
+                        neighbour.prevNode = currentNode;
+                        closedList.Remove(neighbour);
+                        openList.Add(neighbour);
+                    }
+                    else
+                    {
+                        closedList.Add(neighbour);
+                    }
 
                 }
                 else if (inOpenList && newCost < neighbour.costSoFar)
@@ -224,12 +231,18 @@ public class Pathfinding : MonoBehaviour
                 }
                 else if (!inClosedList && !inOpenList)
                 {
-                    neighbour.costSoFar = newCost;
-                    neighbour.totalEstimatedValue = neighbour.costSoFar + neighbour.heuristicValue;
-                    neighbour.prevNode = currentNode;
-                    openList.Add(neighbour);
+                    if (neighbour._player == null || (neighbour._player != null && neighbour._player.tag == gameObject.tag))
+                    {
+                        neighbour.costSoFar = newCost;
+                        neighbour.totalEstimatedValue = neighbour.costSoFar + neighbour.heuristicValue;
+                        neighbour.prevNode = currentNode;
+                        openList.Add(neighbour);
+                    }
+                    else
+                    {
+                        closedList.Add(neighbour);
+                    }
                 }
-
             }
 
         }
