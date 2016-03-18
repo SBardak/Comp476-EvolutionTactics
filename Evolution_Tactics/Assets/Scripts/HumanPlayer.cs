@@ -30,7 +30,7 @@ public class HumanPlayer : Player
     /// <summary>
     /// Handle event from reaching end of walk
     /// </summary>
-    private void HumanPlayer_OnReachEnd()
+    public void HumanPlayer_OnReachEnd()
     {
         SelectedCharacter.Moved = true;
         EnablePicker();
@@ -131,6 +131,7 @@ public class HumanPlayer : Player
 
 
     #region Tile stuff
+
     /// <summary>
     /// Handles selection of a tile
     /// Maybe move to another script
@@ -168,6 +169,7 @@ public class HumanPlayer : Player
                     _selectedTile = t;
                     _selectedTile.SetSelected();
                     ShowCharacterRange(_selectedTile);
+                    UIManager.Instance.CreateHumanPlayerActionUI(t._player);
                 }
                 // Not mine, check stats?
                 else
@@ -209,6 +211,7 @@ public class HumanPlayer : Player
     }
 
     bool isInMovement = false;
+
     void BeginMovement(Tile t)
     {
         isInMovement = true;
@@ -254,26 +257,32 @@ public class HumanPlayer : Player
 
     public void ShowCharacterRange(Tile t)
     {
-        if (t == null) return;
+        if (t == null)
+            return;
         t.MovementUI();
     }
+
     public void ClearCharacterRange(Tile t)
     {
-        if (t == null) return;
+        if (t == null)
+            return;
         t.ClearMovementUI();
     }
 
     public void HandleHover(Tile t)
     {
-        if (isInMovement || t._player == null) return;
+        if (isInMovement || t._player == null)
+            return;
 
         if (SelectedCharacter != null)
             ClearCharacterRange(_selectedTile);
         ShowCharacterRange(t);
     }
+
     public void HandleHoverOut(Tile t)
     {
-        if (isInMovement || t._player == null) return;
+        if (isInMovement || t._player == null)
+            return;
 
         ClearCharacterRange(t);
         if (SelectedCharacter != null)
@@ -291,6 +300,7 @@ public class HumanPlayer : Player
         SelectedCharacter._currentTile.Deselect();
         SelectedCharacter = null;
     }
+
     #endregion
 
 

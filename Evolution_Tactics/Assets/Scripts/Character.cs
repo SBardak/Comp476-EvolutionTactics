@@ -17,15 +17,12 @@ public class Character : MonoBehaviour
 
     public Tile _currentTile;
 
-    private UIManager _uiManager;
     public Player ControllingPlayer;
 
     void Awake()
     {
         _rb = GetComponent<Rigidbody>();
         _animator = GetComponent<Animator>();
-        if (GameObject.Find("UIManager") != null)
-            _uiManager = GameObject.Find("UIManager").GetComponent<UIManager>();
     }
 
     void Start()
@@ -34,7 +31,7 @@ public class Character : MonoBehaviour
 
     void Update()
     {
-        _animator.SetFloat("Walk", _rb.velocity.magnitude);
+//        _animator.SetFloat("Walk", _rb.velocity.magnitude);
     }
 
     public bool MoveTo(Vector3 location, Vector3 previousLocation)

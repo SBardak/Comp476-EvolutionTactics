@@ -7,7 +7,7 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager Instance;
 
-    private HumanPlayer _human;
+    private static HumanPlayer _human;
     private bool _activateUI = false;
     private GameObject[] _humanUI;
 
@@ -16,7 +16,7 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
-        Instance = this;
+        UIManager.Instance = this;
 
         _human = GameObject.Find("Human").GetComponent<HumanPlayer>();
         _humanUI = GameObject.FindGameObjectsWithTag("HumanUI");
@@ -28,14 +28,17 @@ public class UIManager : MonoBehaviour
 
     public void OnClickEndHumanTurn()
     {
-        GameObject.Find("Human").GetComponent<HumanPlayer>().EndTurn();
+        _human.EndTurn();
     }
 
     public void OnClickEndSelectedCharacterTurn()
     {
-        //Only works for one human character for now
-        // We should add that it works only with selected character
-        Debug.Log("Wait button not yet implemented");
+        Debug.Log("Wait Button clicked");
+
+        if (_human.SelectedCharacter != null)
+            _human.HumanPlayer_OnReachEnd();
+
+        DeleteHumanPlayerActionUI();
     }
 
     public void OnClickAttack()
@@ -62,7 +65,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private List<Button> buttonList;
+    private static List<Button> buttonList;
 
     public void CreateHumanPlayerActionUI(Character character)
     {

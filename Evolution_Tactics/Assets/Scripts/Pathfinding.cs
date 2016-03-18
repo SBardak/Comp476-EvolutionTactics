@@ -80,8 +80,6 @@ public class Pathfinding : MonoBehaviour
                         // Check if arrived
                         if (collisionArray[i].GetComponent(typeof(Tile)) == _endNode)
                         {
-                            // TODO: Walk towards center of tile
-
                             GoalAttained = true;
 
                             if (OnReachEnd != null)
