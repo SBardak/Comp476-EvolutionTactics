@@ -2,7 +2,8 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class HP_Tracker : MonoBehaviour {
+public class HP_Tracker : MonoBehaviour
+{
     [SerializeField]
     GameObject target;
     public float xOffset;
@@ -12,10 +13,11 @@ public class HP_Tracker : MonoBehaviour {
     private Image _instantiated;
     private RectTransform _rect;
 
-    public int DEBUG_HP_VALUE = 20, DEBUG_HP_VALUE_MAX = 20;
+    public int _maxHp, _currentHp;
 
     [SerializeField]
-    Color c; // TODO: Change so that the color can be generated at launch
+    Color c;
+    // TODO: Change so that the color can be generated at launch
 
     void Start()
     {
@@ -30,23 +32,36 @@ public class HP_Tracker : MonoBehaviour {
         _instantiated.transform.SetParent(GameObject.Find("Canvas").transform, false);
         _rect = _instantiated.GetComponent<RectTransform>();
 
+        PokemonStats stats = GetComponent<PokemonStats>();
+        _maxHp = stats.MaxHealth;
+        _currentHp = stats.CurrentHealth;
+
         _instantiated.GetComponent<HP_Tracker_UI>().SetColor(c);
+
+        // SetHP();
     }
-	
-	void Update () {
+
+    void Update()
+    {
         var screenPos = Camera.main.WorldToScreenPoint(target.transform.position);
 
-        screenPos.x -=  xOffset;
+        screenPos.x -= xOffset;
         screenPos.y -= yOffset;
 
         _rect.position = screenPos;
 
         // TODO: REMOVE ME
         SetHP();
-	}
+    }
 
-    void SetHP()
+    private void SetHP()
     {
-        _instantiated.GetComponent<HP_Tracker_UI>().SetHP(DEBUG_HP_VALUE, DEBUG_HP_VALUE_MAX);
+        _instantiated.GetComponent<HP_Tracker_UI>().SetHP(_currentHp, _maxHp);
+    }
+
+    public void SetHp(int currentHp)
+    {
+        _currentHp = currentHp;
+        SetHP();
     }
 }
