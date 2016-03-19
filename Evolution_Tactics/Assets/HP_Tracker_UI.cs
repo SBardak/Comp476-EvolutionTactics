@@ -2,7 +2,8 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class HP_Tracker_UI : MonoBehaviour {
+public class HP_Tracker_UI : MonoBehaviour
+{
     [SerializeField]
     Text _text;
     [SerializeField]
@@ -11,11 +12,12 @@ public class HP_Tracker_UI : MonoBehaviour {
     float initialW;
     RectTransform _rect;
 
-    void Start()
+    void Awake()
     {
+
         _rect = _inner.GetComponent<RectTransform>();
 
-        initialW = _rect.sizeDelta.x;
+        initialW = _rect.sizeDelta.x; 
     }
 
     public void SetColor(Color c)

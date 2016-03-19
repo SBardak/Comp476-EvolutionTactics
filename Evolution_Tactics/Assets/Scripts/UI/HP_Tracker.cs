@@ -38,7 +38,7 @@ public class HP_Tracker : MonoBehaviour
 
         _instantiated.GetComponent<HP_Tracker_UI>().SetColor(c);
 
-        // SetHP();
+        SetHP();
     }
 
     void Update()
@@ -51,7 +51,7 @@ public class HP_Tracker : MonoBehaviour
         _rect.position = screenPos;
 
         // TODO: REMOVE ME
-        SetHP();
+        //SetHP();
     }
 
     private void SetHP()
