@@ -122,10 +122,10 @@ public class AttackAlgorithm : MonoBehaviour
         damage = Attack - Enemy_Defense;
 
         //TODO PUT BACK TILE ATTACK BONUS
-        /* if (GetComponent<PokemonStats>().AttackBonus() == true)
+        if (GetComponent<PokemonStats>().AttackBonus() == true)
         {
             damage = (int)((float)damage * 1.2f);
-        }*/
+        }
         if (damage <= 0)
         {
             damage = 0;

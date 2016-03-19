@@ -31,14 +31,7 @@ public class TileStats : MonoBehaviour {
 
     public type MyType=type.Fire; //by default set to fire.
 
-
-    public static type[,] TileList;
-
-
-
 	void Start () {
-        TileList = new type[20, 20];
-
         position.x = this.transform.position.x;
         position.y = 0;
         position.z = this.transform.position.z;
@@ -47,10 +40,18 @@ public class TileStats : MonoBehaviour {
         position.z = (int)(position.z+0.1f);
 
         transform.position = position;
-        TileList[(int)transform.position.x, (int)transform.position.z-1] = MyType;
-        rend = transform.GetComponent<Renderer>(); 
-        
-          
+        rend = transform.GetComponent<Renderer>();
+
+        SetMaterial();
+	}
+
+    public void SetTile(type t)
+    {
+        MyType = t;
+    }
+
+    void SetMaterial()
+    {
         switch (MyType)
         {
             case type.Fire:
@@ -80,8 +81,7 @@ public class TileStats : MonoBehaviour {
             default:
                 break;
         }
-	
-	}
+    }
 
 	void Update () {
         

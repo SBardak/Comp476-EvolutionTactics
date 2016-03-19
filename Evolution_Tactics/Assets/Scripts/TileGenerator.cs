@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 // Started by: Lukas
 // Modified by:
@@ -15,14 +16,16 @@ public class TileGeneratorInspector
     public string Name;
     public string charCode;
 
-    public Tile TilePrefab;
+    public TileStats.type Type;
 }
 
 public class TileGenerator : MonoBehaviour
 {
+    public static TileGenerator Instance;
+
     public GameObject player;
 
-    public Tile tilePrefab, tileB;
+    public Tile tilePrefab;
     public TileGeneratorInspector[] _tilePrefabs;
     public int mapWidth, mapHeight;
 
@@ -33,12 +36,13 @@ public class TileGenerator : MonoBehaviour
     [SerializeField]
     TextAsset TestMap;
 
-    Dictionary<string, Tile> dict = new Dictionary<string, Tile>();
+    Dictionary<string, TileStats.type> dict = new Dictionary<string, TileStats.type>();
 
     void Awake()
     {
+        Instance = this;
         foreach (var t in _tilePrefabs)
-            dict.Add(t.charCode, t.TilePrefab);
+            dict.Add(t.charCode, t.Type);
 
         if (TestMap != null && !ReadMap())
         {
@@ -89,28 +93,28 @@ public class TileGenerator : MonoBehaviour
         //List<char> lc;
         //List<char> last
 
-        foreach (var c in s)
+        var fLines = Regex.Split(s, "\r\n|\n|\r");
+
+        //foreach (var l in fLines)
+        for (int current = fLines.Length - 1; current >= 0; current--)
         {
-            //// Newline stuff
-            if (c == '\r' || c == '\n')
+            var l = fLines[current];
+            foreach (var c in l.Split(' '))
             {
-                if (t == '\r')
-                {
-                    t = 'a';
-                    continue;
-                }
-                t = c;
-                col = 0;
-                ++row;
-                continue;
+                if (c == "") continue;
+
+                var tile = Instantiate(tilePrefab, new Vector3(col, 0f, row), Quaternion.identity) as Tile;
+                SetTileType(c, tile.gameObject);
+                tiles[col, row] = tile;
+                tiles[col, row].transform.parent = map.transform;
+                tiles[col, row].name = "TILE " + count;
+
+                ++col;
+                ++count;
             }
 
-            tiles[col, row] = Instantiate(GetTile(c), new Vector3(col, 0f, row), Quaternion.identity) as Tile;
-            tiles[col, row].transform.parent = map.transform;
-            tiles[col, row].name = "TILE " + count;
-
-            ++col;
-            ++count;
+            col = 0;
+            ++row;
         }
         return true;
     }
@@ -173,16 +177,15 @@ public class TileGenerator : MonoBehaviour
     }
 
     /// <summary>
-    /// Get tile indicated by char
+    /// Set tile type indicated by char
     /// </summary>
     /// <param name="t"></param>
     /// <returns></returns>
-    Tile GetTile(char t)
+    void SetTileType(string t, GameObject o)
     {
-        if (dict.ContainsKey(t.ToString()))
-            return dict[t.ToString()];
-        else
-            return tilePrefab;
+        TileStats ts;
+        if (dict.ContainsKey(t) && (ts = o.GetComponent<TileStats>()) != null)
+            ts.SetTile(dict[t]);
     }
 
     void Start()

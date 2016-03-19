@@ -37,14 +37,11 @@ public class PokemonStats : MonoBehaviour {
 	// Update is called once per frame
     public bool AttackBonus()
     {
-        if (TileStats.TileList[(int)transform.position.x, (int)transform.position.z]==MyType)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        var t = TileGenerator.Instance.Tiles[(int)transform.position.x, (int)transform.position.z];
+        var ts = t.gameObject.GetComponent<TileStats>();
+        if (ts == null) return false;
+
+        return ts.MyType == MyType;
     }
 	void Update () {
 
