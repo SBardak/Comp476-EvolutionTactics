@@ -3,8 +3,6 @@ using System.Collections;
 
 public class AttackAlgorithm : MonoBehaviour
 {
-    GameObject Target;
-
     int MaxHealth;
     int CurrentHealth;
     int Attack;
@@ -21,7 +19,7 @@ public class AttackAlgorithm : MonoBehaviour
     TileStats.type myType;
     int damage;
 
-    void getStats(GameObject Target)
+    void getStats(Character target)
     {
 
         myType = GetComponent<PokemonStats>().MyType;
@@ -32,18 +30,18 @@ public class AttackAlgorithm : MonoBehaviour
         Defense = GetComponent<PokemonStats>().Defense;
         Accuracy = GetComponent<PokemonStats>().Accuracy;
 
-        Enemy_MaxHealth = Target.GetComponent<PokemonStats>().MaxHealth;
-        Enemy_CurrentHealth = Target.GetComponent<PokemonStats>().CurrentHealth;
-        Enemy_Attack = Target.GetComponent<PokemonStats>().Attack;
-        Enemy_Defense = Target.GetComponent<PokemonStats>().Defense;
-        Enemy_Accuracy = Target.GetComponent<PokemonStats>().Accuracy;
+        Enemy_MaxHealth = target.GetComponent<PokemonStats>().MaxHealth;
+        Enemy_CurrentHealth = target.GetComponent<PokemonStats>().CurrentHealth;
+        Enemy_Attack = target.GetComponent<PokemonStats>().Attack;
+        Enemy_Defense = target.GetComponent<PokemonStats>().Defense;
+        Enemy_Accuracy = target.GetComponent<PokemonStats>().Accuracy;
 
     }
 
-    float typeAdvantage(GameObject Target)
+    float typeAdvantage(Character target)
     {
         float modifier = 1.0f;
-        TileStats.type Enemy_Type = Target.GetComponent<PokemonStats>().MyType;
+        TileStats.type Enemy_Type = target.GetComponent<PokemonStats>().MyType;
 
         if (myType == TileStats.type.Fire)
         {
@@ -117,29 +115,36 @@ public class AttackAlgorithm : MonoBehaviour
         return modifier;
     }
 
-    public int GetDamage(GameObject target)
+    public int GetDamage(Character target)
     {
-        getStats(Target);
+        getStats(target);
 
         damage = Attack - Enemy_Defense;
 
-        if (GetComponent<PokemonStats>().AttackBonus() == true)
+        //TODO PUT BACK TILE ATTACK BONUS
+        /* if (GetComponent<PokemonStats>().AttackBonus() == true)
         {
             damage = (int)((float)damage * 1.2f);
-        }
+        }*/
         if (damage <= 0)
         {
             damage = 0;
         }
-        damage = (int)((float)damage * typeAdvantage(Target));
+        damage = (int)((float)damage * typeAdvantage(target));
+
+        Debug.LogWarning("It would do " + damage + " damages to " + target.name);
+
+        return damage;
     }
 
-    public void DoDamage(GameObject target)
+    public void DoDamage(Character target)
     {
+        Debug.LogWarning(gameObject.name + " attacks " + target.name + " and do " + damage + " damages.");
+
         float rand = Random.Range(0, 100);
         if (rand <= Accuracy)
         {
-            Enemy_CurrentHealth -= damage;
+            target.GetComponent<PokemonStats>().CurrentHealth -= damage;
         }
     }
 }

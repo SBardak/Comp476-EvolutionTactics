@@ -13,6 +13,7 @@ public class UIManager : MonoBehaviour
 
     public Button _attackButton;
     public Button _waitButton;
+    public Button _attackWhereButton;
 
     void Start()
     {
@@ -35,20 +36,69 @@ public class UIManager : MonoBehaviour
     {
         Debug.Log("Wait Button clicked");
 
+        EndCurrentPokemonAction();
+    }
+
+    private Character enemy;
+    private int damage;
+
+    // TODO NEED TO BE ABLE TO SELECT WHICH ENEMY TO ATTACK
+    public void OnClickAttack()
+    {
+        Debug.Log("Attack button clicked");
+        buttonList[0].enabled = false;
+        buttonList[0].GetComponent<Image>().color = new Color(0.5f, 0.5f, 0.5f);
+        Character selected = _human.SelectedCharacter;
+        List<Character> neighbourEnemies = selected.GetNeighbourEnemies();
+
+
+        AttackAlgorithm attack = selected.GetComponent<AttackAlgorithm>();
+        // CHANGE FROM HERE
+        enemy = neighbourEnemies[0];
+        damage = attack.GetDamage(enemy);
+
+        Debug.LogWarning("Press middle button to accept");
+
+        Transform canvas = GameObject.Find("Canvas").transform;
+        Button actionButton = Instantiate(_attackWhereButton, new Vector3(0, 0, 0), Quaternion.identity) as Button;
+        actionButton.transform.SetParent(canvas);
+        actionButton.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, 0, 0);
+        actionButton.GetComponentInChildren<Text>().text = "Accept attack";
+
+        actionButton.onClick.AddListener(delegate
+            {
+                UIManager.Instance.Attack();
+            });
+        buttonList.Add(actionButton);
+
+        //TODO Need to stay here, but be modified
+        selected.RotateDirectly(enemy.transform.position);
+
+        //CreateAttackButtons(neighbourEnemies);
+
+    }
+
+    private void EndCurrentPokemonAction()
+    {
         if (_human.SelectedCharacter != null)
             _human.HumanPlayer_OnReachEnd();
 
         DeleteHumanPlayerActionUI();
     }
 
-    public void OnClickAttack()
+    public void Attack()
     {
-        Debug.Log("Attack button clicked");
-        Character selected = _human.SelectedCharacter;
-        List<Character> neighbourEnemies = selected.GetNeighbourEnemies();
-        foreach (Character c in neighbourEnemies)
+        _human.SelectedCharacter.GetComponent<AttackAlgorithm>().DoDamage(enemy);
+        //Need to be here
+        EndCurrentPokemonAction();
+    }
+
+
+    private static IEnumerator WaitForKeyDown(string key)
+    {
+        while (!Input.GetKeyDown(key))
         {
-            Debug.Log(c);
+            yield return null;
         }
     }
 
@@ -70,6 +120,8 @@ public class UIManager : MonoBehaviour
         }
     }
 
+
+
     private static List<Button> buttonList;
 
     public void CreateHumanPlayerActionUI(Character character)
@@ -85,6 +137,10 @@ public class UIManager : MonoBehaviour
                 Button actionButton = Instantiate(_attackButton, new Vector3(0, 0, 0), Quaternion.identity) as Button;
                 actionButton.transform.SetParent(canvas);
                 actionButton.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, yPosition, 0);
+                actionButton.onClick.AddListener(delegate()
+                    {
+                        UIManager.Instance.OnClickAttack();
+                    });
                 yPosition -= 30;
                 buttonList.Add(actionButton);
             }
@@ -92,6 +148,10 @@ public class UIManager : MonoBehaviour
             Button waitButton = Instantiate(_waitButton, new Vector3(0, 0, 0), Quaternion.identity) as Button;
             waitButton.transform.SetParent(canvas);
             waitButton.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, yPosition, 0);
+            waitButton.onClick.AddListener(delegate()
+                {
+                    UIManager.Instance.OnClickEndSelectedCharacterTurn();
+                });
             buttonList.Add(waitButton);
         }
     }
@@ -106,5 +166,50 @@ public class UIManager : MonoBehaviour
             }
         }
         buttonList = null;
+    }
+
+    private void CreateAttackButtons(List<Character> neighbours)
+    {
+        int total = 0;
+        int yPosition = 0;
+        Transform canvas = GameObject.Find("Canvas").transform;
+        foreach (Character c in neighbours)
+        {
+            if (c != null)
+            {   
+                Button actionButton = Instantiate(_attackWhereButton, new Vector3(0, 0, 0), Quaternion.identity) as Button;
+                actionButton.transform.SetParent(canvas);
+                actionButton.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, yPosition, 0);
+                /*actionButton.onClick.AddListener(delegate
+                    {
+                        UIManager.Instance.Attack(c);
+                    });*/
+                //actionButton.onClick.AddListener(() => UIManager.Instance.Attack(c));
+                Debug.Log(c.name);
+                yPosition -= 30;
+                if (total == 0)
+                {
+                    actionButton.GetComponentInChildren<Text>().text = "Attack Left";
+                    Debug.Log(c + " left");
+                }
+                else if (total == 1)
+                {
+                    actionButton.GetComponentInChildren<Text>().text = "Attack Right";
+                    Debug.Log(c + " right");
+                }
+                else if (total == 2)
+                {
+                    actionButton.GetComponentInChildren<Text>().text = "Attack Down";
+                    Debug.Log(c + " down");
+                }
+                else if (total == 3)
+                {
+                    actionButton.GetComponentInChildren<Text>().text = "Attack Up";
+                    Debug.Log(c + " up");
+                } 
+                buttonList.Add(actionButton);
+            }
+            total++;
+        }
     }
 }

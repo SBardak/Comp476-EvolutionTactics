@@ -154,6 +154,11 @@ public class Character : MonoBehaviour
         return false;
     }
 
+    public void RotateDirectly(Vector3 location)
+    {
+        transform.LookAt(location);
+    }
+
     public bool HasEnemyNeighbours()
     {
         foreach (Tile neighbour in _currentTile.neighbours)
@@ -178,6 +183,10 @@ public class Character : MonoBehaviour
             {
                 neighbourEnemies.Add(t._player);
             }
+            /*else
+            {
+                neighbourEnemies.Add(null);
+            }*/
         }
         return neighbourEnemies;
     }
