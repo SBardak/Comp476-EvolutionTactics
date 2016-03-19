@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Character : MonoBehaviour
 {
@@ -164,6 +165,21 @@ public class Character : MonoBehaviour
             }
         }
         return false;
+    }
+
+
+    public List<Character> GetNeighbourEnemies()
+    {
+        List<Tile> neighbourTiles = _currentTile.neighbours;
+        List<Character> neighbourEnemies = new List<Character>();
+        foreach (Tile t in neighbourTiles)
+        {
+            if (t._player != null && t._player.tag != tag)
+            {
+                neighbourEnemies.Add(t._player);
+            }
+        }
+        return neighbourEnemies;
     }
 
     public void SetCurrentTile(Tile tile)

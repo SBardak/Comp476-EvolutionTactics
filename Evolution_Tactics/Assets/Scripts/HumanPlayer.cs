@@ -33,6 +33,7 @@ public class HumanPlayer : Player
     public void HumanPlayer_OnReachEnd()
     {
         SelectedCharacter.Moved = true;
+        Debug.Log("Human reach end");
         EnablePicker();
 
         EndMovement();
@@ -298,6 +299,7 @@ public class HumanPlayer : Player
         _selectedTile.Deselect();
         _selectedTile = null;
         SelectedCharacter._currentTile.Deselect();
+        Debug.Log("Clear selection");
         SelectedCharacter = null;
     }
 

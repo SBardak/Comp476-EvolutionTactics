@@ -43,8 +43,13 @@ public class UIManager : MonoBehaviour
 
     public void OnClickAttack()
     {
-        // Select next nearby enemy to attack
-        Debug.Log("Attack button not yet implemented");
+        Debug.Log("Attack button clicked");
+        Character selected = _human.SelectedCharacter;
+        List<Character> neighbourEnemies = selected.GetNeighbourEnemies();
+        foreach (Character c in neighbourEnemies)
+        {
+            Debug.Log(c);
+        }
     }
 
     public void ActivateUI()
