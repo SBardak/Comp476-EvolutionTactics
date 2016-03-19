@@ -117,11 +117,10 @@ public class AttackAlgorithm : MonoBehaviour
         return modifier;
     }
 
-    void Fight(GameObject Target)
+    public int GetDamage(GameObject target)
     {
         getStats(Target);
 
-        float rand = Random.Range(0, 100);
         damage = Attack - Enemy_Defense;
 
         if (GetComponent<PokemonStats>().AttackBonus() == true)
@@ -133,10 +132,14 @@ public class AttackAlgorithm : MonoBehaviour
             damage = 0;
         }
         damage = (int)((float)damage * typeAdvantage(Target));
+    }
+
+    public void DoDamage(GameObject target)
+    {
+        float rand = Random.Range(0, 100);
         if (rand <= Accuracy)
         {
             Enemy_CurrentHealth -= damage;
         }
-
     }
 }
