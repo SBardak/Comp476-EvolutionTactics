@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(Picker))]
 public class HumanPlayer : Player
@@ -7,11 +8,13 @@ public class HumanPlayer : Player
     private bool _isPlaying;
 
     public Character SelectedCharacter;
+    public Character SelectedEnemyCharacter;
     private Tile _selectedTile;
     [SerializeField]
     private Character[] _characters;
 
     private Picker _pickerScript;
+    public List<Tile> selectableTiles = null;
 
     void Awake()
     {
@@ -140,6 +143,13 @@ public class HumanPlayer : Player
     /// <param name="t"></param>
     public void HandleSelection(Tile t)
     {
+        Debug.Log(selectableTiles);
+        if (selectableTiles != null && CanBeSelected(t))
+        {
+            HandleEnemySelection(t);
+            return;
+        }
+
         // No selected units
         if (SelectedCharacter == null)
         {
@@ -209,6 +219,78 @@ public class HumanPlayer : Player
                 BeginMovement(t);
             }
         }
+    }
+
+    public void HandleEnemySelection(Tile t)
+    {
+        Debug.Log("allo");
+        // No selected units
+        if (SelectedEnemyCharacter == null)
+        {
+            // Nothing on tile
+            if (t._player == null)
+            {
+                // TODO: Something
+                Debug.Log("NO CHARACTER");
+            }
+            else
+            {
+                // Check if mine or not
+                if (!IsMine(t._player))
+                {
+                    // Select
+                    SelectedEnemyCharacter = t._player;
+
+                    // TODO: Notify UI
+                    Debug.Log("SELECTED ENEMY");
+
+                    _selectedTile = t;
+                    _selectedTile.SetSelected();
+                    ShowCharacterRange(_selectedTile);
+                    UIManager.Instance.CreateAcceptButtonAttack(t._player);
+                }
+                // Not mine, check stats?
+                else
+                {
+                    // TODO: Notify UI
+                    Debug.Log("SELECTED MINE");
+                }
+            }
+        }
+        // Selected unit
+        else
+        {
+            // Selected tile contains something
+            // TODO: Add more, check for chars only right now
+            if (t._player != null)
+            {
+                Debug.Log("CONTAINS CHARACTER");
+                return;
+            }
+            else
+            {
+                // Check if already moved
+                if (SelectedCharacter.Moved)
+                    return;
+
+                // TODO: Change
+                // Check movement range
+                if (!t.IsMovementTile())
+                {
+                    // Unreachable terrain (further than walkable)
+                    Debug.Log("INVALID MOVE");
+                    return;
+                }
+
+                // Reachable terrain
+                BeginMovement(t);
+            }
+        }
+    }
+
+    private bool CanBeSelected(Tile tile)
+    {
+        return selectableTiles.Contains(tile);
     }
 
     bool isInMovement = false;
@@ -301,6 +383,7 @@ public class HumanPlayer : Player
         SelectedCharacter._currentTile.Deselect();
         Debug.Log("Clear selection");
         SelectedCharacter = null;
+        SelectedEnemyCharacter = null;
     }
 
     #endregion

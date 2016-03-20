@@ -15,6 +15,8 @@ public class UIManager : MonoBehaviour
     public Button _waitButton;
     public Button _attackWhereButton;
 
+    private static List<Button> buttonList;
+
     void Start()
     {
         UIManager.Instance = this;
@@ -39,26 +41,24 @@ public class UIManager : MonoBehaviour
         EndCurrentPokemonAction();
     }
 
-    private Character enemy;
     private int damage;
+    private Character selectedEnemy;
 
-    // TODO NEED TO BE ABLE TO SELECT WHICH ENEMY TO ATTACK
     public void OnClickAttack()
     {
         Debug.Log("Attack button clicked");
         buttonList[0].enabled = false;
         buttonList[0].GetComponent<Image>().color = new Color(0.5f, 0.5f, 0.5f);
         Character selected = _human.SelectedCharacter;
-        List<Character> neighbourEnemies = selected.GetNeighbourEnemies();
+        List<Tile> neighbourTiles = selected.GetNeighbourTiles();
 
+        _human.selectableTiles = selected.GetNeighbourTiles();
+        _human.EnablePicker();
+        Debug.LogWarning("Select an enemy to attack");
+    }
 
-        AttackAlgorithm attack = selected.GetComponent<AttackAlgorithm>();
-        // CHANGE FROM HERE
-        enemy = neighbourEnemies[0];
-        damage = attack.GetDamage(enemy);
-
-        Debug.LogWarning("Press middle button to accept");
-
+    public void CreateAcceptButtonAttack(Character enemy)
+    {
         Transform canvas = GameObject.Find("Canvas").transform;
         Button actionButton = Instantiate(_attackWhereButton, new Vector3(0, 0, 0), Quaternion.identity) as Button;
         actionButton.transform.SetParent(canvas);
@@ -71,28 +71,34 @@ public class UIManager : MonoBehaviour
             });
         buttonList.Add(actionButton);
 
-        //TODO Need to stay here, but be modified
+        selectedEnemy = enemy;
+
+        Character selected = _human.SelectedCharacter;
         selected.RotateDirectly(enemy.transform.position);
 
-        //CreateAttackButtons(neighbourEnemies);
+        AttackAlgorithm attack = selected.GetComponent<AttackAlgorithm>();
+        damage = attack.GetDamage(enemy);
 
+        Debug.LogWarning("Press middle button to accept");
+    }
+
+    public void Attack()
+    {
+        _human.SelectedCharacter.GetComponent<AttackAlgorithm>().DoDamage(selectedEnemy);
+        //Need to be here
+        EndCurrentPokemonAction();
     }
 
     private void EndCurrentPokemonAction()
     {
         if (_human.SelectedCharacter != null)
+        {
             _human.HumanPlayer_OnReachEnd();
+            _human.selectableTiles = null;
+        }
 
         DeleteHumanPlayerActionUI();
     }
-
-    public void Attack()
-    {
-        _human.SelectedCharacter.GetComponent<AttackAlgorithm>().DoDamage(enemy);
-        //Need to be here
-        EndCurrentPokemonAction();
-    }
-
 
     private static IEnumerator WaitForKeyDown(string key)
     {
@@ -119,10 +125,6 @@ public class UIManager : MonoBehaviour
             }
         }
     }
-
-
-
-    private static List<Button> buttonList;
 
     public void CreateHumanPlayerActionUI(Character character)
     {

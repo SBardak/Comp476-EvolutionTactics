@@ -173,22 +173,9 @@ public class Character : MonoBehaviour
     }
 
 
-    public List<Character> GetNeighbourEnemies()
+    public List<Tile> GetNeighbourTiles()
     {
-        List<Tile> neighbourTiles = _currentTile.neighbours;
-        List<Character> neighbourEnemies = new List<Character>();
-        foreach (Tile t in neighbourTiles)
-        {
-            if (t._player != null && t._player.tag != tag)
-            {
-                neighbourEnemies.Add(t._player);
-            }
-            /*else
-            {
-                neighbourEnemies.Add(null);
-            }*/
-        }
-        return neighbourEnemies;
+        return _currentTile.neighbours;
     }
 
     public void SetCurrentTile(Tile tile)
