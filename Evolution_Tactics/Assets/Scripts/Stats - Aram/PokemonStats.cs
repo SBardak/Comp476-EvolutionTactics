@@ -36,7 +36,7 @@ public class PokemonStats : MonoBehaviour
         }
         else if (CurrentHealth <= 0)
         {
-            // Destroy(gameObject);
+            gameObject.SendMessage("HandleDeath");
         }
     }
     // Update is called once per frame

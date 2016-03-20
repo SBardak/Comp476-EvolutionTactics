@@ -4,8 +4,9 @@ using System.Collections;
 public class Unit : MonoBehaviour
 {
 
-    public delegate void MovementCompleteHandler(Unit u);
-    public event MovementCompleteHandler MovementComplete;
+    public delegate void UnitHandler(Unit u);
+    public event UnitHandler MovementComplete;
+    public event UnitHandler Death;
 
     Character _char;
     Pathfinding _pathfinding;
@@ -13,7 +14,7 @@ public class Unit : MonoBehaviour
     Character Character {
         get {
             if (_char == null)
-               _char = GetComponent<Character>();
+               _char = GetComponentInChildren<Character>();
             return _char;
         }
     }
@@ -25,9 +26,8 @@ public class Unit : MonoBehaviour
 
     void Awake()
     { 
-        if (GetComponent<Pathfinding>() != null)
+        if ((_pathfinding = GetComponentInChildren<Pathfinding>()) != null)
         {
-            _pathfinding = GetComponent < Pathfinding>();
             _pathfinding.OnReachEnd += ReachedDestination;
         }
         // Link char events to handlers
@@ -85,5 +85,12 @@ public class Unit : MonoBehaviour
         Debug.Log("Unit finished movement");
         if (MovementComplete != null)
             MovementComplete(this);
+    }
+
+
+    void HandleDeath()
+    {
+        if (Death != null)
+            Death(this);
     }
 }

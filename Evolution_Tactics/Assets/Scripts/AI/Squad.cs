@@ -11,20 +11,39 @@ public class Squad : MonoBehaviour {
     public event MovementCompleteHandler MovementComplete;
 
     [SerializeField]
-    Unit[] _units;
+    List<Unit> _units;
     int _selectedUnit = 0;
+
+    Player _controlling;
 
     public void SetControllingPlayer(Player p)
     {
+        _controlling = p;
         foreach (var u in _units)
             u.SetControllingPlayer(p);
     }
 
-    void Start()
+    void Awake()
     {
+        var characters = GetComponentsInChildren<Character>();
+        _units = new List<Unit>();
+        for (int i = 0; i < characters.Length; i++)
+            _units.Add(characters[i].gameObject.AddComponent<Unit>());
+
+        if (_controlling != null)
+            SetControllingPlayer(_controlling);
+
         // Move this somewhere else probably
         foreach (var u in _units)
+        {
             u.MovementComplete += MoveComplete;
+            u.Death += UnitDeath;
+        }
+    }
+
+    private void UnitDeath(Unit u)
+    {
+        _units.Remove(u);
     }
 
     /// <summary>
@@ -45,7 +64,7 @@ public class Squad : MonoBehaviour {
     public void MoveSquad()
     {
         // This shouldn't happen
-        if (_units.Length == 0)
+        if (_units.Count == 0)
         {
             NotifyMovementComplete();
             return;
@@ -118,6 +137,6 @@ public class Squad : MonoBehaviour {
     /// <returns></returns>
     bool AllUnitsMoved()
     {
-        return _selectedUnit >= _units.Length;
+        return _selectedUnit >= _units.Count;
     }
 }

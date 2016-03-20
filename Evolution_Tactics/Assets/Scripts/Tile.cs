@@ -81,7 +81,7 @@ public class Tile : MonoBehaviour
         if (_player == null) return;
 
         int maxAttackRange = 1;
-        int movementRange = _player.GetComponent<MovementRange>().Range + maxAttackRange;
+        int movementRange = _player.GetComponent<PokemonStats>().MovementRange + maxAttackRange;
         MovementUIRecursive(movementRange, maxAttackRange, _player.ControllingPlayer);
     }
     void MovementUIRecursive(int reach, int min, Player p)
@@ -116,7 +116,7 @@ public class Tile : MonoBehaviour
         if (_player == null) return;
 
         int maxAttackRange = 1;
-        int movementRange = _player.GetComponent<MovementRange>().Range + maxAttackRange;
+        int movementRange = _player.GetComponent<PokemonStats>().MovementRange + maxAttackRange;
         ClearMovementUIRecursive(movementRange);
     }
     void ClearMovementUIRecursive(int reach)

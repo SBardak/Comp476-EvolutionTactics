@@ -82,7 +82,7 @@ public class Pathfinding : MonoBehaviour
                         {
                             GoalAttained = true;
 
-                            if (tag == "AI" && OnReachEnd != null)
+                            if (OnReachEnd != null)
                                 OnReachEnd();
                         }
                         else if (collisionArray[i].GetComponent(typeof(Tile)) == pathList[counter])

@@ -85,18 +85,12 @@ public class UIManager : MonoBehaviour
     public void Attack()
     {
         _human.SelectedCharacter.GetComponent<AttackAlgorithm>().DoDamage(selectedEnemy);
-        //Need to be here
         EndCurrentPokemonAction();
     }
 
     private void EndCurrentPokemonAction()
     {
-        if (_human.SelectedCharacter != null)
-        {
-            _human.HumanPlayer_OnReachEnd();
-            _human.selectableTiles = null;
-        }
-
+        _human.FinishCharacterMove();
         DeleteHumanPlayerActionUI();
     }
 

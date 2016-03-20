@@ -18,7 +18,17 @@ public class Character : MonoBehaviour
 
     public Tile _currentTile;
 
-    public Player ControllingPlayer;
+    private Player _controllerPlayer;
+    public Player ControllingPlayer {
+        get { return _controllerPlayer; }
+        set {
+            _controllerPlayer = value;
+            if (GetComponent<HP_Tracker>() != null)
+            {
+                GetComponent<HP_Tracker>().SetColor(_controllerPlayer.TeamColor);
+            }
+        }
+    }
 
     void Awake()
     {

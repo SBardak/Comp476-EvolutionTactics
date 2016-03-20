@@ -8,7 +8,6 @@ public class HumanPlayer : Player
     private bool _isPlaying;
 
     public Character SelectedCharacter;
-    public Character SelectedEnemyCharacter;
     private Tile _selectedTile;
     [SerializeField]
     private Character[] _characters;
@@ -143,12 +142,6 @@ public class HumanPlayer : Player
     /// <param name="t"></param>
     public void HandleSelection(Tile t)
     {
-        if (selectableTiles != null && CanBeSelected(t))
-        {
-            HandleEnemySelection(t);
-            return;
-        }
-
         // No selected units
         if (SelectedCharacter == null)
         {
@@ -196,72 +189,12 @@ public class HumanPlayer : Player
             // TODO: Add more, check for chars only right now
             if (t._player != null)
             {
-                Debug.Log("CONTAINS CHARACTER");
-                return;
-            }
-            else
-            {
-                // Check if already moved
-                if (SelectedCharacter.Moved)
-                    return;
-
-                // TODO: Change
-                // Check movement range
-                if (!t.IsMovementTile())
-                {
-                    // Unreachable terrain (further than walkable)
-                    Debug.Log("INVALID MOVE");
-                    return;
-                }
-
-                // Reachable terrain
-                BeginMovement(t);
-            }
-        }
-    }
-
-    public void HandleEnemySelection(Tile t)
-    {
-        // No selected units
-        if (SelectedEnemyCharacter == null)
-        {
-            // Nothing on tile
-            if (t._player == null)
-            {
-                // TODO: Something
-                Debug.Log("NO CHARACTER");
-            }
-            else
-            {
-                // Check if mine or not
                 if (!IsMine(t._player))
                 {
-                    // Select
-                    SelectedEnemyCharacter = t._player;
-
-                    // TODO: Notify UI
-                    Debug.Log("SELECTED ENEMY");
-
-                    _selectedTile = t;
-                    _selectedTile.SetSelected();
-                    ShowCharacterRange(_selectedTile);
                     UIManager.Instance.CreateAcceptButtonAttack(t._player);
+                    return;
                 }
-                // Not mine, check stats?
-                else
-                {
-                    // TODO: Notify UI
-                    Debug.Log("SELECTED MINE");
-                }
-            }
-        }
-        // Selected unit
-        else
-        {
-            // Selected tile contains something
-            // TODO: Add more, check for chars only right now
-            if (t._player != null)
-            {
+
                 Debug.Log("CONTAINS CHARACTER");
                 return;
             }
@@ -319,7 +252,7 @@ public class HumanPlayer : Player
 
         // TODO: Remove
         // For now, deactivate
-        FinishCharacterMove();
+        //FinishCharacterMove();
     }
 
     public bool IsMine(Character o)
@@ -381,7 +314,6 @@ public class HumanPlayer : Player
         SelectedCharacter._currentTile.Deselect();
         Debug.Log("Clear selection");
         SelectedCharacter = null;
-        SelectedEnemyCharacter = null;
     }
 
     #endregion

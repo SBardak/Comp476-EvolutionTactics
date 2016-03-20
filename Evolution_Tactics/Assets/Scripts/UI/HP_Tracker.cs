@@ -15,9 +15,7 @@ public class HP_Tracker : MonoBehaviour
 
     public int _maxHp, _currentHp;
 
-    [SerializeField]
-    Color c;
-    // TODO: Change so that the color can be generated at launch
+    Color c = Color.black; 
 
     void Start()
     {
@@ -36,8 +34,7 @@ public class HP_Tracker : MonoBehaviour
         _maxHp = stats.MaxHealth;
         _currentHp = stats.CurrentHealth;
 
-        _instantiated.GetComponent<HP_Tracker_UI>().SetColor(c);
-
+        SetColor(c);
         SetHP();
     }
 
@@ -49,9 +46,13 @@ public class HP_Tracker : MonoBehaviour
         screenPos.y -= yOffset;
 
         _rect.position = screenPos;
+    }
 
-        // TODO: REMOVE ME
-        //SetHP();
+    public void SetColor(Color color)
+    {
+        c = color;
+        if (_instantiated != null)
+            _instantiated.GetComponent<HP_Tracker_UI>().SetColor(c);
     }
 
     private void SetHP()
@@ -63,5 +64,11 @@ public class HP_Tracker : MonoBehaviour
     {
         _currentHp = currentHp;
         SetHP();
+    }
+
+    void HandleDeath()
+    {
+        Destroy(_instantiated.gameObject);
+        Destroy(gameObject);
     }
 }

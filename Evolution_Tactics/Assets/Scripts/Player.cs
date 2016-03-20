@@ -4,4 +4,6 @@ using System.Collections;
 public class Player : MonoBehaviour {
 
     public virtual void StartTurn() {}
+
+    public Color TeamColor;
 }
