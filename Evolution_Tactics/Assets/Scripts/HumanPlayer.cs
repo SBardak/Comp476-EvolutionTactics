@@ -143,7 +143,6 @@ public class HumanPlayer : Player
     /// <param name="t"></param>
     public void HandleSelection(Tile t)
     {
-        Debug.Log(selectableTiles);
         if (selectableTiles != null && CanBeSelected(t))
         {
             HandleEnemySelection(t);
@@ -223,7 +222,6 @@ public class HumanPlayer : Player
 
     public void HandleEnemySelection(Tile t)
     {
-        Debug.Log("allo");
         // No selected units
         if (SelectedEnemyCharacter == null)
         {
