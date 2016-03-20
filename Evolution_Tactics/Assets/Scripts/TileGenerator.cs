@@ -15,6 +15,7 @@ public class TileGeneratorInspector
 {
     public string Name;
     public string charCode;
+    public int occurence = 1;
 
     public TileStats.type Type;
 }
@@ -44,7 +45,7 @@ public class TileGenerator : MonoBehaviour
         foreach (var t in _tilePrefabs)
             dict.Add(t.charCode, t.Type);
 
-        if (TestMap != null && !ReadMap())
+        if (TestMap == null || !ReadMap())
         {
             tiles = new Tile[mapWidth, mapHeight];
             CreateMap();
@@ -199,6 +200,8 @@ public class TileGenerator : MonoBehaviour
 
     private void CreateMap()
     {
+        var table = GenerateProbabilityRanges();
+
         map = new GameObject();
         map.name = "Map";
 
@@ -206,11 +209,44 @@ public class TileGenerator : MonoBehaviour
         {
             for (int j = 0; j < mapHeight; j++)
             {
-                tiles[i, j] = Instantiate(tilePrefab, new Vector3(i, 0f, j), Quaternion.identity) as Tile;
+                var tileIndex = Random.Range(0, 101);
+
+                var tile = Instantiate(tilePrefab, new Vector3(i, 0f, j), Quaternion.identity) as Tile;
+                SetTileType(GetTileType(table, tileIndex), tile.gameObject);
+                tiles[i, j] = tile;
                 tiles[i, j].transform.parent = map.transform;
                 tiles[i, j].name = "TILE " + (i * mapWidth + j);
             }
         }
+    }
+
+    private List<KeyValuePair<int, TileGeneratorInspector>> GenerateProbabilityRanges()
+    {
+        int max = 0;
+        int totalSoFar = 0;
+        List<KeyValuePair<int, TileGeneratorInspector>> table =
+            new List<KeyValuePair<int, TileGeneratorInspector>>();
+
+        foreach (var tp in _tilePrefabs)
+        {
+            if (tp.occurence < 0)
+                tp.occurence = 0;
+            max += tp.occurence;
+        }
+
+        foreach (var tp in _tilePrefabs)
+        {
+            totalSoFar += tp.occurence * 100 / max;
+            table.Add(new KeyValuePair<int, TileGeneratorInspector>(totalSoFar, tp));
+        }
+
+        return table;
+    }
+    private string GetTileType(List<KeyValuePair<int, TileGeneratorInspector>> table, int value)
+    {
+        foreach (var t in table)
+            if (t.Key > value) return t.Value.charCode;
+        return table[0].Value.charCode;
     }
 
     public Tile[,] Tiles
