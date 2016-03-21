@@ -37,18 +37,21 @@ public class Unit : MonoBehaviour
     }
 
     public void Activate()
-    { 
-        // _char.Activate();
+    {
+        _char.Activate();
     }
 
     public void Move()
     { 
         _pathfinding.RandomPath();
 
-        // if (!_char.IsActivated)
-        //FinishedMove();
+        if (!_char.IsActivated)
+            FinishedMove();
 
         // Decide where to move
+
+        // For the moment, only consider going towards enemies
+        // TODO: ADD MORE
 
         // Move the character
         // _char.Move() (or whatever)

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 // Started by: Lukas
 // Modified by:
@@ -82,7 +83,16 @@ public class Tile : MonoBehaviour
 
         int maxAttackRange = 1;
         int movementRange = _player.GetComponent<PokemonStats>().MovementRange + maxAttackRange;
-        MovementUIRecursive(movementRange, maxAttackRange, _player.ControllingPlayer);
+        //MovementUIRecursive(movementRange, maxAttackRange, _player.ControllingPlayer);
+
+        foreach (var item in GetTiles())
+        {
+            if (item.Value <= movementRange - maxAttackRange)
+                item.Key.SetDecoration(TileDecorationType.MOVE);
+            else
+                item.Key.SetDecoration(TileDecorationType.ATTACK);
+        }
+        //GetTiles();
     }
     void MovementUIRecursive(int reach, int min, Player p)
     {
@@ -109,15 +119,113 @@ public class Tile : MonoBehaviour
     }
 
     /// <summary>
+    /// Returns a dictionary of Tiles and their range from current
+    /// </summary>
+    /// <returns></returns>
+    public Dictionary<Tile, int> GetTiles()
+    {
+        PokemonStats stats;
+        if (_player == null || 
+            (stats = _player.GetComponent<PokemonStats>()) == null) return null;
+
+        int maxAttackRange = stats.DEBUG_MAX_ATTACK_RANGE;
+        int movementRange = stats.MovementRange;
+        var hs = GetTilesB(movementRange, maxAttackRange);
+
+        // TODO: Remove
+        //foreach (var t in hs)
+        //{
+        //    t.Key.OnHover();
+        //}
+
+        return hs;
+    }
+    /// <summary>
+    /// Breadth first search
+    /// </summary>
+    /// <param name="reach"></param>
+    /// <returns></returns>
+    Dictionary<Tile, int> GetTilesB(int reach, int attack)
+    {
+        // Variables
+        int total = reach + attack;
+        int r = 0; // r is Tile current reach
+
+        List<KeyValuePair<Tile, int>> open = new List<KeyValuePair<Tile, int>>();
+        Dictionary<Tile, int> closed = new Dictionary<Tile, int>();
+        open.Add(new KeyValuePair<Tile, int>(this, 0));
+
+        // Open list should contain only reachable + attackable
+        while (open.Count != 0)
+        {
+            // Take and remove first
+            var kvp = open[0];
+            open.RemoveAt(0);
+            r = kvp.Value;
+
+            // Out of bounds (This limits the open list)
+            if (r > total) continue;
+
+            // Tile contains an enemy, no point doing anything. Set reach to total to be seen as attack
+            if (ContainsEnemy(kvp.Key, _player.ControllingPlayer))
+            {
+                closed.Add(kvp.Key, total);
+                continue;
+            }
+
+            // Add to the closed list with current reach
+            closed.Add(kvp.Key, r);
+
+            // If it's a movement tile, reduce depending on neighbours
+            if (r <= reach)
+            {
+                foreach (var n in kvp.Key.neighbours)
+                {
+                    if (ContainsEnemy(n, _player.ControllingPlayer))
+                        ++r;
+                }
+                // Went to far, but still want to consider 'attack' count of Tiles to add
+                if (r >= (total - attack)) r = total - attack; 
+            }
+
+            // +1 for the next tile
+            ++r;
+
+            // Go through all neighbours. Add or update open list
+            foreach (var n in kvp.Key.neighbours)
+            {
+                if (!closed.ContainsKey(n))
+                {
+                    int index = open.FindIndex(x => x.Key == n);
+                    if (index != -1)
+                    {
+                        if (open[index].Value > r)
+                            open[index] = new KeyValuePair<Tile, int>(n, r);
+                        else
+                            continue;
+                    }
+                    else
+                        open.Add(new KeyValuePair<Tile, int>(n, r));
+                }
+            }
+        }
+
+        // Finished!
+        return closed;
+    }
+
+    /// <summary>
     /// Clear all movement/attack UI
     /// </summary>
     public void ClearMovementUI()
     {
         if (_player == null) return;
 
-        int maxAttackRange = 1;
+        int maxAttackRange = _player.GetComponent<PokemonStats>().DEBUG_MAX_ATTACK_RANGE;
         int movementRange = _player.GetComponent<PokemonStats>().MovementRange + maxAttackRange;
-        ClearMovementUIRecursive(movementRange);
+        //ClearMovementUIRecursive(movementRange);
+        foreach (var item in GetTiles())
+            item.Key.ResetDecoration();
     }
     void ClearMovementUIRecursive(int reach)
     {

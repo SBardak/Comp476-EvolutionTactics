@@ -11,6 +11,8 @@ public class PokemonStats : MonoBehaviour
     public int Accuracy = 100;
     public int MovementRange = 3;
 
+    public int DEBUG_MAX_ATTACK_RANGE = 1;
+
     TileStats.type TileType;
     public TileStats.type MyType = TileStats.type.Fire;
 
