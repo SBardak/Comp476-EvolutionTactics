@@ -189,7 +189,7 @@ public class HumanPlayer : Player
             // TODO: Add more, check for chars only right now
             if (t._player != null)
             {
-                if (!IsMine(t._player))
+                if (selectableTiles != null && CanBeSelected(t) && !IsMine(t._player))
                 {
                     UIManager.Instance.CreateAcceptButtonAttack(t._player);
                     return;

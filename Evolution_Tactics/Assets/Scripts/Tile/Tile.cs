@@ -3,15 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-// Started by: Lukas
-// Modified by:
 
-/*
-  This script is for the moment only for testing purpose
-  */
 public enum TileDecorationType
 {
-    NORMAL, ATTACK, MOVE
+    NORMAL,
+    ATTACK,
+    MOVE
 }
 
 public class Tile : MonoBehaviour
@@ -57,6 +54,7 @@ public class Tile : MonoBehaviour
         if (_ActiveDecoration != null)
             _ActiveDecoration.SetActive(true);
     }
+
     /// <summary>
     /// Is the tile a movement tile?
     /// </summary>
@@ -65,6 +63,7 @@ public class Tile : MonoBehaviour
     {
         return GetDecoration() == TileDecorationType.MOVE;
     }
+
     /// <summary>
     /// Get current tile decoration
     /// </summary>
@@ -79,7 +78,8 @@ public class Tile : MonoBehaviour
     /// </summary>
     public void MovementUI()
     {
-        if (_player == null) return;
+        if (_player == null)
+            return;
 
         int maxAttackRange = 1;
         int movementRange = _player.GetComponent<PokemonStats>().MovementRange + maxAttackRange;
@@ -94,6 +94,7 @@ public class Tile : MonoBehaviour
         }
         //GetTiles();
     }
+
     void MovementUIRecursive(int reach, int min, Player p)
     {
         if (reach < min || ContainsEnemy(this, p))
@@ -108,11 +109,13 @@ public class Tile : MonoBehaviour
 
         // REMOVE THIS LINE TO KEEP INITIAL REACH
         foreach (var n in neighbours)
-            if (ContainsEnemy(n, p)) --reach;
+            if (ContainsEnemy(n, p))
+                --reach;
 
         foreach (var n in neighbours)
             n.MovementUIRecursive(reach - 1, min, p);
     }
+
     bool ContainsEnemy(Tile t, Player p)
     {
         return t._player != null && t._player.ControllingPlayer != p;
@@ -125,8 +128,9 @@ public class Tile : MonoBehaviour
     public Dictionary<Tile, int> GetTiles()
     {
         PokemonStats stats;
-        if (_player == null || 
-            (stats = _player.GetComponent<PokemonStats>()) == null) return null;
+        if (_player == null ||
+            (stats = _player.GetComponent<PokemonStats>()) == null)
+            return null;
 
         int maxAttackRange = stats.DEBUG_MAX_ATTACK_RANGE;
         int movementRange = stats.MovementRange;
@@ -140,6 +144,7 @@ public class Tile : MonoBehaviour
 
         return hs;
     }
+
     /// <summary>
     /// Breadth first search
     /// </summary>
@@ -164,7 +169,8 @@ public class Tile : MonoBehaviour
             r = kvp.Value;
 
             // Out of bounds (This limits the open list)
-            if (r > total) continue;
+            if (r > total)
+                continue;
 
             // Tile contains an enemy, no point doing anything. Set reach to total to be seen as attack
             if (ContainsEnemy(kvp.Key, _player.ControllingPlayer))
@@ -185,7 +191,8 @@ public class Tile : MonoBehaviour
                         ++r;
                 }
                 // Went to far, but still want to consider 'attack' count of Tiles to add
-                if (r >= (total - attack)) r = total - attack; 
+                if (r >= (total - attack))
+                    r = total - attack; 
             }
 
             // +1 for the next tile
@@ -219,7 +226,8 @@ public class Tile : MonoBehaviour
     /// </summary>
     public void ClearMovementUI()
     {
-        if (_player == null) return;
+        if (_player == null)
+            return;
 
         int maxAttackRange = _player.GetComponent<PokemonStats>().DEBUG_MAX_ATTACK_RANGE;
         int movementRange = _player.GetComponent<PokemonStats>().MovementRange + maxAttackRange;
@@ -227,6 +235,7 @@ public class Tile : MonoBehaviour
         foreach (var item in GetTiles())
             item.Key.ResetDecoration();
     }
+
     void ClearMovementUIRecursive(int reach)
     {
         if (reach < 0)
@@ -256,6 +265,7 @@ public class Tile : MonoBehaviour
     }
 
     #region Selection
+
     /// <summary>
     /// Used for hovering the tile
     /// </summary>
@@ -264,6 +274,7 @@ public class Tile : MonoBehaviour
         if (!_Selected.activeSelf)
             _Hover.SetActive(true);
     }
+
     /// <summary>
     /// Resets the hover
     /// </summary>
@@ -276,10 +287,12 @@ public class Tile : MonoBehaviour
     {
         _Selected.SetActive(true);
     }
+
     public void Deselect()
     {
         _Selected.SetActive(false);
     }
+
     #endregion Selection
 
     // Get its neighbours
