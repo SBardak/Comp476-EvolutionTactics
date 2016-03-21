@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 
 /// <summary>
 /// To minimize conditions in the update loop while units move and attack,
