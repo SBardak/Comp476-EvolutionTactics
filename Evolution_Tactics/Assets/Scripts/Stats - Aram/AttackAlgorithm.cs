@@ -121,7 +121,6 @@ public class AttackAlgorithm : MonoBehaviour
 
         damage = Attack - Enemy_Defense;
 
-        //TODO PUT BACK TILE ATTACK BONUS
         if (GetComponent<PokemonStats>().AttackBonus() == true)
         {
             damage = (int)((float)damage * 1.2f);
@@ -133,6 +132,25 @@ public class AttackAlgorithm : MonoBehaviour
         damage = (int)((float)damage * typeAdvantage(target));
 
         Debug.LogWarning("It would do " + damage + " damages to " + target.name);
+
+        return damage;
+    }
+
+    public int GetDamage(Character target, Tile tile)
+    {
+        getStats(target);
+
+        damage = Attack - Enemy_Defense;
+
+        if (GetComponent<PokemonStats>().AttackBonus(tile) == true)
+        {
+            damage = (int)((float)damage * 1.2f);
+        }
+        if (damage <= 0)
+        {
+            damage = 0;
+        }
+        damage = (int)((float)damage * typeAdvantage(target));
 
         return damage;
     }

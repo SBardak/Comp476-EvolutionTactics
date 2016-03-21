@@ -119,11 +119,10 @@ public class Pathfinding : MonoBehaviour
         return player.MoveTo(_endNode.transform.position, pathList[pathList.Count - 2].transform.position);
     }
 
-
-    public void RandomPath()
+    public void SetPath(Tile end)
     {
         StartNode = player._currentTile;
-        _endNode = nodeList[Random.Range(0, nodeList.Count - 1)];
+        _endNode = end;
 
         CalculateNewPath();
     }
@@ -140,15 +139,13 @@ public class Pathfinding : MonoBehaviour
         if (_startNode == _endNode)
         {
             // might add more behaviour
-            Debug.Log("SAME TILE");       
-            RandomPath();
+            Debug.Log("SAME TILE");     
             return;
         }
         // if player select a non-empty tile
         if (_endNode._player != null)
         {
             Debug.Log("Need to select empty tile");
-            RandomPath();
             return;
         }
         

@@ -32,6 +32,7 @@ public class UIManager : MonoBehaviour
     public void OnClickEndHumanTurn()
     {
         _human.EndTurn();
+        DeleteHumanPlayerActionUI();
     }
 
     public void OnClickEndSelectedCharacterTurn()
