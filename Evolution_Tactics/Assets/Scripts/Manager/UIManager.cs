@@ -51,7 +51,6 @@ public class UIManager : MonoBehaviour
         buttonList[0].enabled = false;
         buttonList[0].GetComponent<Image>().color = new Color(0.5f, 0.5f, 0.5f);
         Character selected = _human.SelectedCharacter;
-        List<Tile> neighbourTiles = selected.GetNeighbourTiles();
 
         _human.selectableTiles = selected.GetNeighbourTiles();
         _human.EnablePicker();
@@ -75,7 +74,6 @@ public class UIManager : MonoBehaviour
         selectedEnemy = enemy;
 
         Character selected = _human.SelectedCharacter;
-        selected.RotateDirectly(enemy.transform.position);
 
         AttackAlgorithm attack = selected.GetComponent<AttackAlgorithm>();
         damage = attack.GetDamage(enemy);
@@ -85,7 +83,7 @@ public class UIManager : MonoBehaviour
 
     public void Attack()
     {
-        _human.SelectedCharacter.GetComponent<AttackAlgorithm>().DoDamage(selectedEnemy);
+        _human.SelectedCharacter.Attack(selectedEnemy);
         EndCurrentPokemonAction();
     }
 

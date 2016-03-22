@@ -45,25 +45,25 @@ public class Unit : MonoBehaviour
         _char.Activate();
     }
 
+    private Character enemyToAttack = null;
+
     public void Move()
     { 
+        enemyToAttack = null;
         Tile nextTile = FindBestTile();
         Debug.Log(gameObject.name + " " + nextTile);
-        if (nextTile != null && nextTile != Character._currentTile && nextTile._player == null)
+        if (nextTile != null && nextTile._player == null)
         {
             _pathfinding.SetPath(nextTile);
         }
         else
         {
             _char.IsActivated = false;
+            if (!_char.IsActivated)
+                FinishedMove();
         }
 
-        if (!_char.IsActivated)
-            FinishedMove();
-
-        // Decide where to move
-
-        // For the moment, only consider going towards enemies
+        // For the moment, only consider going damage made to enemy
         // TODO: ADD MORE
 
         // Move the character
@@ -73,22 +73,25 @@ public class Unit : MonoBehaviour
     void ReachedDestination()
     {
         // Attack ?
-        // if ( decided to attack )
-        //{
-        //    Attack();
-        //}
-        // else
+        if (enemyToAttack != null)
+        {
+            Attack();
+        }
+        else
         {
             FinishedMove();
         }
     }
 
-    void Attack()
+    public void Attack()
     { 
         // Select attack
 
         // Let char do its thing
         // _char.attack(); -> End of attack event link to finished attack
+        _char.Attack(enemyToAttack);
+
+        FinishedAttack();
     }
 
     void FinishedAttack()
@@ -101,6 +104,7 @@ public class Unit : MonoBehaviour
         Debug.Log("Unit finished movement");
         if (MovementComplete != null)
             MovementComplete(this);
+        enemyToAttack = null;
     }
 
 
@@ -127,6 +131,7 @@ public class Unit : MonoBehaviour
             Tile bestTile = tilesWithEnemy[0].neighbours[0];
             AttackAlgorithm attack = GetComponentInChildren<AttackAlgorithm>();
             int highestDamage = attack.GetDamage(tilesWithEnemy[0]._player, bestTile);
+            enemyToAttack = tilesWithEnemy[0]._player;
 
             foreach (Tile t in tilesWithEnemy)
             {
@@ -136,21 +141,18 @@ public class Unit : MonoBehaviour
                     {
                         int damage = attack.GetDamage(t._player, neighbour);
 
-                        if (neighbour == Character._currentTile)
-                        {
-                            Debug.Log("Allo");
-                        }
-
                         if (damage > highestDamage)
                         {
                             bestTile = neighbour;
                             highestDamage = damage;
+                            enemyToAttack = t._player;
                         }
                     }
                 }
             }
             return bestTile;
         }
+        enemyToAttack = null;
         return null;
     }
 }

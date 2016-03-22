@@ -19,9 +19,12 @@ public class Character : MonoBehaviour
     public Tile _currentTile;
 
     private Player _controllerPlayer;
-    public Player ControllingPlayer {
+
+    public Player ControllingPlayer
+    {
         get { return _controllerPlayer; }
-        set {
+        set
+        {
             _controllerPlayer = value;
             if (GetComponent<HP_Tracker>() != null)
             {
@@ -43,6 +46,12 @@ public class Character : MonoBehaviour
     void Update()
     {
 //        _animator.SetFloat("Walk", _rb.velocity.magnitude);
+    }
+
+    public void Attack(Character enemyToAttack)
+    {
+        RotateDirectly(enemyToAttack.transform.position);
+        GetComponent<AttackAlgorithm>().DoDamage(enemyToAttack);
     }
 
     public bool MoveTo(Vector3 location, Vector3 previousLocation)

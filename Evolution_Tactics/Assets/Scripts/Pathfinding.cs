@@ -81,9 +81,6 @@ public class Pathfinding : MonoBehaviour
                         if (collisionArray[i].GetComponent(typeof(Tile)) == _endNode)
                         {
                             GoalAttained = true;
-
-                            if (OnReachEnd != null)
-                                OnReachEnd();
                         }
                         else if (collisionArray[i].GetComponent(typeof(Tile)) == pathList[counter])
                         {
@@ -109,6 +106,8 @@ public class Pathfinding : MonoBehaviour
                 {
                     _middleOfTheNodeAttained = true;
                     _hasPath = false;
+                    if (OnReachEnd != null)
+                        OnReachEnd();
                 }
             }
         }
@@ -140,7 +139,7 @@ public class Pathfinding : MonoBehaviour
         {
             // might add more behaviour
             Debug.Log("SAME TILE");     
-            return;
+            //return;
         }
         // if player select a non-empty tile
         if (_endNode._player != null)
@@ -295,6 +294,7 @@ public class Pathfinding : MonoBehaviour
                 else
                     UIManager.Instance.DeleteHumanPlayerActionUI();
             }
+
             _goalAttained = value;
         }
         get
