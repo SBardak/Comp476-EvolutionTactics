@@ -126,6 +126,8 @@ public class Unit : MonoBehaviour
         Dictionary<Tile, int> possibleTiles = Character._currentTile.GetTiles();
         List<Tile> tilesWithEnemy = new List<Tile>();
 
+        int movementRange = GetComponent<PokemonStats>().MovementRange;
+
         //get a list of the tiles in range that contain an enemy
         foreach (Tile t in possibleTiles.Keys)
         {
@@ -166,7 +168,7 @@ public class Unit : MonoBehaviour
                 foreach (Tile neighbour in t.neighbours)
                 {
                     // if (neighbour is empty or neighbour is where we currently are) and (this neighbour is in range)
-                    if ((neighbour._player == null || neighbour._player == Character) && (possibleTiles.ContainsKey(neighbour)))
+                    if ((neighbour._player == null || neighbour._player == Character) && (possibleTiles.ContainsKey(neighbour) && possibleTiles[neighbour] <= movementRange))
                     {
                         int damage = attack.GetDamage(t._player, neighbour);
 
