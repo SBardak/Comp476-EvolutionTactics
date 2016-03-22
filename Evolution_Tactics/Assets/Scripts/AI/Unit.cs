@@ -56,6 +56,11 @@ public class Unit : MonoBehaviour
         {
             _pathfinding.SetPath(nextTile);
         }
+        else if (nextTile == Character._currentTile)
+        {
+            ReachedDestination();
+            //Character.GetComponent<Pathfinding>().OnReachEnd();
+        }
         else
         {
             _char.IsActivated = false;
@@ -80,6 +85,7 @@ public class Unit : MonoBehaviour
         else
         {
             FinishedMove();
+            Debug.Log(gameObject.name + " Allo");
         }
     }
 
@@ -116,8 +122,11 @@ public class Unit : MonoBehaviour
 
     public Tile FindBestTile()
     {
+        // Get all possible tiles, including the ones where character can't move bu can attack to
         Dictionary<Tile, int> possibleTiles = Character._currentTile.GetTiles();
         List<Tile> tilesWithEnemy = new List<Tile>();
+
+        //get a list of the tiles in range that contain an enemy
         foreach (Tile t in possibleTiles.Keys)
         {
             if (t._player != null && t._player.tag == "Human")
@@ -126,21 +135,43 @@ public class Unit : MonoBehaviour
             }
         }
 
+        //if there are at least one enemy in range
+        // TODO add more conditions?
         if (tilesWithEnemy.Count > 0)
         {
-            Tile bestTile = tilesWithEnemy[0].neighbours[0];
+            Tile bestTile = null;
             AttackAlgorithm attack = GetComponentInChildren<AttackAlgorithm>();
-            int highestDamage = attack.GetDamage(tilesWithEnemy[0]._player, bestTile);
-            enemyToAttack = tilesWithEnemy[0]._player;
-
+            int highestDamage = 0;
+            //Find an initial empty best tile
             foreach (Tile t in tilesWithEnemy)
             {
+                bestTile = tilesWithEnemy[0].neighbours[0];
+                // when no player on the tile, break
+                if (bestTile._player == null)
+                {
+                    highestDamage = attack.GetDamage(tilesWithEnemy[0]._player, bestTile);
+                    enemyToAttack = tilesWithEnemy[0]._player;
+                    break;
+                }
+                else
+                {
+                    bestTile = null;
+                }
+            }
+
+            // for each tile t with an enemy in range
+            foreach (Tile t in tilesWithEnemy)
+            {
+                // for each neighbour of t
                 foreach (Tile neighbour in t.neighbours)
                 {
-                    if ((neighbour._player == null || neighbour._player == Character) && possibleTiles.ContainsKey(neighbour))
+                    // if (neighbour is empty or neighbour is where we currently are) and (this neighbour is in range)
+                    if ((neighbour._player == null || neighbour._player == Character) && (possibleTiles.ContainsKey(neighbour)))
                     {
                         int damage = attack.GetDamage(t._player, neighbour);
 
+                        // if this tile would do more damage, set it as best tile
+                        // TODO add more conditions, like damage received?
                         if (damage > highestDamage)
                         {
                             bestTile = neighbour;
@@ -152,7 +183,6 @@ public class Unit : MonoBehaviour
             }
             return bestTile;
         }
-        enemyToAttack = null;
         return null;
     }
 }
