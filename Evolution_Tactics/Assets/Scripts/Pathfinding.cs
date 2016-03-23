@@ -42,10 +42,10 @@ public class Pathfinding : MonoBehaviour
 
         // TODO REMOVED
         //Randomize start and end nodes and place player at start
-        StartNode = nodeList[Random.Range(0, nodeList.Count - 1)];
+        //StartNode = nodeList[Random.Range(0, nodeList.Count - 1)];
         //_endNode = nodeList[Random.Range(0, nodeList.Count - 1)];
 
-        player.transform.position = new Vector3(_startNode.transform.position.x, player.transform.position.y, _startNode.transform.position.z);
+        //player.transform.position = new Vector3(_startNode.transform.position.x, player.transform.position.y, _startNode.transform.position.z);
         // _startNode.GetComponent<Renderer>().material.color = Color.green;
         //_endNode.GetComponent<Renderer>().material.color = Color.red;
 

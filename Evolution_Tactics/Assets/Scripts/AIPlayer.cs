@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 /// <summary>
 /// To minimize conditions in the update loop while units move and attack,
@@ -30,6 +31,12 @@ public class AIPlayer : Player
 
         foreach (var s in _squads)
             s.SetControllingPlayer(this);
+    }
+
+    void Start()
+    {
+        foreach (var s in _squads)
+            PositionCharacter(new List<Character>(s.GetComponentsInChildren<Character>()));
     }
 
     /// <summary>

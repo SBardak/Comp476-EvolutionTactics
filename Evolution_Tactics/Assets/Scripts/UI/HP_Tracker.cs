@@ -69,6 +69,5 @@ public class HP_Tracker : MonoBehaviour
     void HandleDeath()
     {
         Destroy(_instantiated.gameObject);
-        Destroy(gameObject);
     }
 }

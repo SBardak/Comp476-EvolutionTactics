@@ -33,7 +33,8 @@ public class TileStats : MonoBehaviour {
 
 	void Start () {
         position.x = this.transform.position.x;
-        position.y = 0;
+        //position.y = 0;
+        position.y = this.transform.position.y;
         position.z = this.transform.position.z;
 
         position.x = (int)(position.x+0.1f);

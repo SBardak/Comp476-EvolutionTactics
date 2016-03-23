@@ -29,6 +29,11 @@ public class HumanPlayer : Player
         // TODO: Make a hashtable with the characters?
     }
 
+    void Start()
+    {
+        PositionCharacter(new List<Character>(_characters));
+    }
+
     /// <summary>
     /// Handle event from reaching end of walk
     /// </summary>

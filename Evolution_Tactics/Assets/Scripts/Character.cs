@@ -229,6 +229,13 @@ public class Character : MonoBehaviour
         IsActivated = false;
     }
 
+    void HandleDeath()
+    {
+        if (_currentTile != null)
+            _currentTile._player = null;
+        Destroy(gameObject);
+    }
+
     public bool Moved;
     public bool IsActivated;
 }

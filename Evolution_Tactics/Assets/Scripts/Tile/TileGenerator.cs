@@ -39,6 +39,8 @@ public class TileGenerator : MonoBehaviour
 
     Dictionary<string, TileStats.type> dict = new Dictionary<string, TileStats.type>();
 
+    float yPos = 0;
+
     void Awake()
     {
         Instance = this;
@@ -63,18 +65,23 @@ public class TileGenerator : MonoBehaviour
         int i, a;
         GetIndex(s, 0, out i, out a);
 
-        if (i == 0)
+        // No newline
+        if (i == -1)
             return false;
 
+        // Check if our maps
         var fl = s.Substring(0, i);
         if (fl != "Evo_Map")
             return false;
 
+        // Get second line which contains width/height
         int i2, a2;
         GetIndex(s, i + a, out i2, out a2);
 
         int w, h;
         GetDimensions(s.Substring(i + a, i2 - (i + a)), out w, out h);
+        mapWidth = w; mapHeight = h;
+
         s = s.Substring(i2 + a2);
 
         var col = 0;
@@ -104,7 +111,7 @@ public class TileGenerator : MonoBehaviour
             {
                 if (c == "") continue;
 
-                var tile = Instantiate(tilePrefab, new Vector3(col, 0f, row), Quaternion.identity) as Tile;
+                var tile = Instantiate(tilePrefab, new Vector3(col, yPos, row), Quaternion.identity) as Tile;
                 SetTileType(c, tile.gameObject);
                 tiles[col, row] = tile;
                 tiles[col, row].transform.parent = map.transform;
@@ -211,7 +218,7 @@ public class TileGenerator : MonoBehaviour
             {
                 var tileIndex = Random.Range(0, 101);
 
-                var tile = Instantiate(tilePrefab, new Vector3(i, 0f, j), Quaternion.identity) as Tile;
+                var tile = Instantiate(tilePrefab, new Vector3(i, yPos, j), Quaternion.identity) as Tile;
                 SetTileType(GetTileType(table, tileIndex), tile.gameObject);
                 tiles[i, j] = tile;
                 tiles[i, j].transform.parent = map.transform;
