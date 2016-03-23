@@ -149,7 +149,7 @@ public class Unit : MonoBehaviour
             {
                 bestTile = tilesWithEnemy[0].neighbours[0];
                 // when no player on the tile, break
-                if (bestTile._player == null)
+                if (possibleTiles[t] <= movementRange && bestTile._player == null)
                 {
                     highestDamage = attack.GetDamage(tilesWithEnemy[0]._player, bestTile);
                     enemyToAttack = tilesWithEnemy[0]._player;
