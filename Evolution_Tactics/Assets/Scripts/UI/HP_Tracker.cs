@@ -15,7 +15,7 @@ public class HP_Tracker : MonoBehaviour
 
     public int _maxHp, _currentHp;
 
-    Color c = Color.black; 
+    Color c = Color.black;
 
     void Start()
     {
@@ -51,9 +51,27 @@ public class HP_Tracker : MonoBehaviour
     public void SetColor(Color color)
     {
         c = color;
+        SetColorHP(c);
+    }
+    void SetColorHP(Color c)
+    {
         if (_instantiated != null)
             _instantiated.GetComponent<HP_Tracker_UI>().SetColor(c);
     }
+
+    public void HP_Activated()
+    {
+        SetColorHP(c);
+    }
+    public void HP_Deactivated()
+    {
+        var r = c.r - c.r * 0.5f;
+        var g = c.g - c.g * 0.5f;
+        var b = c.b - c.b * 0.5f;
+
+        SetColorHP(new Color(r, g, b));
+    }
+
 
     private void SetHP()
     {

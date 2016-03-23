@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 public class Character : MonoBehaviour
 {
+    public delegate void CharacterHandler (Character c);
+    public event CharacterHandler OnDeath;
+
     public Rigidbody _rb;
     private Animator _animator;
 
@@ -222,17 +225,23 @@ public class Character : MonoBehaviour
     {
         IsActivated = true;
         Moved = false;
+        GetComponent<HP_Tracker>().HP_Activated();
     }
 
     public void Deactivate()
     {
         IsActivated = false;
+        GetComponent<HP_Tracker>().HP_Deactivated();
     }
 
     void HandleDeath()
     {
         if (_currentTile != null)
             _currentTile._player = null;
+
+        if (OnDeath != null)
+            OnDeath(this);
+
         Destroy(gameObject);
     }
 

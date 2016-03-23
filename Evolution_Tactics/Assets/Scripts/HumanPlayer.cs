@@ -11,27 +11,41 @@ public class HumanPlayer : Player
     private Tile _selectedTile;
     [SerializeField]
     private Character[] _characters;
+    private List<Character> _charactersList;
 
     private Picker _pickerScript;
     public List<Tile> selectableTiles = null;
+
+    bool _finishedStart = false, _awaitingTurn = false;
 
     void Awake()
     {
         _pickerScript = GetComponent<Picker>();
         _characters = GetComponentsInChildren<Character>();
+        _charactersList = new List<Character>(_characters);
 
-        foreach (var c in _characters)
+        foreach (var c in _charactersList)
         {
             c.GetComponent<Pathfinding>().OnReachEnd += HumanPlayer_OnReachEnd;
+            c.OnDeath += Character_OnDeath;
             c.ControllingPlayer = this;
         }
 
         // TODO: Make a hashtable with the characters?
     }
 
+    private void Character_OnDeath(Character c)
+    {
+        _charactersList.Remove(c);
+    }
+
     void Start()
     {
-        PositionCharacter(new List<Character>(_characters));
+        PositionCharacter(_charactersList);
+
+        _finishedStart = true;
+        if (_awaitingTurn)
+            StartTurn();
     }
 
     /// <summary>
@@ -39,6 +53,7 @@ public class HumanPlayer : Player
     /// </summary>
     public void HumanPlayer_OnReachEnd()
     {
+        isInMovement = false;
         SelectedCharacter.Moved = true;
         Debug.Log("Human reach end");
         EnablePicker();
@@ -60,6 +75,12 @@ public class HumanPlayer : Player
 
     public override void StartTurn()
     {
+        if (!_finishedStart)
+        {
+            _awaitingTurn = true;
+            return;
+        }
+
         EnablePicker();
 
         ClearSelection();
@@ -67,8 +88,12 @@ public class HumanPlayer : Player
         Debug.Log("Human Start turn");
 
         // Reactivate all units
-        foreach (var c in _characters)
+        foreach (var c in _charactersList)
             c.Activate();
+
+        // Select first character
+        SelectCharacter(_charactersList[0]);
+        Map_Movement.Instance.CenterOn(_charactersList[0].gameObject);
 
         // anything else ?
         _isPlaying = true;
@@ -89,12 +114,26 @@ public class HumanPlayer : Player
         Debug.Log("Right mouse");
         if (SelectedCharacter != null)
         {
-            if (SelectedCharacter.Moved)
+            if (SelectedCharacter.Moved && SelectedCharacter.IsActivated)
             {
                 // Possibly reset to initial position?   
+                SelectedCharacter.Moved = false;
+                SelectedCharacter._currentTile.Deselect();
+                var pt = SelectedCharacter._currentTile;
+                ClearCharacterRange(pt);
+
+                SelectedCharacter.SetCurrentTile(_selectedTile);
+                var pos  = _selectedTile.transform.position;
+                pos.y = SelectedCharacter.transform.position.y;
+                SelectedCharacter.transform.position = pos;
+                _selectedTile.SetSelected();
+
+                ShowCharacterRange(_selectedTile);
             }
             else
             {
+                if (isInMovement)
+                    return;
                 ClearSelection();
             }
         }
@@ -140,6 +179,20 @@ public class HumanPlayer : Player
 
     #region Tile stuff
 
+    void SelectCharacter(Character c)
+    {
+        // Select
+        SelectedCharacter = c;
+
+        // TODO: Notify UI
+        Debug.Log("SELECTED MINE");
+
+        _selectedTile = c._currentTile;
+        _selectedTile.SetSelected();
+        ShowCharacterRange(_selectedTile);
+        UIManager.Instance.CreateHumanPlayerActionUI(c);
+    }
+
     /// <summary>
     /// Handles selection of a tile
     /// Maybe move to another script
@@ -168,16 +221,7 @@ public class HumanPlayer : Player
                         return;
                     }
 
-                    // Select
-                    SelectedCharacter = t._player;
-
-                    // TODO: Notify UI
-                    Debug.Log("SELECTED MINE");
-
-                    _selectedTile = t;
-                    _selectedTile.SetSelected();
-                    ShowCharacterRange(_selectedTile);
-                    UIManager.Instance.CreateHumanPlayerActionUI(t._player);
+                    SelectCharacter(t._player);
                 }
                 // Not mine, check stats?
                 else
@@ -198,6 +242,12 @@ public class HumanPlayer : Player
                 {
                     UIManager.Instance.CreateAcceptButtonAttack(t._player);
                     return;
+                }
+
+                if (IsMine(t._player) && t._player.IsActivated)
+                {
+                    ClearSelection();
+                    SelectCharacter(t._player);
                 }
 
                 Debug.Log("CONTAINS CHARACTER");
@@ -314,7 +364,9 @@ public class HumanPlayer : Player
             return;
 
         ClearCharacterRange(_selectedTile);
-        _selectedTile.Deselect();
+
+        if (_selectedTile != null)
+            _selectedTile.Deselect();
         _selectedTile = null;
         SelectedCharacter._currentTile.Deselect();
         Debug.Log("Clear selection");

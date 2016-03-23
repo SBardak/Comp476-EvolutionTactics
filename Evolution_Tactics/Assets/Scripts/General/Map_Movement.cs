@@ -3,6 +3,8 @@ using System.Collections;
 
 public class Map_Movement : MonoBehaviour {
 
+    public static Map_Movement Instance;
+
     [SerializeField]
     int _boundary = 50;
     [SerializeField]
@@ -21,8 +23,13 @@ public class Map_Movement : MonoBehaviour {
     [SerializeField]
     bool _enabled = true;
 
+    Vector3 syncPosition = Vector3.zero;
+    [SerializeField]
+    float _damp = 1.5f;
+
     void Start()
     {
+        Instance = this;
         //Cursor.SetCursor(_cursor, _hotSpot, _cursorMode);
     }
 
@@ -41,11 +48,43 @@ public class Map_Movement : MonoBehaviour {
             if (Input.mousePosition.y < _boundary || input("s"))
                 pos.z -= _speed * Time.deltaTime;
 
+            if (pos != transform.position)
+                syncPosition = Vector3.zero;
+
             pos.x = Mathf.Clamp(pos.x, _bounds.min.x, _bounds.max.x);
             pos.z = Mathf.Clamp(pos.z, _bounds.min.y, _bounds.max.y);
 
             transform.position = pos;
         }
+
+        if (syncPosition != Vector3.zero)
+        {
+            var pos = transform.position;
+
+            pos = Vector3.Lerp(transform.position, syncPosition, Time.deltaTime * _damp);
+
+            pos.x = Mathf.Clamp(pos.x, _bounds.min.x, _bounds.max.x);
+            pos.z = Mathf.Clamp(pos.z, _bounds.min.y, _bounds.max.y);
+
+            transform.position = pos;
+
+            //if (p.x == _bounds.min.x || p.x == _bounds.max.x)
+            //    syncPosition.x = p.x;
+
+            //if (p.z == _bounds.min.y || p.z == _bounds.max.y)
+            //    syncPosition.z = p.z;
+
+            if ((transform.position - syncPosition).sqrMagnitude < 0.02f)
+                syncPosition = Vector3.zero;
+        }
+    }
+
+    public void CenterOn(GameObject o)
+    {
+        syncPosition = o.transform.position;
+        syncPosition.y = transform.position.y;
+
+        syncPosition.z -= 10; // If I did my math right (z - tan(45) [which is 1] * 10)
     }
 
     bool input(string s)
