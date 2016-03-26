@@ -132,8 +132,53 @@ public class Tile : MonoBehaviour
             (stats = _player.GetComponent<PokemonStats>()) == null)
             return null;
 
-        int maxAttackRange = stats.DEBUG_MAX_ATTACK_RANGE;
+        int maxAttackRange = stats.AttackRange;
         int movementRange = stats.MovementRange;
+        var hs = GetTilesB(movementRange, maxAttackRange);
+
+        // TODO: Remove
+        //foreach (var t in hs)
+        //{
+        //    t.Key.OnHover();
+        //}
+
+        return hs;
+    }
+
+    /// <summary>
+    /// Returns a dictionary of Tiles and their range from current
+    /// </summary>
+    /// <returns></returns>
+    public Dictionary<Tile, int> GetTiles(int movementRange)
+    {
+        PokemonStats stats;
+        if (_player == null ||
+            (stats = _player.GetComponent<PokemonStats>()) == null)
+            return null;
+
+        int maxAttackRange = stats.AttackRange;
+        var hs = GetTilesB(movementRange, maxAttackRange);
+
+        // TODO: Remove
+        //foreach (var t in hs)
+        //{
+        //    t.Key.OnHover();
+        //}
+
+        return hs;
+    }
+
+    /// <summary>
+    /// Returns a dictionary of Tiles and their range from current
+    /// </summary>
+    /// <returns></returns>
+    public Dictionary<Tile, int> GetTiles(int movementRange, int maxAttackRange)
+    {
+        PokemonStats stats;
+        if (_player == null ||
+            (stats = _player.GetComponent<PokemonStats>()) == null)
+            return null;
+
         var hs = GetTilesB(movementRange, maxAttackRange);
 
         // TODO: Remove
@@ -229,7 +274,7 @@ public class Tile : MonoBehaviour
         if (_player == null)
             return;
 
-        int maxAttackRange = _player.GetComponent<PokemonStats>().DEBUG_MAX_ATTACK_RANGE;
+        int maxAttackRange = _player.GetComponent<PokemonStats>().AttackRange;
         int movementRange = _player.GetComponent<PokemonStats>().MovementRange + maxAttackRange;
         //ClearMovementUIRecursive(movementRange);
         foreach (var item in GetTiles())

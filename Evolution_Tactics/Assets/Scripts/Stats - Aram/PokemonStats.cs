@@ -4,7 +4,7 @@ using System.Collections;
 public class PokemonStats : MonoBehaviour
 {
     public int Level = 1;
-    public int XP_on_Death=10;
+    public int XP_on_Death = 10;
     public int MaxHealth = 100;
     public int _currentHealth = 100;
     public int Attack = 10;
@@ -12,7 +12,7 @@ public class PokemonStats : MonoBehaviour
     public int Accuracy = 100;
     public int MovementRange = 3;
 
-    public int DEBUG_MAX_ATTACK_RANGE = 1;
+    public int AttackRange = 1;
 
     TileStats.type TileType;
     public TileStats.type MyType = TileStats.type.Fire;

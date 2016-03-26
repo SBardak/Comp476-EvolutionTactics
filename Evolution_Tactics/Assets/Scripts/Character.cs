@@ -4,7 +4,8 @@ using System.Collections.Generic;
 
 public class Character : MonoBehaviour
 {
-    public delegate void CharacterHandler (Character c);
+    public delegate void CharacterHandler(Character c);
+
     public event CharacterHandler OnDeath;
 
     public Rigidbody _rb;
@@ -183,9 +184,11 @@ public class Character : MonoBehaviour
 
     public bool HasEnemyNeighbours()
     {
-        foreach (Tile neighbour in _currentTile.neighbours)
+        Dictionary<Tile, int> possibleAttackingTiles = _currentTile.GetTiles(0);
+
+        foreach (Tile t in possibleAttackingTiles.Keys)
         {
-            Character neighbourCharacter = neighbour._player;
+            Character neighbourCharacter = t._player;
             if (neighbourCharacter != null && neighbourCharacter.tag == "AI")
             {
                 return true;
@@ -197,7 +200,7 @@ public class Character : MonoBehaviour
 
     public List<Tile> GetNeighbourTiles()
     {
-        return _currentTile.neighbours;
+        return new List<Tile>(_currentTile.GetTiles(0).Keys);
     }
 
     public void SetCurrentTile(Tile tile)
