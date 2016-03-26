@@ -142,6 +142,7 @@ public class HumanPlayer : Player
     public void EndTurn()
     {
         Debug.Log("Human end turn");
+        ClearSelection();
 
         DisablePicker();
 
@@ -360,14 +361,14 @@ public class HumanPlayer : Player
 
     void ClearSelection()
     {
-        if (SelectedCharacter == null)
-            return;
-
         ClearCharacterRange(_selectedTile);
 
         if (_selectedTile != null)
             _selectedTile.Deselect();
         _selectedTile = null;
+
+        if (SelectedCharacter == null)
+            return;
         SelectedCharacter._currentTile.Deselect();
         Debug.Log("Clear selection");
         SelectedCharacter = null;

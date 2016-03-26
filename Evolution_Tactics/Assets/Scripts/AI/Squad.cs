@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 /// <summary>
 /// See AIPlayer script for main description of how this works
 /// </summary>
 public class Squad : MonoBehaviour {
-
     public delegate void MovementCompleteHandler(Squad s);
     public event MovementCompleteHandler MovementComplete;
 
@@ -14,7 +14,12 @@ public class Squad : MonoBehaviour {
     List<Unit> _units;
     int _selectedUnit = 0;
 
-    Player _controlling;
+    public Player _controlling;
+
+    [SerializeField]
+    SquadState _state;
+    Vector3 _squadDirection;
+    int _squadDirectionCounter;
 
     public void SetControllingPlayer(Player p)
     {
@@ -25,6 +30,8 @@ public class Squad : MonoBehaviour {
 
     void Awake()
     {
+        _state = new SquadState(this);
+
         var characters = GetComponentsInChildren<Character>();
         _units = new List<Unit>();
         for (int i = 0; i < characters.Length; i++)
@@ -73,20 +80,66 @@ public class Squad : MonoBehaviour {
         // Reset unit selection
         _selectedUnit = 0;
 
-        /* Squad should have an idea of where it is on the map */
+        // Prepare the active state
+        _state.Prepare();
 
-        // Select 'best' move location. 
-        // if ( knows where player is )
-        {
-            // Find a suitable character for the squad to attack
-            // Let each squad member decide whether to go for it or not
-        }
-        // else 
-        {
-            // Choose a location in the general direction of the squad
-        }
+        // Start moving units
+        ProcessUnit();
+    }
 
+    public Vector3 GetAveragePosition()
+    {
+        var pos = Vector3.zero;
+
+        if (_units.Count == 0)
+            return pos;
+
+        foreach (var item in _units)
+            pos += item.transform.position;
+
+        return pos / _units.Count;
+    }
+    public int GetSmallestMovement()
+    {
+        int smallest = int.MaxValue;
+        foreach (var u in _units)
+            smallest = Mathf.Min(smallest, u.GetComponent<PokemonStats>().MovementRange);
+        return smallest;
+    }
+    public Dictionary<Tile, int> GetReachableTiles()
+    {
+        Dictionary<Tile, int> tiles = new Dictionary<Tile, int>();
+        foreach (var c in GetComponentsInChildren<Character>())
+            tiles = tiles.Concat(
+                c._currentTile.GetTiles().Where(kvp => !tiles.ContainsKey(kvp.Key)
+                )).ToDictionary(x => x.Key, x => x.Value);
+        return tiles;
+    }
+    public int GetUnitCount()
+    {
+        return _units.Count;
+    }
+
+    void ProcessUnit()
+    {
+        _state.ExecuteAction();
+    }
+
+    public void Wander(Tile t)
+    {
         MoveUnit();
+    }
+    public void Attack(Character target)
+    {
+        MoveUnit();
+    }
+    public void Flee(Vector3 direction)
+    {
+        MoveUnit();
+    }
+    public void Idle()
+    {
+        MoveComplete(_units[_selectedUnit]);
     }
 
     /// <summary>

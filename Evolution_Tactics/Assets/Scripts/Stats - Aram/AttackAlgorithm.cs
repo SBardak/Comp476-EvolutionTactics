@@ -58,11 +58,11 @@ public class AttackAlgorithm : MonoBehaviour
         {
             if (Enemy_Type == TileStats.type.Fire)
             {
-                modifier -= 0.5f;
+                modifier += 0.5f;
             }
             if (Enemy_Type == TileStats.type.Grass)
             {
-                modifier += 0.5f;
+                modifier -= 0.5f;
             }
         }
         else if (myType == TileStats.type.Grass)

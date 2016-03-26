@@ -176,23 +176,25 @@ public class Tile : MonoBehaviour
             if (ContainsEnemy(kvp.Key, _player.ControllingPlayer))
             {
                 closed.Add(kvp.Key, total);
-                continue;
+                if (r <= reach)
+                    r = total - attack + 1;
             }
+            else {
+                // Add to the closed list with current reach
+                closed.Add(kvp.Key, r);
 
-            // Add to the closed list with current reach
-            closed.Add(kvp.Key, r);
-
-            // If it's a movement tile, reduce depending on neighbours
-            if (r <= reach)
-            {
-                foreach (var n in kvp.Key.neighbours)
+                // If it's a movement tile, reduce depending on neighbours
+                if (r <= reach)
                 {
-                    if (ContainsEnemy(n, _player.ControllingPlayer))
-                        ++r;
+                    foreach (var n in kvp.Key.neighbours)
+                    {
+                        if (ContainsEnemy(n, _player.ControllingPlayer))
+                            ++r;
+                    }
+                    // Went to far, but still want to consider 'attack' count of Tiles to add
+                    if (r >= (total - attack))
+                        r = total - attack;
                 }
-                // Went to far, but still want to consider 'attack' count of Tiles to add
-                if (r >= (total - attack))
-                    r = total - attack; 
             }
 
             // +1 for the next tile

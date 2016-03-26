@@ -243,6 +243,8 @@ public class TileGenerator : MonoBehaviour
 
         foreach (var tp in _tilePrefabs)
         {
+            if (tp.occurence == 0)
+                continue;
             totalSoFar += tp.occurence * 100 / max;
             table.Add(new KeyValuePair<int, TileGeneratorInspector>(totalSoFar, tp));
         }
@@ -254,6 +256,19 @@ public class TileGenerator : MonoBehaviour
         foreach (var t in table)
             if (t.Key > value) return t.Value.charCode;
         return table[0].Value.charCode;
+    }
+
+    public bool InXRange(int t)
+    {
+        return t >= 0 && t < mapWidth;
+    }
+    public bool InZRange(int t)
+    {
+        return t >= 0 && t < mapHeight;
+    }
+    public bool InMap(int x, int z)
+    {
+        return InXRange(x) && InZRange(z);
     }
 
     public Tile[,] Tiles

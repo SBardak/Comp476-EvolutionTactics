@@ -8,6 +8,7 @@ using System.Collections;
  //manipulating pathfinding can be done by using the array "TileList".
  //Obstacle type implies impassable terrain.
 
+//[ExecuteInEditMode]
 public class TileStats : MonoBehaviour {
     Vector3 position;
     Renderer rend;
