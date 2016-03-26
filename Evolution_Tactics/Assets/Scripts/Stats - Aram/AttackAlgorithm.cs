@@ -163,6 +163,13 @@ public class AttackAlgorithm : MonoBehaviour
         if (rand <= Accuracy)
         {
             target.GetComponent<PokemonStats>().CurrentHealth -= damage;
+
+            FloatingCombatText.setDamage(damage);
+
+            if (target.GetComponent<PokemonStats>().CurrentHealth<=0)
+            {
+                transform.GetComponent<Experience>().gainXP(target.GetComponent<PokemonStats>().XP_on_Death);
+            }
         }
     }
 }
