@@ -15,7 +15,6 @@ public class AttackAlgorithm : MonoBehaviour
     int Enemy_Defense;
     int Enemy_Accuracy;
 
-
     TileStats.type myType;
     int damage;
 
@@ -164,11 +163,11 @@ public class AttackAlgorithm : MonoBehaviour
         {
             target.GetComponent<PokemonStats>().CurrentHealth -= damage;
 
-            FloatingCombatText.setDamage(damage);
+            StartCoroutine(UIManager.Instance.CreateNewDamageLabel(damage));
 
-            if (target.GetComponent<PokemonStats>().CurrentHealth<=0)
+            if (target.GetComponent<PokemonStats>().CurrentHealth <= 0)
             {
-               // transform.GetComponent<Experience>().gainXP(target.GetComponent<PokemonStats>().XP_on_Death);
+                // transform.GetComponent<Experience>().gainXP(target.GetComponent<PokemonStats>().XP_on_Death);
             }
         }
     }
