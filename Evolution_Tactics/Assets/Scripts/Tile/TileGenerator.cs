@@ -3,13 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-// Started by: Lukas
-// Modified by:
-
-/*
-  This script is only for testing purpose
-  */
-
 [System.Serializable]
 public class TileGeneratorInspector
 {
@@ -80,7 +73,8 @@ public class TileGenerator : MonoBehaviour
 
         int w, h;
         GetDimensions(s.Substring(i + a, i2 - (i + a)), out w, out h);
-        mapWidth = w; mapHeight = h;
+        mapWidth = w;
+        mapHeight = h;
 
         s = s.Substring(i2 + a2);
 
@@ -109,7 +103,8 @@ public class TileGenerator : MonoBehaviour
             var l = fLines[current];
             foreach (var c in l.Split(' '))
             {
-                if (c == "") continue;
+                if (c == "")
+                    continue;
 
                 var tile = Instantiate(tilePrefab, new Vector3(col, yPos, row), Quaternion.identity) as Tile;
                 SetTileType(c, tile.gameObject);
@@ -251,10 +246,12 @@ public class TileGenerator : MonoBehaviour
 
         return table;
     }
+
     private string GetTileType(List<KeyValuePair<int, TileGeneratorInspector>> table, int value)
     {
         foreach (var t in table)
-            if (t.Key > value) return t.Value.charCode;
+            if (t.Key > value)
+                return t.Value.charCode;
         return table[0].Value.charCode;
     }
 

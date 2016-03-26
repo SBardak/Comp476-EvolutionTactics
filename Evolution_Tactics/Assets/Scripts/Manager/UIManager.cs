@@ -14,6 +14,7 @@ public class UIManager : MonoBehaviour
     public Button _attackButton;
     public Button _waitButton;
     public Button _attackWhereButton;
+    public GameObject damageText;
 
     private static List<Button> buttonList;
 
@@ -23,10 +24,6 @@ public class UIManager : MonoBehaviour
 
         _human = GameObject.Find("Human").GetComponent<HumanPlayer>();
         _humanUI = GameObject.FindGameObjectsWithTag("HumanUI");
-    }
-
-    void Update()
-    {
     }
 
     public void OnClickEndHumanTurn()
@@ -93,12 +90,14 @@ public class UIManager : MonoBehaviour
         DeleteHumanPlayerActionUI();
     }
 
-    private static IEnumerator WaitForKeyDown(string key)
+    public IEnumerator CreateNewDamageLabel(int d)
     {
-        while (!Input.GetKeyDown(key))
-        {
-            yield return null;
-        }
+        GameObject text = Instantiate(damageText, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
+        text.GetComponent<Text>().text = d.ToString() + "!";
+        text.transform.SetParent(GameObject.Find("Canvas").transform);
+        text.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(20, 0, 0);
+        yield return new WaitForSeconds(2.0f);
+        Destroy(text.gameObject);
     }
 
     public void ActivateUI()
@@ -161,50 +160,5 @@ public class UIManager : MonoBehaviour
             }
         }
         buttonList = null;
-    }
-
-    private void CreateAttackButtons(List<Character> neighbours)
-    {
-        int total = 0;
-        int yPosition = 0;
-        Transform canvas = GameObject.Find("Canvas").transform;
-        foreach (Character c in neighbours)
-        {
-            if (c != null)
-            {   
-                Button actionButton = Instantiate(_attackWhereButton, new Vector3(0, 0, 0), Quaternion.identity) as Button;
-                actionButton.transform.SetParent(canvas);
-                actionButton.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, yPosition, 0);
-                /*actionButton.onClick.AddListener(delegate
-                    {
-                        UIManager.Instance.Attack(c);
-                    });*/
-                //actionButton.onClick.AddListener(() => UIManager.Instance.Attack(c));
-                Debug.Log(c.name);
-                yPosition -= 30;
-                if (total == 0)
-                {
-                    actionButton.GetComponentInChildren<Text>().text = "Attack Left";
-                    Debug.Log(c + " left");
-                }
-                else if (total == 1)
-                {
-                    actionButton.GetComponentInChildren<Text>().text = "Attack Right";
-                    Debug.Log(c + " right");
-                }
-                else if (total == 2)
-                {
-                    actionButton.GetComponentInChildren<Text>().text = "Attack Down";
-                    Debug.Log(c + " down");
-                }
-                else if (total == 3)
-                {
-                    actionButton.GetComponentInChildren<Text>().text = "Attack Up";
-                    Debug.Log(c + " up");
-                } 
-                buttonList.Add(actionButton);
-            }
-            total++;
-        }
     }
 }

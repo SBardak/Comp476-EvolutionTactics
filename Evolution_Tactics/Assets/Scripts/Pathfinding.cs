@@ -24,9 +24,12 @@ public class Pathfinding : MonoBehaviour
     public bool _middleOfTheNodeAttained = false;
     public bool _hasPath = false;
 
+    private TileStats.type myType;
+
     void Start()
     {
         Graph();
+        myType = GetComponent<PokemonStats>().MyType;
     }
 
     void Graph()
@@ -39,17 +42,6 @@ public class Pathfinding : MonoBehaviour
         {
             nodeList.Add(n.GetComponent<Tile>());
         }
-
-        // TODO REMOVED
-        //Randomize start and end nodes and place player at start
-        //StartNode = nodeList[Random.Range(0, nodeList.Count - 1)];
-        //_endNode = nodeList[Random.Range(0, nodeList.Count - 1)];
-
-        //player.transform.position = new Vector3(_startNode.transform.position.x, player.transform.position.y, _startNode.transform.position.z);
-        // _startNode.GetComponent<Renderer>().material.color = Color.green;
-        //_endNode.GetComponent<Renderer>().material.color = Color.red;
-
-        //CalculateNewPath();
     }
 
     void Update()
@@ -138,8 +130,7 @@ public class Pathfinding : MonoBehaviour
         if (_startNode == _endNode)
         {
             // might add more behaviour
-            Debug.Log("SAME TILE");     
-            //return;
+            Debug.Log("SAME TILE");   
         }
         // if player select a non-empty tile
         if (_endNode._player != null)
@@ -149,14 +140,6 @@ public class Pathfinding : MonoBehaviour
         }
         
         ResetPath();
-
-        //foreach (Tile n in nodeList)
-        //{
-        //    if (Cost(player.transform.position, n.transform.position) < Cost(player.transform.position, _startNode.transform.position))
-        //    {
-        //        StartNode = n;
-        //    }
-        //}
 
         DijkstraPathfinding();
     }
@@ -203,7 +186,7 @@ public class Pathfinding : MonoBehaviour
 
                 if (closedList.Contains(neighbour) && newCost < neighbour.costSoFar)
                 {
-                    if (neighbour._player == null || (neighbour._player != null && neighbour._player.tag == gameObject.tag))
+                    if (neighbour._player == null || (neighbour._player != null && (neighbour._player.tag == gameObject.tag || myType == TileStats.type.Flying)))
                     {
                         neighbour.costSoFar = newCost;
                         neighbour.totalEstimatedValue = neighbour.costSoFar + neighbour.heuristicValue;
@@ -225,7 +208,7 @@ public class Pathfinding : MonoBehaviour
                 }
                 else if (!inClosedList && !inOpenList)
                 {
-                    if (neighbour._player == null || (neighbour._player != null && neighbour._player.tag == gameObject.tag))
+                    if (neighbour._player == null || (neighbour._player != null && (neighbour._player.tag == gameObject.tag || myType == TileStats.type.Flying)))
                     {
                         neighbour.costSoFar = newCost;
                         neighbour.totalEstimatedValue = neighbour.costSoFar + neighbour.heuristicValue;

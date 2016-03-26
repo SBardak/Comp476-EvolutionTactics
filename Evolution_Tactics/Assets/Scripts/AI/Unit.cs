@@ -165,18 +165,22 @@ public class Unit : MonoBehaviour
             foreach (Tile t in tilesWithEnemy)
             {
                 // for each neighbour of t
-                foreach (Tile neighbour in t.neighbours)
+                Dictionary<Tile, int> possibleAttackingTiles = t.GetTiles(0, GetComponent<PokemonStats>().AttackRange);
+                Debug.Log("Possible " + possibleAttackingTiles.Count);
+                foreach (Tile tt in possibleAttackingTiles.Keys)
                 {
+                    Debug.Log("Tile " + tt);
                     // if (neighbour is empty or neighbour is where we currently are) and (this neighbour is in range)
-                    if ((neighbour._player == null || neighbour._player == Character) && (possibleTiles.ContainsKey(neighbour) && possibleTiles[neighbour] <= movementRange))
+                    if ((tt._player == null || tt._player == Character) && (possibleTiles.ContainsKey(tt) && possibleTiles[tt] <= movementRange))
                     {
-                        int damage = attack.GetDamage(t._player, neighbour);
+                        int damage = attack.GetDamage(t._player, tt);
+                        int rangeDistance = possibleTiles[tt];
 
                         // if this tile would do more damage, set it as best tile
                         // TODO add more conditions, like damage received?
-                        if (damage > highestDamage)
+                        if (damage > highestDamage || (bestTile != _char._currentTile && damage == highestDamage && rangeDistance > possibleTiles[bestTile]))
                         {
-                            bestTile = neighbour;
+                            bestTile = tt;
                             highestDamage = damage;
                             enemyToAttack = t._player;
                         }
