@@ -164,6 +164,7 @@ public class AttackAlgorithm : MonoBehaviour
             target.GetComponent<PokemonStats>().CurrentHealth -= damage;
 
             StartCoroutine(UIManager.Instance.CreateNewDamageLabel(damage));
+            StartCoroutine(AttackAnimation());
 
             if (target.GetComponent<PokemonStats>().CurrentHealth <= 0)
             {
@@ -171,4 +172,15 @@ public class AttackAlgorithm : MonoBehaviour
             }
         }
     }
+
+    private IEnumerator AttackAnimation()
+    {
+        transform.position += (transform.forward * 0.5f);
+        yield return new WaitForSeconds(0.1f);
+        transform.position -= (transform.forward * 0.5f);
+    }
+    /*private void AttackAnimation()
+    {
+        
+    }*/
 }
