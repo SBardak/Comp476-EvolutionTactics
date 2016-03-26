@@ -2,9 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Player : MonoBehaviour {
+public class Player : MonoBehaviour
+{
 
-    public virtual void StartTurn() {}
+    public virtual void StartTurn()
+    {
+    }
 
     public Color TeamColor;
 
@@ -12,12 +15,14 @@ public class Player : MonoBehaviour {
     {
         PositionCharacter(character, null);
     }
+
     public void PositionCharacter(List<Character> characters)
     {
         Tile prev = null;
         foreach (var c in characters)
             prev = PositionCharacter(c, prev);
     }
+
     Tile PositionCharacter(Character character, Tile t)
     {
         int x = 0, z = 0;
@@ -45,7 +50,7 @@ public class Player : MonoBehaviour {
                 xx = x + ((Random.Range(0, 2) < 1) ? -1 : 1) * xtra;
                 zz = z + ((Random.Range(0, 2) < 1) ? -1 : 1) * ztra;
 
-                xx = Mathf.Clamp(xx, 0, TileGenerator.Instance.mapWidth -1);
+                xx = Mathf.Clamp(xx, 0, TileGenerator.Instance.mapWidth - 1);
                 zz = Mathf.Clamp(zz, 0, TileGenerator.Instance.mapHeight - 1);
 
                 t = TileGenerator.Instance.Tiles[xx, zz];

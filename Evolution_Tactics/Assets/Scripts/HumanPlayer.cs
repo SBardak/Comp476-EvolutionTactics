@@ -123,7 +123,7 @@ public class HumanPlayer : Player
                 ClearCharacterRange(pt);
 
                 SelectedCharacter.SetCurrentTile(_selectedTile);
-                var pos  = _selectedTile.transform.position;
+                var pos = _selectedTile.transform.position;
                 pos.y = SelectedCharacter.transform.position.y;
                 SelectedCharacter.transform.position = pos;
                 _selectedTile.SetSelected();

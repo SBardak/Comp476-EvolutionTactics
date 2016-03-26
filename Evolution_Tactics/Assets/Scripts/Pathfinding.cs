@@ -24,9 +24,12 @@ public class Pathfinding : MonoBehaviour
     public bool _middleOfTheNodeAttained = false;
     public bool _hasPath = false;
 
+    private TileStats.type myType;
+
     void Start()
     {
         Graph();
+        myType = GetComponent<PokemonStats>().MyType;
     }
 
     void Graph()
@@ -183,7 +186,7 @@ public class Pathfinding : MonoBehaviour
 
                 if (closedList.Contains(neighbour) && newCost < neighbour.costSoFar)
                 {
-                    if (neighbour._player == null || (neighbour._player != null && neighbour._player.tag == gameObject.tag))
+                    if (neighbour._player == null || (neighbour._player != null && (neighbour._player.tag == gameObject.tag || myType == TileStats.type.Flying)))
                     {
                         neighbour.costSoFar = newCost;
                         neighbour.totalEstimatedValue = neighbour.costSoFar + neighbour.heuristicValue;
@@ -205,7 +208,7 @@ public class Pathfinding : MonoBehaviour
                 }
                 else if (!inClosedList && !inOpenList)
                 {
-                    if (neighbour._player == null || (neighbour._player != null && neighbour._player.tag == gameObject.tag))
+                    if (neighbour._player == null || (neighbour._player != null && (neighbour._player.tag == gameObject.tag || myType == TileStats.type.Flying)))
                     {
                         neighbour.costSoFar = newCost;
                         neighbour.totalEstimatedValue = neighbour.costSoFar + neighbour.heuristicValue;
