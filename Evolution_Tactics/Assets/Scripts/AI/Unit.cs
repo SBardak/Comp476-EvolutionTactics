@@ -171,10 +171,11 @@ public class Unit : MonoBehaviour
                     if ((neighbour._player == null || neighbour._player == Character) && (possibleTiles.ContainsKey(neighbour) && possibleTiles[neighbour] <= movementRange))
                     {
                         int damage = attack.GetDamage(t._player, neighbour);
+                        int rangeDistance = possibleTiles[neighbour];
 
                         // if this tile would do more damage, set it as best tile
                         // TODO add more conditions, like damage received?
-                        if (damage > highestDamage)
+                        if (damage > highestDamage || (bestTile != _char._currentTile && damage == highestDamage && rangeDistance > possibleTiles[bestTile]))
                         {
                             bestTile = neighbour;
                             highestDamage = damage;

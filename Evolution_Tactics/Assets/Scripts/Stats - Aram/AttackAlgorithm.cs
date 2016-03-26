@@ -168,7 +168,7 @@ public class AttackAlgorithm : MonoBehaviour
 
             if (target.GetComponent<PokemonStats>().CurrentHealth<=0)
             {
-                transform.GetComponent<Experience>().gainXP(target.GetComponent<PokemonStats>().XP_on_Death);
+               // transform.GetComponent<Experience>().gainXP(target.GetComponent<PokemonStats>().XP_on_Death);
             }
         }
     }
