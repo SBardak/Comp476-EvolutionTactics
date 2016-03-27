@@ -17,6 +17,9 @@ using System.Collections.Generic;
 /// </summary>
 public class AIPlayer : Player
 {
+    public int SquadCount = 3;
+    public int MaxUnitCountPerSquad = 3;
+
     [SerializeField]
     Squad[] _squads;
     int _selectedSquad = 0;
@@ -24,7 +27,17 @@ public class AIPlayer : Player
     bool _isPlaying;
 
     void Awake()
-    { 
+    {
+        PrepareSquads();
+    }
+
+    public void SetSquads(List<Squad> squads)
+    {
+        _squads = squads.ToArray();
+        PrepareSquads();
+    }
+    void PrepareSquads()
+    {
         // Move this somewhere else probably
         foreach (var s in _squads)
             s.MovementComplete += MovedSquad;

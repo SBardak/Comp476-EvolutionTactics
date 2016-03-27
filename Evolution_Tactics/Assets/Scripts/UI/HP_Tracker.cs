@@ -42,7 +42,7 @@ public class HP_Tracker : MonoBehaviour
     {
         var screenPos = Camera.main.WorldToScreenPoint(target.transform.position);
 
-        screenPos.x -= xOffset;
+        screenPos.x -= xOffset - 9;
         screenPos.y -= yOffset;
 
         _rect.position = screenPos;
@@ -85,6 +85,10 @@ public class HP_Tracker : MonoBehaviour
     }
 
     void HandleDeath()
+    {
+        Destroy(_instantiated.gameObject);
+    }
+    void OnDestroy()
     {
         Destroy(_instantiated.gameObject);
     }

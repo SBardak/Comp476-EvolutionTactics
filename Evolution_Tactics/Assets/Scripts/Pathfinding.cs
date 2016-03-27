@@ -13,7 +13,6 @@ public class Pathfinding : MonoBehaviour
 
     public Tile _startNode, _endNode;
 
-    public List<Tile> nodeList = new List<Tile>();
     public List<Tile> pathList = new List<Tile>();
     public List<Tile> openList = new List<Tile>();
     public List<Tile> closedList = new List<Tile>();
@@ -34,25 +33,11 @@ public class Pathfinding : MonoBehaviour
 
     void Graph()
     {
-        // Find all tiles and add them to the global list
-        GameObject[] node = GameObject.FindGameObjectsWithTag("Tile");
         player = GetComponentInParent<Character>();
-
-        foreach (GameObject n in node)
-        {
-            nodeList.Add(n.GetComponent<Tile>());
-        }
     }
 
     void Update()
     {
-        // TODO: Change
-        if (nodeList.Count == 0)
-        {
-            Debug.LogError("REMOVE ME. PROBLEM: Start comes too soon, tiles not generated");
-            Graph();
-        }
-
         // if path has been calculated
         if (_hasPath)
         {
@@ -150,7 +135,7 @@ public class Pathfinding : MonoBehaviour
         openList.Add(_startNode);
 
         //while open list is open or closed list does not include all nodes
-        while (openList.Count > 0 || closedList.Count != nodeList.Count)
+        while (openList.Count > 0 || closedList.Count != TileGenerator.Instance.Tiles.Length)
         {
             Tile currentNode = openList[0];
 
@@ -258,7 +243,7 @@ public class Pathfinding : MonoBehaviour
         _middleOfTheNodeAttained = false;
         _hasPath = true;
 
-        foreach (Tile node in nodeList)
+        foreach (Tile node in TileGenerator.Instance.Tiles)
         {
             node.costSoFar = 0;
             node.totalEstimatedValue = 0;

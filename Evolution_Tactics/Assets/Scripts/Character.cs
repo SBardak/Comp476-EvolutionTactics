@@ -189,7 +189,7 @@ public class Character : MonoBehaviour
         foreach (Tile t in possibleAttackingTiles.Keys)
         {
             Character neighbourCharacter = t._player;
-            if (neighbourCharacter != null && neighbourCharacter.tag == "AI")
+            if (neighbourCharacter != null && neighbourCharacter.ControllingPlayer != ControllingPlayer)
             {
                 return true;
             }

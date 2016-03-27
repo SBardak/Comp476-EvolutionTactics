@@ -87,6 +87,9 @@ public class HumanPlayer : Player
 
         Debug.Log("Human Start turn");
 
+        if (_charactersList.Count == 0)
+            return;
+
         // Reactivate all units
         foreach (var c in _charactersList)
             c.Activate();

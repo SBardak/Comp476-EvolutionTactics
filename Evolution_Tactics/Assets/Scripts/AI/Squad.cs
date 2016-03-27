@@ -32,6 +32,10 @@ public class Squad : MonoBehaviour {
     {
         _state = new SquadState(this);
 
+        PrepareSquad();
+    }
+    public void PrepareSquad()
+    {
         var characters = GetComponentsInChildren<Character>();
         _units = new List<Unit>();
         for (int i = 0; i < characters.Length; i++)
@@ -127,15 +131,17 @@ public class Squad : MonoBehaviour {
 
     public void Wander(Tile t)
     {
-        MoveUnit();
+        MoveUnit(t);
     }
     public void Attack(Character target)
     {
-        MoveUnit();
+        MoveUnit(target);
     }
     public void Flee(Vector3 direction)
     {
-        MoveUnit();
+        var u = _units[_selectedUnit];
+
+        u.Move();
     }
     public void Idle()
     {
@@ -145,12 +151,17 @@ public class Squad : MonoBehaviour {
     /// <summary>
     /// Moves the current selected unit
     /// </summary>
-    void MoveUnit()
+    void MoveUnit(Tile t)
     {
         var u = _units[_selectedUnit];
 
-        // Character should move where it can possibly attack someone
-        u.Move(); //general squad location
+        u.Move();
+    }
+    void MoveUnit(Character c)
+    {
+        var u = _units[_selectedUnit];
+
+        u.Move();
     }
 
     /// <summary>
@@ -171,7 +182,7 @@ public class Squad : MonoBehaviour {
         if (AllUnitsMoved())
             NotifyMovementComplete();
         else
-            MoveUnit();
+            ProcessUnit();
     }
 
     /// <summary>
