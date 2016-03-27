@@ -16,7 +16,7 @@ public class HumanPlayer : Player
     private Picker _pickerScript;
     public List<Tile> selectableTiles = null;
 
-    bool _finishedStart = false, _awaitingTurn = false;
+    bool _finishedStart = false, _awaitingTurn = false, _showingAttack = false;
 
     void Awake()
     {
@@ -70,6 +70,7 @@ public class HumanPlayer : Player
         isInMovement = false;
 
         SelectedCharacter.Deactivate();
+        ClearAttackRange();
         ClearSelection();
     }
 
@@ -117,7 +118,12 @@ public class HumanPlayer : Player
         Debug.Log("Right mouse");
         if (SelectedCharacter != null)
         {
-            if (SelectedCharacter.Moved && SelectedCharacter.IsActivated)
+            if (_showingAttack)
+            {
+                UIManager.Instance.CancelAttack();
+                ClearAttackRange(SelectedCharacter._currentTile);
+            }
+            else if (SelectedCharacter.Moved && SelectedCharacter.IsActivated)
             {
                 // Possibly reset to initial position?   
                 SelectedCharacter.Moved = false;
@@ -248,7 +254,7 @@ public class HumanPlayer : Player
                     return;
                 }
 
-                if (IsMine(t._player) && t._player.IsActivated)
+                if (IsMine(t._player) && !SelectedCharacter.Moved && t._player.IsActivated)
                 {
                     ClearSelection();
                     SelectCharacter(t._player);
@@ -342,9 +348,38 @@ public class HumanPlayer : Player
         t.ClearMovementUI();
     }
 
+    public void ShowAttackRange()
+    {
+        if (SelectedCharacter != null)
+            ShowAttackRange(SelectedCharacter._currentTile);
+    }
+    public void ShowAttackRange(Tile t)
+    {
+        if (t == null)
+            return;
+
+        if (SelectedCharacter != null)
+            ClearCharacterRange(SelectedCharacter._currentTile);
+
+        t.AttackUI();
+        _showingAttack = true;
+    }
+    public void ClearAttackRange()
+    {
+        if (SelectedCharacter != null)
+            ClearAttackRange(SelectedCharacter._currentTile);
+    }
+    public void ClearAttackRange(Tile t)
+    {
+        if (t == null)
+            return;
+        t.ClearAttackUI();
+        _showingAttack = false;
+    }
+
     public void HandleHover(Tile t)
     {
-        if (isInMovement || t._player == null)
+        if (isInMovement || _showingAttack || t._player == null)
             return;
 
         if (SelectedCharacter != null)
@@ -354,7 +389,7 @@ public class HumanPlayer : Player
 
     public void HandleHoverOut(Tile t)
     {
-        if (isInMovement || t._player == null)
+        if (isInMovement || _showingAttack || t._player == null)
             return;
 
         ClearCharacterRange(t);

@@ -81,18 +81,41 @@ public class Tile : MonoBehaviour
         if (_player == null)
             return;
 
-        int maxAttackRange = 1;
-        int movementRange = _player.GetComponent<PokemonStats>().MovementRange + maxAttackRange;
-        //MovementUIRecursive(movementRange, maxAttackRange, _player.ControllingPlayer);
+        int movementRange = _player.GetComponent<PokemonStats>().MovementRange;
 
+        // Set decorations
         foreach (var item in GetTiles())
         {
-            if (item.Value <= movementRange - maxAttackRange)
+            if (item.Value <= movementRange)
                 item.Key.SetDecoration(TileDecorationType.MOVE);
             else
                 item.Key.SetDecoration(TileDecorationType.ATTACK);
         }
-        //GetTiles();
+    }
+
+    public void AttackUI()
+    {
+        if (_player == null)
+            return;
+
+        int attackRange = _player.GetComponent<PokemonStats>().AttackRange;
+
+        foreach (var item in GetTiles(0, attackRange))
+        {
+            if (item.Value <= 0)
+                item.Key.SetDecoration(TileDecorationType.MOVE);
+            else
+                item.Key.SetDecoration(TileDecorationType.ATTACK);
+        }
+    }
+    public void ClearAttackUI()
+    {
+        if (_player == null)
+            return;
+
+        int maxAttackRange = _player.GetComponent<PokemonStats>().AttackRange;
+        foreach (var item in GetTiles(0, maxAttackRange))
+            item.Key.ResetDecoration();
     }
 
     void MovementUIRecursive(int reach, int min, Player p)
@@ -136,12 +159,6 @@ public class Tile : MonoBehaviour
         int movementRange = stats.MovementRange;
         var hs = GetTilesB(movementRange, maxAttackRange);
 
-        // TODO: Remove
-        //foreach (var t in hs)
-        //{
-        //    t.Key.OnHover();
-        //}
-
         return hs;
     }
 
@@ -174,20 +191,7 @@ public class Tile : MonoBehaviour
     /// <returns></returns>
     public Dictionary<Tile, int> GetTiles(int movementRange, int maxAttackRange)
     {
-        PokemonStats stats;
-        if (_player == null ||
-            (stats = _player.GetComponent<PokemonStats>()) == null)
-            return null;
-
-        var hs = GetTilesB(movementRange, maxAttackRange);
-
-        // TODO: Remove
-        //foreach (var t in hs)
-        //{
-        //    t.Key.OnHover();
-        //}
-
-        return hs;
+        return GetTilesB(movementRange, maxAttackRange);
     }
 
     /// <summary>

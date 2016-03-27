@@ -51,7 +51,16 @@ public class UIManager : MonoBehaviour
 
         _human.selectableTiles = selected.GetNeighbourTiles();
         _human.EnablePicker();
+        _human.ShowAttackRange();
         Debug.LogWarning("Select an enemy to attack");
+    }
+    public void CancelAttack()
+    {
+        buttonList[0].enabled = true;
+        buttonList[0].GetComponent<Image>().color = new Color(1, 1, 1);
+
+        _human.selectableTiles = null;
+        _human.ClearAttackRange();
     }
 
     public void CreateAcceptButtonAttack(Character enemy)
