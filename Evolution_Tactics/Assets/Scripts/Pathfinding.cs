@@ -24,11 +24,15 @@ public class Pathfinding : MonoBehaviour
     public bool _hasPath = false;
 
     private TileStats.type myType;
+    private int movementRange;
+    private PokemonStats stats;
 
     void Start()
     {
         Graph();
-        myType = GetComponent<PokemonStats>().MyType;
+        stats = GetComponent<PokemonStats>();
+        myType = stats.MyType;
+        movementRange = stats.MovementRange;
     }
 
     void Graph()
@@ -55,9 +59,14 @@ public class Pathfinding : MonoBehaviour
                     for (int i = 0; i < collisionArray.Length; i++)
                     {          
                         // Check if arrived
-                        if (collisionArray[i].GetComponent(typeof(Tile)) == _endNode)
+                        if (counter > movementRange || collisionArray[i].GetComponent(typeof(Tile)) == _endNode)
                         {
                             GoalAttained = true;
+                            if (_endNode._hCollectible != null)
+                            {
+                                stats.GiveHealth(_endNode._hCollectible.healthGiven);
+                                TileGenerator.Instance.SetNewCollectibleTile();
+                            }
                         }
                         else if (collisionArray[i].GetComponent(typeof(Tile)) == pathList[counter])
                         {

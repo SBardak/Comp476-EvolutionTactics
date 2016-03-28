@@ -14,6 +14,8 @@ public enum TileDecorationType
 public class Tile : MonoBehaviour
 {
     public Character _player;
+    // TODO: add more collectibles?
+    public HealingCollectible _hCollectible;
 
     public List<Tile> neighbours;
     public float costSoFar, heuristicValue, totalEstimatedValue;
@@ -108,6 +110,7 @@ public class Tile : MonoBehaviour
                 item.Key.SetDecoration(TileDecorationType.ATTACK);
         }
     }
+
     public void ClearAttackUI()
     {
         if (_player == null)
@@ -228,7 +231,8 @@ public class Tile : MonoBehaviour
                 if (r <= reach)
                     r = total - attack + 1;
             }
-            else {
+            else
+            {
                 // Add to the closed list with current reach
                 closed.Add(kvp.Key, r);
 

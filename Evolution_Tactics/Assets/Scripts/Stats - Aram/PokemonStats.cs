@@ -31,6 +31,19 @@ public class PokemonStats : MonoBehaviour
 
     }
 
+    public void GiveHealth(int health)
+    {
+        // TODO Small healing sound
+        int newHealth = _currentHealth + health;
+        if (newHealth > MaxHealth)
+        {
+            CurrentHealth = MaxHealth;
+        }
+        else
+        {
+            CurrentHealth = newHealth;
+        }
+    }
 
     public int CurrentHealth
     {

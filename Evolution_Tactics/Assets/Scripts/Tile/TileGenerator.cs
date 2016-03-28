@@ -18,6 +18,8 @@ public class TileGenerator : MonoBehaviour
     public static TileGenerator Instance;
 
     public GameObject player;
+    public HealingCollectible healingCollectiblePrefab;
+    private HealingCollectible _collectible;
 
     public Tile tilePrefab;
     public TileGeneratorInspector[] _tilePrefabs;
@@ -259,10 +261,12 @@ public class TileGenerator : MonoBehaviour
     {
         return t >= 0 && t < mapWidth;
     }
+
     public bool InZRange(int t)
     {
         return t >= 0 && t < mapHeight;
     }
+
     public bool InMap(int x, int z)
     {
         return InXRange(x) && InZRange(z);
@@ -271,5 +275,28 @@ public class TileGenerator : MonoBehaviour
     public Tile[,] Tiles
     {
         get { return tiles; }
+    }
+
+    public void SetNewCollectibleTile()
+    {
+        if (_collectible != null)
+        {
+            _collectible._currentTile._hCollectible = null;
+            Destroy(_collectible.gameObject);
+        }
+        
+        int height = Random.Range(0, mapHeight - 1), width = Random.Range(0, mapWidth - 1);
+        Tile t = Tiles[height, width];
+        while (t._player != null)
+        {
+            height = Random.Range(0, mapHeight - 1);
+            width = Random.Range(0, mapWidth - 1);
+            t = Tiles[width, height];
+        }
+
+        Vector3 newPos = new Vector3(t.transform.position.x, healingCollectiblePrefab.transform.position.y, t.transform.position.z);
+        _collectible = Instantiate(healingCollectiblePrefab, newPos, Quaternion.identity) as HealingCollectible;
+        _collectible._currentTile = t;
+        t._hCollectible = _collectible;
     }
 }

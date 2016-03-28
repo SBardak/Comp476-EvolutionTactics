@@ -179,8 +179,4 @@ public class AttackAlgorithm : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
         transform.position -= (transform.forward * 0.5f);
     }
-    /*private void AttackAnimation()
-    {
-        
-    }*/
 }

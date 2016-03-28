@@ -47,6 +47,16 @@ public class Unit : MonoBehaviour
 
     private Character enemyToAttack = null;
 
+    public void Move(Tile t)
+    {
+        
+    }
+
+    public void Move(Character c)
+    {
+        
+    }
+
     public void Move()
     { 
         enemyToAttack = null;
