@@ -182,7 +182,7 @@ public class GameManager : MonoBehaviour
             int selected = 0;
             for (int j = 0; j < ai.MaxUnitCountPerSquad; j++)
             {
-                if (j == ai.MaxUnitCountPerSquad -1 && Random.Range(0, 1f) < 0.5f)
+                if (j == ai.MaxUnitCountPerSquad - 1 && Random.Range(0, 1f) < 0.5f)
                     selected = 1;
                 var instance = (GameObject)Instantiate(chars[selected], Vector3.zero, Quaternion.identity);
                 instance.transform.parent = squad.transform;
@@ -195,5 +195,6 @@ public class GameManager : MonoBehaviour
 
         // Set ai as parent
         squadContainer.transform.parent = ai.transform;
+        TileGenerator.Instance.SetNewCollectibleTile();
     }
 }
