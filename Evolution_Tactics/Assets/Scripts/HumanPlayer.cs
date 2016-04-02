@@ -22,16 +22,19 @@ public class HumanPlayer : Player
     {
         _pickerScript = GetComponent<Picker>();
         _characters = GetComponentsInChildren<Character>();
-        _charactersList = new List<Character>(_characters);
 
+        PrepareCharacters(new List<Character>(_characters));
+    }
+
+    public void PrepareCharacters(List<Character> chars)
+    {
+        _charactersList = chars;
         foreach (var c in _charactersList)
         {
             c.GetComponent<Pathfinding>().OnReachEnd += HumanPlayer_OnReachEnd;
             c.OnDeath += Character_OnDeath;
             c.ControllingPlayer = this;
         }
-
-        // TODO: Make a hashtable with the characters?
     }
 
     private void Character_OnDeath(Character c)
@@ -201,6 +204,10 @@ public class HumanPlayer : Player
         _selectedTile.SetSelected();
         ShowCharacterRange(_selectedTile);
         UIManager.Instance.CreateHumanPlayerActionUI(c);
+
+        var v = c.GetComponent<CharacterVoice>();
+        if (v != null)
+            v.PlayVoice();
     }
 
     /// <summary>
@@ -323,7 +330,7 @@ public class HumanPlayer : Player
     public bool IsMine(Character o)
     {
         bool mine = false;
-        foreach (var c in _characters)
+        foreach (var c in _charactersList)
         {
             if (c == o)
             {

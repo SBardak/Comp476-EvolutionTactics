@@ -135,7 +135,7 @@ public class Pathfinding : MonoBehaviour
         openList.Add(_startNode);
 
         //while open list is open or closed list does not include all nodes
-        while (openList.Count > 0 || closedList.Count != TileGenerator.Instance.Tiles.Length)
+        while (openList.Count > 0)// || closedList.Count != TileGenerator.Instance.Tiles.Length)
         {
             Tile currentNode = openList[0];
 

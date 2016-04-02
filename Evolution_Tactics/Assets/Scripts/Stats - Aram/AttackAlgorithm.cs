@@ -83,7 +83,7 @@ public class AttackAlgorithm : MonoBehaviour
             }
             else if (Enemy_Type == TileStats.type.Flying)
             {
-                modifier += 0.5f;
+                //modifier += 0.5f;
             }
         }
         else if (myType == TileStats.type.Ground)
@@ -94,18 +94,18 @@ public class AttackAlgorithm : MonoBehaviour
             }
             else if (Enemy_Type == TileStats.type.Electric)
             {
-                modifier += 0.5f;
+                //modifier += 0.5f;
             }
         }
         else if (myType == TileStats.type.Flying)
         {
             if (Enemy_Type == TileStats.type.Electric)
             {
-                modifier += 0.5f;
+                modifier += 0;
             }
             if (Enemy_Type == TileStats.type.Ground)
             {
-                modifier += 0.5f;
+                //modifier += 0.5f;
             }
         }
 

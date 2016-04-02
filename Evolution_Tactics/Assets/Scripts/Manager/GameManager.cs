@@ -5,6 +5,7 @@ using System.Linq;
 
 public class GameManager : MonoBehaviour
 {
+    public int CurrentTurn = 1;
     public int CurrentPlayer = 0;
     public static GameManager Instance;
 
@@ -28,14 +29,34 @@ public class GameManager : MonoBehaviour
         GeneratePlayers();
     }
 
+    /// <summary>
+    /// Switches active player and start its turn
+    /// </summary>
     public void NextTurn()
     {
         Debug.Log("Next Turn");
-        CurrentPlayer = CurrentPlayer >= _allPlayers.Count - 1 ? 0 : ++CurrentPlayer;
+        ChangePlayer();
         StartTurn();
         UIManager.Instance.ActivateUI();
     }
+    
+    /// <summary>
+    /// Switch to the next player's turn. If a whole rotation has occured, turn count + 1
+    /// </summary>
+    void ChangePlayer()
+    {
+        ++CurrentPlayer;
+        // New turn
+        if (CurrentPlayer >= _allPlayers.Count)
+        {
+            ++CurrentTurn;
+            CurrentPlayer = 0;
+        }
+    }
 
+    /// <summary>
+    /// Starts then active player's turn
+    /// </summary>
     void StartTurn()
     {
         GetActivePlayer().StartTurn();
@@ -46,6 +67,9 @@ public class GameManager : MonoBehaviour
         return _allPlayers[CurrentPlayer];
     }
 
+    /// <summary>
+    /// Generates the players and their teams
+    /// </summary>
     void GeneratePlayers()
     {
         _allPlayers = new List<Player>();
@@ -53,6 +77,15 @@ public class GameManager : MonoBehaviour
             _allPlayers.Add(p);
         foreach (var p in _AI)
             _allPlayers.Add(p);
+
+        foreach (var p in _players)
+        {
+            // Remove everything
+            for (int i = p.transform.childCount - 1; i >= 0; i--)
+                DestroyImmediate(p.transform.GetChild(i).gameObject);
+
+            GeneratePlayerSquad(p);
+        }
 
         if (_generateAISquad)
         {
@@ -69,12 +102,54 @@ public class GameManager : MonoBehaviour
         StartCoroutine(WaitForCharacterLoad());
     }
 
+    /// <summary>
+    /// Coroutine to wait a frame so that everything loads properly
+    /// </summary>
+    /// <returns></returns>
     IEnumerator WaitForCharacterLoad()
     {
         yield return new WaitForEndOfFrame();
         StartTurn();
     }
 
+    /// <summary>
+    /// This generates a random team for the player, but the same
+    /// kind of logic applies when selecting their own team
+    /// </summary>
+    /// <param name="p"></param>
+    void GeneratePlayerSquad(HumanPlayer p)
+    {
+        System.Array values = System.Enum.GetValues(typeof(TileStats.type));
+        TileStats.type type;
+        List<Character> characters = new List<Character>();
+
+        // Add x units
+        for (int j = 0; j < 6; j++)
+        {
+            do
+            {
+                System.Random random = new System.Random();
+                type = (TileStats.type)values.GetValue(Random.Range(0, values.Length));
+            } while (type == TileStats.type.Obstacle);
+
+            var chars = AvailableCharacters
+                .Where(ac => ac.Type == type)
+                .Select(ac => ac.Characters).First();
+
+            var instance = (GameObject)Instantiate(chars[0], Vector3.zero, Quaternion.identity);
+            instance.transform.parent = p.transform;
+            instance.tag = "Human";
+
+            characters.Add(instance.GetComponent<Character>());
+        }
+
+        p.PrepareCharacters(characters);
+    }
+
+    /// <summary>
+    /// Generates a random team for the AI based on its specs
+    /// </summary>
+    /// <param name="ai"></param>
     void GenerateAI(AIPlayer ai)
     {
         List<Squad> squads = new List<Squad>();
