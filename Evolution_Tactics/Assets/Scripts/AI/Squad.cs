@@ -6,8 +6,10 @@ using System.Linq;
 /// <summary>
 /// See AIPlayer script for main description of how this works
 /// </summary>
-public class Squad : MonoBehaviour {
+public class Squad : MonoBehaviour
+{
     public delegate void MovementCompleteHandler(Squad s);
+
     public event MovementCompleteHandler MovementComplete;
 
     [SerializeField]
@@ -34,6 +36,7 @@ public class Squad : MonoBehaviour {
 
         PrepareSquad();
     }
+
     public void PrepareSquad()
     {
         var characters = GetComponentsInChildren<Character>();
@@ -103,6 +106,7 @@ public class Squad : MonoBehaviour {
 
         return pos / _units.Count;
     }
+
     public int GetSmallestMovement()
     {
         int smallest = int.MaxValue;
@@ -110,6 +114,7 @@ public class Squad : MonoBehaviour {
             smallest = Mathf.Min(smallest, u.GetComponent<PokemonStats>().MovementRange);
         return smallest;
     }
+
     public Dictionary<Tile, int> GetReachableTiles()
     {
         Dictionary<Tile, int> tiles = new Dictionary<Tile, int>();
@@ -119,6 +124,7 @@ public class Squad : MonoBehaviour {
                 )).ToDictionary(x => x.Key, x => x.Value);
         return tiles;
     }
+
     public int GetUnitCount()
     {
         return _units.Count;
@@ -133,16 +139,19 @@ public class Squad : MonoBehaviour {
     {
         MoveUnit(t);
     }
+
     public void Attack(Character target)
     {
         MoveUnit(target);
     }
+
     public void Flee(Vector3 direction)
     {
         var u = _units[_selectedUnit];
 
         u.Move();
     }
+
     public void Idle()
     {
         MoveComplete(_units[_selectedUnit]);
@@ -157,6 +166,7 @@ public class Squad : MonoBehaviour {
 
         u.Move();
     }
+
     void MoveUnit(Character c)
     {
         var u = _units[_selectedUnit];
@@ -202,5 +212,13 @@ public class Squad : MonoBehaviour {
     bool AllUnitsMoved()
     {
         return _selectedUnit >= _units.Count;
+    }
+
+    public List<Unit> Units
+    {
+        get
+        {
+            return _units;
+        }
     }
 }

@@ -12,6 +12,7 @@ public class Unit : MonoBehaviour
 
     Character _char;
     Pathfinding _pathfinding;
+    PokemonStats _stats;
 
     Character Character
     {
@@ -20,6 +21,16 @@ public class Unit : MonoBehaviour
             if (_char == null)
                 _char = GetComponentInChildren<Character>();
             return _char;
+        }
+    }
+
+    PokemonStats Stats
+    {
+        get
+        {
+            if (_stats == null)
+                _stats = GetComponent<PokemonStats>();
+            return _stats;
         }
     }
 
@@ -49,7 +60,16 @@ public class Unit : MonoBehaviour
 
     public void Move(Tile t)
     {
-        
+        Dictionary<Tile, int> possibleTiles = Character._currentTile.GetTiles();
+        Tile collecTile = CollectibleInRange(possibleTiles);
+        Tile nextTile = t;
+
+        //if collectible in range and is the more hurt in squad
+        if (collecTile != null && IsMoreHurtInSquad())
+        {
+            nextTile = collecTile;
+        }
+        _pathfinding.SetPath(nextTile);
     }
 
     public void Move(Character c)
@@ -60,7 +80,8 @@ public class Unit : MonoBehaviour
     public void Move()
     { 
         enemyToAttack = null;
-        Tile nextTile = FindBestTile();
+        Dictionary<Tile, int> possibleTiles = Character._currentTile.GetTiles();
+        Tile nextTile = FindBestTile(possibleTiles);
         Debug.Log(gameObject.name + " " + nextTile);
         if (nextTile != null && nextTile._player == null)
         {
@@ -130,13 +151,12 @@ public class Unit : MonoBehaviour
             Death(this);
     }
 
-    public Tile FindBestTile()
+    public Tile FindBestTile(Dictionary<Tile, int> possibleTiles)
     {
         // Get all possible tiles, including the ones where character can't move bu can attack to
-        Dictionary<Tile, int> possibleTiles = Character._currentTile.GetTiles();
         List<Tile> tilesWithEnemy = new List<Tile>();
 
-        int movementRange = GetComponent<PokemonStats>().MovementRange;
+        int movementRange = Stats.MovementRange;
 
         //get a list of the tiles in range that contain an enemy
         foreach (Tile t in possibleTiles.Keys)
@@ -175,7 +195,7 @@ public class Unit : MonoBehaviour
             foreach (Tile t in tilesWithEnemy)
             {
                 // for each neighbour of t
-                Dictionary<Tile, int> possibleAttackingTiles = t.GetTiles(0, GetComponent<PokemonStats>().AttackRange);
+                Dictionary<Tile, int> possibleAttackingTiles = t.GetTiles(0, Stats.AttackRange);
                 Debug.Log("Possible " + possibleAttackingTiles.Count);
                 foreach (Tile tt in possibleAttackingTiles.Keys)
                 {
@@ -200,5 +220,43 @@ public class Unit : MonoBehaviour
             return bestTile;
         }
         return null;
+    }
+
+    private Tile CollectibleInRange(Dictionary<Tile, int> possibleTiles)
+    {
+        foreach (Tile t in possibleTiles.Keys)
+        {
+            if (t._hCollectible != null)
+            {
+                return t;
+            }
+        }
+        return null;
+    }
+
+    private bool IsMoreHurtInSquad()
+    {
+        List<Unit> squadMembers = GetComponentInParent<Squad>().Units;
+        int c_health = Stats.CurrentHealth;
+
+        // if not alone in squad
+        if (squadMembers.Count > 1)
+        {
+
+            foreach (Unit u in squadMembers)
+            {
+                int u_health = u.GetComponent<PokemonStats>().CurrentHealth;
+                if (u_health < c_health)
+                {
+                    return false;
+                }
+            }
+        }
+
+        //TODO smaller than some threshold?
+        if (c_health < Stats.MaxHealth)
+            return true;
+        else
+            return false;
     }
 }
