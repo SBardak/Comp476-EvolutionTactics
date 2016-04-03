@@ -44,7 +44,7 @@ public class TileGenerator : MonoBehaviour
 
     float yPos = 0;
     #endregion Fields
-
+    //=========================================================================
     #region Properties
 
     /// <summary>
@@ -56,22 +56,10 @@ public class TileGenerator : MonoBehaviour
     }
 
     #endregion Properties
-
+    //=========================================================================
     #region Methods
 
-    void Awake()
-    {
-        Instance = this;
-        foreach (var t in _tilePrefabs)
-            dict.Add(t.charCode, t.Type);
-
-        if (TestMap == null || !ReadMap())
-        {
-            tiles = new Tile[mapWidth, mapHeight];
-            CreateMap();
-        }
-    }
-
+    //-------------------------------------------------------------------------
     #region Map file reading
 
     /// <summary>
@@ -219,7 +207,7 @@ public class TileGenerator : MonoBehaviour
     }
 
     #endregion Map file reading
-
+    //-------------------------------------------------------------------------
     #region Random map generation
 
     /// <summary>
@@ -291,7 +279,7 @@ public class TileGenerator : MonoBehaviour
     }
 
     #endregion Random map generation
-
+    //-------------------------------------------------------------------------
     #region Boundaries
 
     /// <summary>
@@ -326,7 +314,7 @@ public class TileGenerator : MonoBehaviour
     }
 
     #endregion Boundaries
-
+    //-------------------------------------------------------------------------
     #region Collectible (health for now)
 
     /// <summary>
@@ -356,6 +344,20 @@ public class TileGenerator : MonoBehaviour
     }
 
     #endregion Collectible (health for now)
+    //-------------------------------------------------------------------------
+
+    void Awake()
+    {
+        Instance = this;
+        foreach (var t in _tilePrefabs)
+            dict.Add(t.charCode, t.Type);
+
+        if (TestMap == null || !ReadMap())
+        {
+            tiles = new Tile[mapWidth, mapHeight];
+            CreateMap();
+        }
+    }
 
     public Tile GetSurroundingAvailableTile(Tile t, int range)
     {

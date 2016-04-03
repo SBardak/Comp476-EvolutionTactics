@@ -18,7 +18,7 @@ public class HP_Tracker : MonoBehaviour
 
     Color c = Color.black;
     #endregion Fields
-
+    //=========================================================================
     #region Methods
 
     void Start()
@@ -29,9 +29,9 @@ public class HP_Tracker : MonoBehaviour
             Destroy(this);
             return;
         }
-        target = gameObject;
+       target = gameObject;
         _instantiated = Instantiate(HP_PREFAB);
-        _instantiated.transform.SetParent(GameObject.Find("Canvas").transform, false);
+        _instantiated.transform.SetParent(GameObject.Find("Canvas").transform.Find("HP_Container").transform, false);
         _rect = _instantiated.GetComponent<RectTransform>();
 
         PokemonStats stats = GetComponent<PokemonStats>();
@@ -51,7 +51,7 @@ public class HP_Tracker : MonoBehaviour
 
         _rect.position = screenPos;
     }
-
+    //-------------------------------------------------------------------------
     #region Setters & Activators
 
     public void SetColor(Color color)
@@ -87,9 +87,9 @@ public class HP_Tracker : MonoBehaviour
         _currentHp = currentHp;
         SetHP();
     }
-    
-    #endregion Setters & Activators
 
+    #endregion Setters & Activators
+    //-------------------------------------------------------------------------
     #region Destroy
     void HandleDeath()
     {

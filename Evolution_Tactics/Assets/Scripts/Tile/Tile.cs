@@ -26,22 +26,17 @@ public class Tile : MonoBehaviour
     private GameObject _ActiveDecoration;
     private TileDecorationType _decoration = TileDecorationType.NORMAL;
     #endregion Fields
-
+    //=========================================================================
     #region Properties
     public bool HasPlayer
     {
         get { return _player != null; }
     }
     #endregion Properties
-
+    //=========================================================================
     #region Methods 
-
-    void Start()
-    {
-        neighbours = new List<Tile>();
-        GetNeighbours();
-    }
-
+    
+    //-------------------------------------------------------------------------
     #region UI decorations
 
     /// <summary>
@@ -247,7 +242,7 @@ public class Tile : MonoBehaviour
     #endregion Selection
 
     #endregion UI decorations
-
+    //-------------------------------------------------------------------------
     #region Helper
 
     /// <summary>
@@ -404,6 +399,13 @@ public class Tile : MonoBehaviour
     }
 
     #endregion Helper
+    //-------------------------------------------------------------------------
+
+    void Start()
+    {
+        neighbours = new List<Tile>();
+        GetNeighbours();
+    }
 
     // Get its neighbours
     // TODO Will need to add more checkers, for instance to see if neighbour can be visited

@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class HP_Tracker_UI : MonoBehaviour
 {
+    #region Fields
     [SerializeField]
     Text _text;
     [SerializeField]
@@ -11,6 +12,9 @@ public class HP_Tracker_UI : MonoBehaviour
 
     float initialW;
     RectTransform _rect;
+    #endregion Fields
+    //=========================================================================
+    #region Methods
 
     void Awake()
     {
@@ -47,4 +51,6 @@ public class HP_Tracker_UI : MonoBehaviour
 
         //rect.localPosition = p;
     }
+    
+    #endregion Methods
 }

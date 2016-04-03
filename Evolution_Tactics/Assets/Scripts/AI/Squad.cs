@@ -15,7 +15,21 @@ public class Squad : MonoBehaviour
     public event MovementCompleteHandler MovementComplete;
 
     #endregion Events
+    //=========================================================================
+    #region Fields
 
+    [SerializeField]
+    List<Unit> _units;
+    [SerializeField]
+    SquadState _state;
+
+    public Player _controlling;
+
+    int _selectedUnit = 0;
+    float _unitEndTurnWaitTime = 1f;
+
+    #endregion Fields
+    //=========================================================================
     #region Properties
 
     public List<Unit> Units
@@ -27,26 +41,9 @@ public class Squad : MonoBehaviour
     }
 
     #endregion Properties
-
-    #region Fields
-
-    [SerializeField]
-    List<Unit> _units;
-    int _selectedUnit = 0;
-
-    public Player _controlling;
-
-    [SerializeField]
-    SquadState _state;
-    Vector3 _squadDirection;
-    int _squadDirectionCounter;
-
-    float _unitEndTurnWaitTime = 1f;
-
-    #endregion Fields
-
+    //=========================================================================
     #region Methods
-
+    //-------------------------------------------------------------------------
     #region Prep/Initilization
 
     public void SetControllingPlayer(Player p)
@@ -85,7 +82,7 @@ public class Squad : MonoBehaviour
     }
 
     #endregion Prep/Initilization
-
+    //-------------------------------------------------------------------------
     #region Helpers
 
     /// <summary>
@@ -138,7 +135,7 @@ public class Squad : MonoBehaviour
     }
 
     #endregion Helpers
-
+    //-------------------------------------------------------------------------
     #region Squad actions
 
     /// <summary>
@@ -246,7 +243,7 @@ public class Squad : MonoBehaviour
     }
 
     #endregion Squad actions
-
+    //-------------------------------------------------------------------------
     #region State methods
 
     public void Wander(Tile t)
@@ -260,11 +257,10 @@ public class Squad : MonoBehaviour
         MoveUnit(target);
     }
 
-    public void Flee(Vector3 direction)
+    public void Flee(Tile t)
     {
-        var u = GetCurrentUnit();
-
-        //u.Move();
+        Debug.Log("Flee " + t);
+        MoveUnit(t);
     }
 
     public void Idle()
@@ -273,7 +269,7 @@ public class Squad : MonoBehaviour
     }
 
     #endregion State methods
-
+    //-------------------------------------------------------------------------
     /// <summary>
     /// Returns current unit or null if over
     /// </summary>

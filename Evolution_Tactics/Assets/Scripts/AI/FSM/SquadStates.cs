@@ -101,6 +101,28 @@ public abstract class SquadBaseState : IState
                 kvp.Key._player.ControllingPlayer != SquadState.Squad._controlling)
             .Select(kvp => kvp.Key._player).ToList();
     }
+
+    /// <summary>
+    /// Get all AI squads
+    /// </summary>
+    /// <returns></returns>
+    protected Squad[] GetAISquads()
+    {
+        return SquadState.Squad.transform.parent.GetComponentsInChildren<Squad>();
+    }
+    protected int GetLiveSquads()
+    {
+        int alive = 0;
+        if (SquadState.Squad.transform.parent != null)
+        {
+            foreach (var s in GetAISquads())
+            {
+                if (s == SquadState.Squad || s.GetUnitCount() == 0) continue;
+                ++alive;
+            }
+        }
+        return alive;
+    }
 }
 
 public class SquadIdle : SquadBaseState
@@ -143,22 +165,47 @@ public class SquadIdle : SquadBaseState
 
 public class SquadFlee : SquadBaseState
 {
+    Vector3 _targetSquad = Vector3.zero;
+
     public SquadFlee(SquadState ss): base(ss)
     { }
 
     public override void CheckState()
     {
-        SquadState.ToAttack();
+        if (GetLiveSquads() == 0)
+            SquadState.ToAttack();
     }
 
     public override void ExecuteAction()
     {
-        SquadState.Squad.Flee(Vector3.zero);
+        var tile = TileGenerator.Instance.Tiles[(int)_targetSquad.x, (int)_targetSquad.z];
+        SquadState.Squad.Flee(tile);
     }
 
     public override void Process()
     {
         Debug.Log("Flee");
+
+        var squads = GetAISquads().Where(s => s != SquadState.Squad).ToList();
+        Squad closest = squads[0];
+        Vector3 avg = SquadState.Squad.GetAveragePosition();
+        float dist = (closest.GetAveragePosition() - avg).sqrMagnitude;
+        float distT;
+
+        // Search for closest squad (not taking into account objects as of yet
+        for (int i = 1; i < squads.Count; ++i)
+        {
+            var s = squads[i];
+            distT = (s.GetAveragePosition() - avg).sqrMagnitude;
+
+            if (distT < dist)
+            {
+                closest = s;
+                dist = distT;
+            }
+        }
+
+        _targetSquad = closest.GetAveragePosition();
     }
 }
 
@@ -174,10 +221,12 @@ public class SquadAttack : SquadBaseState
         // Outnumbered?
         if (SquadState.Squad.GetUnitCount() == 1 && GetEnemiesInRange().Count > SquadState.Squad.GetUnitCount())
         {
-            // TODO: Add check for squads remaining
-
-            SquadState.ToFlee();
-            return;
+            // TODO: Change
+            if (GetLiveSquads() > 0)
+            {
+                SquadState.ToFlee();
+                return;
+            }
         }
 
         // All killed
