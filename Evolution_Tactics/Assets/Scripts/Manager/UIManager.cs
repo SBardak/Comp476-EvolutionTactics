@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
+using System.Linq;
+
 public class UIManager : MonoBehaviour
 {
     public static UIManager Instance;
@@ -59,23 +61,37 @@ public class UIManager : MonoBehaviour
         buttonList[0].enabled = true;
         buttonList[0].GetComponent<Image>().color = new Color(1, 1, 1);
 
+        for (int i = buttonList.Count - 1; i > 0; i--)
+        {
+            if (buttonList[i].name == "Accept attack")
+            {
+                Destroy(buttonList[i].gameObject);
+                buttonList.RemoveAt(i);
+            }
+        }
+
         _human.selectableTiles = null;
         _human.ClearAttackRange();
     }
 
     public void CreateAcceptButtonAttack(Character enemy)
     {
-        Transform canvas = GameObject.Find("Canvas").transform;
-        Button actionButton = Instantiate(_attackWhereButton, new Vector3(0, 0, 0), Quaternion.identity) as Button;
-        actionButton.transform.SetParent(canvas);
-        actionButton.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, 0, 0);
-        actionButton.GetComponentInChildren<Text>().text = "Accept attack";
+        // Kept for now. Possibly change
+        // What it does : Checks if an accept attack button is already present. If not, add.
+        if (!buttonList.Any(b => b.name == "Accept attack"))
+        {
+            Transform canvas = GameObject.Find("Canvas").transform;
+            Button actionButton = Instantiate(_attackWhereButton, new Vector3(0, 0, 0), Quaternion.identity) as Button;
+            actionButton.transform.SetParent(canvas);
+            actionButton.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, 0, 0);
+            actionButton.GetComponentInChildren<Text>().text = "Accept attack";
 
-        actionButton.onClick.AddListener(delegate
-            {
-                UIManager.Instance.Attack();
-            });
-        buttonList.Add(actionButton);
+            actionButton.onClick.AddListener(delegate
+                {
+                    UIManager.Instance.Attack();
+                });
+            buttonList.Add(actionButton);
+        }
 
         selectedEnemy = enemy;
 

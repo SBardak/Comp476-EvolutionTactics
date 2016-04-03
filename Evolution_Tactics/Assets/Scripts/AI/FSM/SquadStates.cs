@@ -226,6 +226,7 @@ public class SquadWander : SquadBaseState
     Tile squadTile;
 
     float idleProbability = 10;
+    int number = 0;
 
     public SquadWander(SquadState ss): base(ss)
     {
@@ -268,11 +269,27 @@ public class SquadWander : SquadBaseState
 
     public override void ExecuteAction()
     {
-        SquadState.Squad.Wander(squadTile);
+        // Search for a tile around the squad tile.
+        // For now, first unit will always go to this tile
+        if (number++ == 0 && !squadTile.HasPlayer)
+            SquadState.Squad.Wander(squadTile);
+        else
+        {
+            // Select a location around this tile
+            int distance = 2;
+            Tile t = null;
+            while (distance < 4 && t == null)
+            {
+                t = TileGenerator.Instance.GetSurroundingAvailableTile(squadTile, distance);
+                ++distance;
+            }
+            SquadState.Squad.Wander(t);
+        }
     }
 
     public override void Process()
     {
+        number = 0;
         squadTile = null;
 
         Vector3 pos = Vector3.zero;

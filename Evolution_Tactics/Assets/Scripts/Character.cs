@@ -4,10 +4,12 @@ using System.Collections.Generic;
 
 public class Character : MonoBehaviour
 {
+    #region Delegate
     public delegate void CharacterHandler(Character c);
-
     public event CharacterHandler OnDeath;
+    #endregion Delegate
 
+    #region Fields
     public Rigidbody _rb;
     private Animator _animator;
 
@@ -24,6 +26,11 @@ public class Character : MonoBehaviour
 
     private Player _controllerPlayer;
 
+    public bool Moved;
+    public bool IsActivated;
+    #endregion Fields
+
+    #region Properties
     public Player ControllingPlayer
     {
         get { return _controllerPlayer; }
@@ -36,6 +43,9 @@ public class Character : MonoBehaviour
             }
         }
     }
+    #endregion Properties
+
+    #region Methods
 
     void Awake()
     {
@@ -43,14 +53,12 @@ public class Character : MonoBehaviour
         _animator = GetComponent<Animator>();
     }
 
-    void Start()
-    {
-    }
-
     void Update()
     {
 //        _animator.SetFloat("Walk", _rb.velocity.magnitude);
     }
+
+    #region Locomotion
 
     public void Attack(Character enemyToAttack)
     {
@@ -70,7 +78,6 @@ public class Character : MonoBehaviour
 
         return oldPosition == transform.position;
     }
-
 
     public bool KinematicMovement(Vector3 target)
     {
@@ -182,6 +189,10 @@ public class Character : MonoBehaviour
         transform.LookAt(location);
     }
 
+    #endregion Locomotion
+
+    #region Tile information
+
     public bool HasEnemyNeighbours()
     {
         Dictionary<Tile, int> possibleAttackingTiles = _currentTile.GetTiles(0);
@@ -196,7 +207,6 @@ public class Character : MonoBehaviour
         }
         return false;
     }
-
 
     public List<Tile> GetNeighbourTiles()
     {
@@ -217,7 +227,11 @@ public class Character : MonoBehaviour
         }
         
     }
-        
+
+    #endregion Tile information
+
+    #region Activation
+
     /* ADDED BY FRANCIS. RELOCATE WHEN DONE */
     public void ResetPosition()
     {
@@ -248,6 +262,7 @@ public class Character : MonoBehaviour
         Destroy(gameObject);
     }
 
-    public bool Moved;
-    public bool IsActivated;
+    #endregion Activation
+
+    #endregion Methods
 }

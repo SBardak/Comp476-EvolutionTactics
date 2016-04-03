@@ -119,16 +119,19 @@ public class HumanPlayer : Player
     public void HandleRightMouse()
     {
         Debug.Log("Right mouse");
-        if (SelectedCharacter != null)
+        if (SelectedCharacter != null && !isInMovement)
         {
             if (_showingAttack)
             {
                 UIManager.Instance.CancelAttack();
+
                 ClearAttackRange(SelectedCharacter._currentTile);
             }
             else if (SelectedCharacter.Moved && SelectedCharacter.IsActivated)
             {
-                // Possibly reset to initial position?   
+                UIManager.Instance.DeleteHumanPlayerActionUI();
+
+                // Resets character to initial position
                 SelectedCharacter.Moved = false;
                 SelectedCharacter._currentTile.Deselect();
                 var pt = SelectedCharacter._currentTile;
@@ -141,11 +144,14 @@ public class HumanPlayer : Player
                 _selectedTile.SetSelected();
 
                 ShowCharacterRange(_selectedTile);
+
+                UIManager.Instance.CreateHumanPlayerActionUI(SelectedCharacter);
             }
             else
             {
-                if (isInMovement)
-                    return;
+                UIManager.Instance.DeleteHumanPlayerActionUI();
+
+                // End of line. Clear all selections
                 ClearSelection();
             }
         }

@@ -8,10 +8,22 @@ using System.Linq;
 /// </summary>
 public class Squad : MonoBehaviour
 {
+    #region Events
     public delegate void MovementCompleteHandler(Squad s);
-
     public event MovementCompleteHandler MovementComplete;
+    #endregion Events
 
+    #region Properties
+    public List<Unit> Units
+    {
+        get
+        {
+            return _units;
+        }
+    }
+    #endregion Properties
+
+    #region Fields
     [SerializeField]
     List<Unit> _units;
     int _selectedUnit = 0;
@@ -22,6 +34,13 @@ public class Squad : MonoBehaviour
     SquadState _state;
     Vector3 _squadDirection;
     int _squadDirectionCounter;
+
+    float _unitEndTurnWaitTime = 1f;
+    #endregion Fields
+
+    #region Methods
+
+    #region Prep/Initilization
 
     public void SetControllingPlayer(Player p)
     {
@@ -37,6 +56,9 @@ public class Squad : MonoBehaviour
         PrepareSquad();
     }
 
+    /// <summary>
+    /// Prepares/Initializes the squad to be used
+    /// </summary>
     public void PrepareSquad()
     {
         var characters = GetComponentsInChildren<Character>();
@@ -55,6 +77,61 @@ public class Squad : MonoBehaviour
         }
     }
 
+    #endregion Prep/Initilization
+
+    #region Helpers
+
+    /// <summary>
+    /// Returns the average squad position in the world
+    /// </summary>
+    /// <returns></returns>
+    public Vector3 GetAveragePosition()
+    {
+        var pos = Vector3.zero;
+
+        if (_units.Count == 0)
+            return pos;
+
+        foreach (var item in _units)
+            pos += item.transform.position;
+
+        return pos / _units.Count;
+    }
+
+    /// <summary>
+    /// Returns the smallest unit movement range
+    /// </summary>
+    /// <returns></returns>
+    public int GetSmallestMovement()
+    {
+        int smallest = int.MaxValue;
+        foreach (var u in _units)
+            smallest = Mathf.Min(smallest, u.GetComponent<PokemonStats>().MovementRange);
+        return smallest;
+    }
+
+    /// <summary>
+    /// Returns all reachable tiles by the squad
+    /// </summary>
+    /// <returns></returns>
+    public Dictionary<Tile, int> GetReachableTiles()
+    {
+        Dictionary<Tile, int> tiles = new Dictionary<Tile, int>();
+        foreach (var c in GetComponentsInChildren<Character>())
+            tiles = tiles.Concat(
+                c._currentTile.GetTiles().Where(kvp => !tiles.ContainsKey(kvp.Key)
+                )).ToDictionary(x => x.Key, x => x.Value);
+        return tiles;
+    }
+
+    #endregion Helpers
+
+    #region Squad actions
+
+    /// <summary>
+    /// Removes a dead unit from the list
+    /// </summary>
+    /// <param name="u"></param>
     private void UnitDeath(Unit u)
     {
         _units.Remove(u);
@@ -92,37 +169,8 @@ public class Squad : MonoBehaviour
 
         // Start moving units
         ProcessUnit();
-    }
 
-    public Vector3 GetAveragePosition()
-    {
-        var pos = Vector3.zero;
-
-        if (_units.Count == 0)
-            return pos;
-
-        foreach (var item in _units)
-            pos += item.transform.position;
-
-        return pos / _units.Count;
-    }
-
-    public int GetSmallestMovement()
-    {
-        int smallest = int.MaxValue;
-        foreach (var u in _units)
-            smallest = Mathf.Min(smallest, u.GetComponent<PokemonStats>().MovementRange);
-        return smallest;
-    }
-
-    public Dictionary<Tile, int> GetReachableTiles()
-    {
-        Dictionary<Tile, int> tiles = new Dictionary<Tile, int>();
-        foreach (var c in GetComponentsInChildren<Character>())
-            tiles = tiles.Concat(
-                c._currentTile.GetTiles().Where(kvp => !tiles.ContainsKey(kvp.Key)
-                )).ToDictionary(x => x.Key, x => x.Value);
-        return tiles;
+        StartCoroutine(CenterOnUnit());
     }
 
     public int GetUnitCount()
@@ -135,41 +183,19 @@ public class Squad : MonoBehaviour
         _state.ExecuteAction();
     }
 
-    public void Wander(Tile t)
-    {
-        MoveUnit(t);
-    }
-
-    public void Attack(Character target)
-    {
-        MoveUnit(target);
-    }
-
-    public void Flee(Vector3 direction)
-    {
-        var u = _units[_selectedUnit];
-
-        u.Move();
-    }
-
-    public void Idle()
-    {
-        MoveComplete(_units[_selectedUnit]);
-    }
-
     /// <summary>
     /// Moves the current selected unit
     /// </summary>
     void MoveUnit(Tile t)
     {
-        var u = _units[_selectedUnit];
+        var u = GetCurrentUnit();
 
-        u.Move();
+        u.Move(t);
     }
 
     void MoveUnit(Character c)
     {
-        var u = _units[_selectedUnit];
+        var u = GetCurrentUnit();
 
         u.Move();
     }
@@ -180,6 +206,17 @@ public class Squad : MonoBehaviour
     /// <param name="c"></param>
     void MoveComplete(Unit c)
     {
+        //SelectNextUnit();
+        StartCoroutine(EndUnitTurn());
+    }
+
+    /// <summary>
+    /// Waits a 'few' seconds between unit moves
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator EndUnitTurn()
+    {
+        yield return new WaitForSeconds(_unitEndTurnWaitTime);
         SelectNextUnit();
     }
 
@@ -195,11 +232,52 @@ public class Squad : MonoBehaviour
             ProcessUnit();
     }
 
+    #endregion Squad actions
+
+    #region State methods
+
+    public void Wander(Tile t)
+    {
+        MoveUnit(t);
+    }
+
+    public void Attack(Character target)
+    {
+        MoveUnit(target);
+    }
+
+    public void Flee(Vector3 direction)
+    {
+        var u = GetCurrentUnit();
+
+        u.Move();
+    }
+
+    public void Idle()
+    {
+        MoveComplete(GetCurrentUnit());
+    }
+
+    #endregion State methods
+
+    /// <summary>
+    /// Returns current unit or null if over
+    /// </summary>
+    /// <returns></returns>
+    Unit GetCurrentUnit()
+    {
+        if (AllUnitsMoved())
+            return null;
+        return _units[_selectedUnit];
+    }
+
     /// <summary>
     /// Notifies any listeners that the movement is complete
     /// </summary>
     void NotifyMovementComplete()
     {
+        StopCoroutine(CenterOnUnit());
+
         Debug.Log("Squad finished movement");
         if (MovementComplete != null)
             MovementComplete(this);
@@ -211,14 +289,18 @@ public class Squad : MonoBehaviour
     /// <returns></returns>
     bool AllUnitsMoved()
     {
-        return _selectedUnit >= _units.Count;
+        return _selectedUnit >= GetUnitCount();
     }
 
-    public List<Unit> Units
+    IEnumerator CenterOnUnit()
     {
-        get
+        var u = GetCurrentUnit();
+        while ((u = GetCurrentUnit()) != null)
         {
-            return _units;
+            Map_Movement.Instance.CenterOn(u.gameObject);
+            yield return null;
         }
     }
+
+    #endregion Methods
 }

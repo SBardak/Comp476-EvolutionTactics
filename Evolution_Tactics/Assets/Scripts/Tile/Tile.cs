@@ -13,6 +13,7 @@ public enum TileDecorationType
 
 public class Tile : MonoBehaviour
 {
+    #region Fields
     public Character _player;
     // TODO: add more collectibles?
     public HealingCollectible _hCollectible;
@@ -24,12 +25,24 @@ public class Tile : MonoBehaviour
     public GameObject _Attack, _Hover, _Move, _Selected;
     private GameObject _ActiveDecoration;
     private TileDecorationType _decoration = TileDecorationType.NORMAL;
+    #endregion Fields
+
+    #region Properties
+    public bool HasPlayer
+    {
+        get { return _player != null; }
+    }
+    #endregion Properties
+
+    #region Methods 
 
     void Start()
     {
         neighbours = new List<Tile>();
         GetNeighbours();
     }
+
+    #region UI decorations
 
     /// <summary>
     /// Sets a tile's decoration
@@ -95,6 +108,9 @@ public class Tile : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Shows the attack tiles
+    /// </summary>
     public void AttackUI()
     {
         if (_player == null)
@@ -111,6 +127,9 @@ public class Tile : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Clear all tiles related to attack
+    /// </summary>
     public void ClearAttackUI()
     {
         if (_player == null)
@@ -142,138 +161,15 @@ public class Tile : MonoBehaviour
             n.MovementUIRecursive(reach - 1, min, p);
     }
 
+    /// <summary>
+    /// Tile contains a character from another player?
+    /// </summary>
+    /// <param name="t"></param>
+    /// <param name="p"></param>
+    /// <returns></returns>
     bool ContainsEnemy(Tile t, Player p)
     {
-        return t._player != null && t._player.ControllingPlayer != p;
-    }
-
-    /// <summary>
-    /// Returns a dictionary of Tiles and their range from current
-    /// </summary>
-    /// <returns></returns>
-    public Dictionary<Tile, int> GetTiles()
-    {
-        PokemonStats stats;
-        if (_player == null ||
-            (stats = _player.GetComponent<PokemonStats>()) == null)
-            return null;
-
-        int maxAttackRange = stats.AttackRange;
-        int movementRange = stats.MovementRange;
-        var hs = GetTilesB(movementRange, maxAttackRange);
-
-        return hs;
-    }
-
-    /// <summary>
-    /// Returns a dictionary of Tiles and their range from current
-    /// </summary>
-    /// <returns></returns>
-    public Dictionary<Tile, int> GetTiles(int movementRange)
-    {
-        PokemonStats stats;
-        if (_player == null ||
-            (stats = _player.GetComponent<PokemonStats>()) == null)
-            return null;
-
-        int maxAttackRange = stats.AttackRange;
-        var hs = GetTilesB(movementRange, maxAttackRange);
-
-        // TODO: Remove
-        //foreach (var t in hs)
-        //{
-        //    t.Key.OnHover();
-        //}
-
-        return hs;
-    }
-
-    /// <summary>
-    /// Returns a dictionary of Tiles and their range from current
-    /// </summary>
-    /// <returns></returns>
-    public Dictionary<Tile, int> GetTiles(int movementRange, int maxAttackRange)
-    {
-        return GetTilesB(movementRange, maxAttackRange);
-    }
-
-    /// <summary>
-    /// Breadth first search
-    /// </summary>
-    /// <param name="reach"></param>
-    /// <returns></returns>
-    Dictionary<Tile, int> GetTilesB(int reach, int attack)
-    {
-        // Variables
-        int total = reach + attack;
-        int r = 0; // r is Tile current reach
-
-        List<KeyValuePair<Tile, int>> open = new List<KeyValuePair<Tile, int>>();
-        Dictionary<Tile, int> closed = new Dictionary<Tile, int>();
-        open.Add(new KeyValuePair<Tile, int>(this, 0));
-
-        // Open list should contain only reachable + attackable
-        while (open.Count != 0)
-        {
-            // Take and remove first
-            var kvp = open[0];
-            open.RemoveAt(0);
-            r = kvp.Value;
-
-            // Out of bounds (This limits the open list)
-            if (r > total)
-                continue;
-
-            // Tile contains an enemy, no point doing anything. Set reach to total to be seen as attack
-            if (ContainsEnemy(kvp.Key, _player.ControllingPlayer))
-            {
-                closed.Add(kvp.Key, total);
-                if (r <= reach)
-                    r = total - attack + 1;
-            }
-            else
-            {
-                // Add to the closed list with current reach
-                closed.Add(kvp.Key, r);
-
-                // If it's a movement tile, reduce depending on neighbours
-                if (r <= reach)
-                {
-                    foreach (var n in kvp.Key.neighbours)
-                    {
-                        if (ContainsEnemy(n, _player.ControllingPlayer))
-                            ++r;
-                    }
-                    // Went to far, but still want to consider 'attack' count of Tiles to add
-                    if (r >= (total - attack))
-                        r = total - attack;
-                }
-            }
-
-            // +1 for the next tile
-            ++r;
-
-            // Go through all neighbours. Add or update open list
-            foreach (var n in kvp.Key.neighbours)
-            {
-                if (!closed.ContainsKey(n))
-                {
-                    int index = open.FindIndex(x => x.Key == n);
-                    if (index != -1)
-                    {
-                        if (open[index].Value > r)
-                            open[index] = new KeyValuePair<Tile, int>(n, r);
-                        else
-                            continue;
-                    }
-                    else
-                        open.Add(new KeyValuePair<Tile, int>(n, r));
-                }
-            }
-        }
-
-        // Finished!
-        return closed;
+        return t.HasPlayer && t._player.ControllingPlayer != p;
     }
 
     /// <summary>
@@ -350,6 +246,165 @@ public class Tile : MonoBehaviour
 
     #endregion Selection
 
+    #endregion UI decorations
+
+    #region Helper
+
+    /// <summary>
+    /// Returns a dictionary of Tiles and their range from current
+    /// </summary>
+    /// <returns></returns>
+    public Dictionary<Tile, int> GetTiles()
+    {
+        PokemonStats stats;
+        if (_player == null ||
+            (stats = _player.GetComponent<PokemonStats>()) == null)
+            return null;
+
+        int maxAttackRange = stats.AttackRange;
+        int movementRange = stats.MovementRange;
+        var hs = GetTilesB(movementRange, maxAttackRange);
+
+        return hs;
+    }
+
+    /// <summary>
+    /// Returns a dictionary of Tiles and their range from current
+    /// </summary>
+    /// <returns></returns>
+    public Dictionary<Tile, int> GetTiles(int movementRange)
+    {
+        PokemonStats stats;
+        if (_player == null ||
+            (stats = _player.GetComponent<PokemonStats>()) == null)
+            return null;
+
+        int maxAttackRange = stats.AttackRange;
+        var hs = GetTilesB(movementRange, maxAttackRange);
+
+        // TODO: Remove
+        //foreach (var t in hs)
+        //{
+        //    t.Key.OnHover();
+        //}
+
+        return hs;
+    }
+
+    /// <summary>
+    /// Returns a dictionary of Tiles and their range from current
+    /// </summary>
+    /// <returns></returns>
+    public Dictionary<Tile, int> GetTiles(int movementRange, int maxAttackRange)
+    {
+        return GetTilesB(movementRange, maxAttackRange);
+    }
+
+    /// <summary>
+    /// Returns a dictionary of Tiles and their range from current
+    /// Doesn't take into account range reduction
+    /// </summary>
+    /// <returns></returns>
+    public Dictionary<Tile, int> GetTilesAny(int movementRange)
+    {
+        return GetTilesB(movementRange, 0, false);
+    }
+
+
+    /// <summary>
+    /// Breadth first search
+    /// </summary>
+    /// <param name="reach"></param>
+    /// <returns></returns>
+    Dictionary<Tile, int> GetTilesB(int reach, int attack)
+    {
+        return GetTilesB(reach, attack, true);   
+    }
+
+    /// <summary>
+    /// Breadth first search
+    /// </summary>
+    /// <param name="reach"></param>
+    /// <param name="attack"></param>
+    /// <param name="takePlayerIntoAccount">Set to false to ignore players</param>
+    /// <returns></returns>
+    Dictionary<Tile, int> GetTilesB(int reach, int attack, bool takePlayerIntoAccount)
+    {
+        // Variables
+        takePlayerIntoAccount &= HasPlayer;
+        int total = reach + attack;
+        int r = 0; // r is Tile current reach
+
+        List<KeyValuePair<Tile, int>> open = new List<KeyValuePair<Tile, int>>();
+        Dictionary<Tile, int> closed = new Dictionary<Tile, int>();
+        open.Add(new KeyValuePair<Tile, int>(this, 0));
+
+        // Open list should contain only reachable + attackable
+        while (open.Count != 0)
+        {
+            // Take and remove first
+            var kvp = open[0];
+            open.RemoveAt(0);
+            r = kvp.Value;
+
+            // Out of bounds (This limits the open list)
+            if (r > total)
+                continue;
+
+            // Tile contains an enemy, no point doing anything. Set reach to total to be seen as attack
+            if (takePlayerIntoAccount && ContainsEnemy(kvp.Key, _player.ControllingPlayer))
+            {
+                closed.Add(kvp.Key, total);
+                if (r <= reach)
+                    r = total - attack + 1;
+            }
+            else
+            {
+                // Add to the closed list with current reach
+                closed.Add(kvp.Key, r);
+
+                // If it's a movement tile, reduce depending on neighbours
+                if (takePlayerIntoAccount && r <= reach)
+                {
+                    foreach (var n in kvp.Key.neighbours)
+                    {
+                        if (ContainsEnemy(n, _player.ControllingPlayer))
+                            ++r;
+                    }
+                    // Went to far, but still want to consider 'attack' count of Tiles to add
+                    if (r >= (total - attack))
+                        r = total - attack;
+                }
+            }
+
+            // +1 for the next tile
+            ++r;
+
+            // Go through all neighbours. Add or update open list
+            foreach (var n in kvp.Key.neighbours)
+            {
+                if (!closed.ContainsKey(n))
+                {
+                    int index = open.FindIndex(x => x.Key == n);
+                    if (index != -1)
+                    {
+                        if (open[index].Value > r)
+                            open[index] = new KeyValuePair<Tile, int>(n, r);
+                        else
+                            continue;
+                    }
+                    else
+                        open.Add(new KeyValuePair<Tile, int>(n, r));
+                }
+            }
+        }
+
+        // Finished!
+        return closed;
+    }
+
+    #endregion Helper
+
     // Get its neighbours
     // TODO Will need to add more checkers, for instance to see if neighbour can be visited
     private void GetNeighbours()
@@ -375,4 +430,6 @@ public class Tile : MonoBehaviour
             neighbours.Add(tiles[x, z + 1]);
         }
     }
+ 
+    #endregion Methods 
 }

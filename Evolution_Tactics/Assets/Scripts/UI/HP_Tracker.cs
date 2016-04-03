@@ -90,6 +90,7 @@ public class HP_Tracker : MonoBehaviour
     }
     void OnDestroy()
     {
-        Destroy(_instantiated.gameObject);
+        if (_instantiated != null && _instantiated.gameObject != null)
+            Destroy(_instantiated.gameObject);
     }
 }

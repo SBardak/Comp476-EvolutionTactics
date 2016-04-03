@@ -3,6 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
+using System.Linq;
+
+#region Inspector class
+/// <summary>
+/// Used to: Assign a charcode to a type as well as chance of occuring in random map generation
+/// </summary>
 [System.Serializable]
 public class TileGeneratorInspector
 {
@@ -12,9 +18,11 @@ public class TileGeneratorInspector
 
     public TileStats.type Type;
 }
+#endregion Inspector class
 
 public class TileGenerator : MonoBehaviour
 {
+    #region Fields
     public static TileGenerator Instance;
 
     public GameObject player;
@@ -35,6 +43,21 @@ public class TileGenerator : MonoBehaviour
     Dictionary<string, TileStats.type> dict = new Dictionary<string, TileStats.type>();
 
     float yPos = 0;
+    #endregion Fields
+
+    #region Properties
+
+    /// <summary>
+    /// Gets 2d array map tiles
+    /// </summary>
+    public Tile[,] Tiles
+    {
+        get { return tiles; }
+    }
+
+    #endregion Properties
+
+    #region Methods
 
     void Awake()
     {
@@ -48,6 +71,8 @@ public class TileGenerator : MonoBehaviour
             CreateMap();
         }
     }
+
+    #region Map file reading
 
     /// <summary>
     /// Attempts to read a map file
@@ -193,15 +218,13 @@ public class TileGenerator : MonoBehaviour
             ts.SetTile(dict[t]);
     }
 
-    void Start()
-    {
-    }
+    #endregion Map file reading
 
-    void Update()
-    {
+    #region Random map generation
 
-    }
-
+    /// <summary>
+    /// Generates a random map
+    /// </summary>
     private void CreateMap()
     {
         var table = GenerateProbabilityRanges();
@@ -224,6 +247,10 @@ public class TileGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Creates the probability table using values from array
+    /// </summary>
+    /// <returns></returns>
     private List<KeyValuePair<int, TileGeneratorInspector>> GenerateProbabilityRanges()
     {
         int max = 0;
@@ -249,6 +276,12 @@ public class TileGenerator : MonoBehaviour
         return table;
     }
 
+    /// <summary>
+    /// Gets the tile type in the probability table
+    /// </summary>
+    /// <param name="table">Probability table</param>
+    /// <param name="value">Probability index</param>
+    /// <returns></returns>
     private string GetTileType(List<KeyValuePair<int, TileGeneratorInspector>> table, int value)
     {
         foreach (var t in table)
@@ -257,26 +290,48 @@ public class TileGenerator : MonoBehaviour
         return table[0].Value.charCode;
     }
 
+    #endregion Random map generation
+
+    #region Boundaries
+
+    /// <summary>
+    /// Within map (width)
+    /// </summary>
+    /// <param name="t"></param>
+    /// <returns></returns>
     public bool InXRange(int t)
     {
         return t >= 0 && t < mapWidth;
     }
 
+    /// <summary>
+    /// Within map (height)
+    /// </summary>
+    /// <param name="t"></param>
+    /// <returns></returns>
     public bool InZRange(int t)
     {
         return t >= 0 && t < mapHeight;
     }
 
+    /// <summary>
+    /// Combines width/height together
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="z"></param>
+    /// <returns></returns>
     public bool InMap(int x, int z)
     {
         return InXRange(x) && InZRange(z);
     }
 
-    public Tile[,] Tiles
-    {
-        get { return tiles; }
-    }
+    #endregion Boundaries
 
+    #region Collectible (health for now)
+
+    /// <summary>
+    /// Sets a new collectible onto a tile
+    /// </summary>
     public void SetNewCollectibleTile()
     {
         if (_collectible != null)
@@ -299,4 +354,14 @@ public class TileGenerator : MonoBehaviour
         _collectible._currentTile = t;
         t._hCollectible = _collectible;
     }
+
+    #endregion Collectible (health for now)
+
+    public Tile GetSurroundingAvailableTile(Tile t, int range)
+    {
+        var tiles = t.GetTilesAny(range);
+        return tiles.First(kvp => !kvp.Key.HasPlayer).Key;
+    }
+
+    #endregion Methods
 }
