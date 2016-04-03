@@ -4,7 +4,9 @@ using System.Collections;
 public class Tile_Selector : Selector
 {
     #region Fields
+
     private Tile _myTile;
+
     #endregion Fields
 
     #region Methods
@@ -48,7 +50,7 @@ public class Tile_Selector : Selector
         //UIManager.Ins
         if (!(player is HumanPlayer))
         {
-            Debug.Log("Not human");
+//            Debug.Log("Not human");
             return;
         }
         var human = (HumanPlayer)player;

@@ -9,11 +9,15 @@ using System.Linq;
 public class Squad : MonoBehaviour
 {
     #region Events
+
     public delegate void MovementCompleteHandler(Squad s);
+
     public event MovementCompleteHandler MovementComplete;
+
     #endregion Events
 
     #region Properties
+
     public List<Unit> Units
     {
         get
@@ -21,9 +25,11 @@ public class Squad : MonoBehaviour
             return _units;
         }
     }
+
     #endregion Properties
 
     #region Fields
+
     [SerializeField]
     List<Unit> _units;
     int _selectedUnit = 0;
@@ -36,6 +42,7 @@ public class Squad : MonoBehaviour
     int _squadDirectionCounter;
 
     float _unitEndTurnWaitTime = 1f;
+
     #endregion Fields
 
     #region Methods
@@ -203,7 +210,7 @@ public class Squad : MonoBehaviour
     {
         var u = GetCurrentUnit();
 
-        u.Move();
+        u.Move(c);
     }
 
     /// <summary>
@@ -244,6 +251,7 @@ public class Squad : MonoBehaviour
 
     public void Wander(Tile t)
     {
+        Debug.Log("Wander " + t);
         MoveUnit(t);
     }
 
@@ -256,7 +264,7 @@ public class Squad : MonoBehaviour
     {
         var u = GetCurrentUnit();
 
-        u.Move();
+        //u.Move();
     }
 
     public void Idle()

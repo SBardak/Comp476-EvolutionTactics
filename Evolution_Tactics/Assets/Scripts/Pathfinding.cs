@@ -48,7 +48,7 @@ public class Pathfinding : MonoBehaviour
             // if end node attained
             if (!_goalAttained)
             {
-                if (pathList.Count > counter && _endNode == pathList[pathList.Count - 1])
+                if (counter <= movementRange || pathList.Count > counter && _endNode == pathList[pathList.Count - 1])
                 {
                     bool tileCollision = false;
 
@@ -59,9 +59,10 @@ public class Pathfinding : MonoBehaviour
                     for (int i = 0; i < collisionArray.Length; i++)
                     {          
                         // Check if arrived
-                        if (counter > movementRange || collisionArray[i].GetComponent(typeof(Tile)) == _endNode)
+                        if ((counter > movementRange && pathList[counter]._player == null) || collisionArray[i].GetComponent(typeof(Tile)) == _endNode)
                         {
                             GoalAttained = true;
+                            _endNode = pathList[counter];
                             if (_endNode._hCollectible != null)
                             {
                                 stats.GiveHealth(_endNode._hCollectible.healthGiven);
