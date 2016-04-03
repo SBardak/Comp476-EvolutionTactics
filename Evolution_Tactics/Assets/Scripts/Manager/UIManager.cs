@@ -128,18 +128,23 @@ public class UIManager : MonoBehaviour
     public void ActivateUI()
     {
         if (_human.IsPlaying)
-        {
-            foreach (GameObject o in _humanUI)
-            {
-                o.SetActive(true);
-            }
-        }
+            ShowUI();
         else
+            HideUI();
+    }
+    public void ShowUI()
+    {
+        ChangeUI(true);
+    }
+    public void HideUI()
+    {
+        ChangeUI(false);
+    }
+    void ChangeUI(bool enabled)
+    {
+        foreach (GameObject o in _humanUI)
         {
-            foreach (GameObject o in _humanUI)
-            {
-                o.SetActive(false);
-            }
+            o.SetActive(enabled);
         }
     }
 

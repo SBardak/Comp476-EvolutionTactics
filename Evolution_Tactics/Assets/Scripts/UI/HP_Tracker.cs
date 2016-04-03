@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class HP_Tracker : MonoBehaviour
 {
+    #region Fields
     [SerializeField]
     GameObject target;
     public float xOffset;
@@ -16,6 +17,9 @@ public class HP_Tracker : MonoBehaviour
     public int _maxHp, _currentHp;
 
     Color c = Color.black;
+    #endregion Fields
+
+    #region Methods
 
     void Start()
     {
@@ -48,6 +52,8 @@ public class HP_Tracker : MonoBehaviour
         _rect.position = screenPos;
     }
 
+    #region Setters & Activators
+
     public void SetColor(Color color)
     {
         c = color;
@@ -72,18 +78,19 @@ public class HP_Tracker : MonoBehaviour
         SetColorHP(new Color(r, g, b));
     }
 
-
     private void SetHP()
     {
         _instantiated.GetComponent<HP_Tracker_UI>().SetHP(_currentHp, _maxHp);
     }
-
     public void SetHp(int currentHp)
     {
         _currentHp = currentHp;
         SetHP();
     }
+    
+    #endregion Setters & Activators
 
+    #region Destroy
     void HandleDeath()
     {
         Destroy(_instantiated.gameObject);
@@ -93,4 +100,7 @@ public class HP_Tracker : MonoBehaviour
         if (_instantiated != null && _instantiated.gameObject != null)
             Destroy(_instantiated.gameObject);
     }
+    #endregion Destroy
+
+    #endregion Methods
 }

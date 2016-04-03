@@ -118,9 +118,15 @@ public class Squad : MonoBehaviour
     {
         Dictionary<Tile, int> tiles = new Dictionary<Tile, int>();
         foreach (var c in GetComponentsInChildren<Character>())
-            tiles = tiles.Concat(
-                c._currentTile.GetTiles().Where(kvp => !tiles.ContainsKey(kvp.Key)
-                )).ToDictionary(x => x.Key, x => x.Value);
+        {
+            var t = c._currentTile.GetTiles();
+            if (t != null)
+            {
+                tiles = tiles.Concat(
+                    t.Where(kvp => !tiles.ContainsKey(kvp.Key)
+                    )).ToDictionary(x => x.Key, x => x.Value);
+            }
+        }
         return tiles;
     }
 

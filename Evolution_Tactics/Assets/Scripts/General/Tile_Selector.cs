@@ -3,15 +3,21 @@ using System.Collections;
 
 public class Tile_Selector : Selector
 {
-
+    #region Fields
     private Tile _myTile;
-    private Pathfinding _pathFinder;
+    #endregion Fields
+
+    #region Methods
 
     void Start()
     {
         _myTile = gameObject.GetComponent<Tile>();
     }
 
+    /// <summary>
+    /// On ray hit
+    /// </summary>
+    /// <param name="number">Number in rayhit</param>
     public override void RayHit(int number)
     {
         /* Couple of scenarios */
@@ -28,6 +34,9 @@ public class Tile_Selector : Selector
         human.HandleSelection(_myTile);
     }
 
+    /// <summary>
+    /// On mouse over (hovering)
+    /// </summary>
     protected override void OnMouseOver()
     {
 //        Debug.LogWarning("Fire element, +10 evade, etc");
@@ -47,6 +56,9 @@ public class Tile_Selector : Selector
         //base.OnMouseOver();
     }
 
+    /// <summary>
+    /// On mouse exit (to remove hover decorations)
+    /// </summary>
     protected override void OnMouseExit()
     {
         _myTile.ResetHover();
@@ -62,4 +74,6 @@ public class Tile_Selector : Selector
 
         human.HandleHoverOut(_myTile);
     }
+
+    #endregion Methods
 }

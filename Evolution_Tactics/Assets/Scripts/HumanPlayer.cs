@@ -5,8 +5,7 @@ using System.Collections.Generic;
 [RequireComponent(typeof(Picker))]
 public class HumanPlayer : Player
 {
-    private bool _isPlaying;
-
+    #region Fields
     public Character SelectedCharacter;
     private Tile _selectedTile;
     [SerializeField]
@@ -16,7 +15,25 @@ public class HumanPlayer : Player
     private Picker _pickerScript;
     public List<Tile> selectableTiles = null;
 
-    bool _finishedStart = false, _awaitingTurn = false, _showingAttack = false;
+    bool _finishedStart = false, 
+        _awaitingTurn = false, 
+        _showingAttack = false,
+        _isPlaying;
+    #endregion Fields
+
+    #region Properties
+    public bool IsPlaying
+    {
+        get
+        {
+            return _isPlaying;
+        }
+    }
+    #endregion Properties
+
+    #region Methods
+
+    #region Init/Preperation
 
     void Awake()
     {
@@ -51,11 +68,17 @@ public class HumanPlayer : Player
             StartTurn();
     }
 
+    #endregion Init/Preperation
+
+    #region Turn
+
     /// <summary>
     /// Handle event from reaching end of walk
     /// </summary>
     public void HumanPlayer_OnReachEnd()
     {
+        UIManager.Instance.ShowUI();
+
         isInMovement = false;
         SelectedCharacter.Moved = true;
         Debug.Log("Human reach end");
@@ -105,8 +128,25 @@ public class HumanPlayer : Player
         // anything else ?
         _isPlaying = true;
 
+        UIManager.Instance.ShowUI();
+
         base.StartTurn();
     }
+
+    public void EndTurn()
+    {
+        Debug.Log("Human end turn");
+        ClearSelection();
+
+        DisablePicker();
+
+        _isPlaying = false;
+        GameManager.Instance.NextTurn();
+    }
+
+    #endregion Turn
+
+    #region Input 
 
     void Update()
     {
@@ -157,25 +197,6 @@ public class HumanPlayer : Player
         }
     }
 
-    public void EndTurn()
-    {
-        Debug.Log("Human end turn");
-        ClearSelection();
-
-        DisablePicker();
-
-        _isPlaying = false;
-        GameManager.Instance.NextTurn();
-    }
-
-    public bool IsPlaying
-    {
-        get
-        {
-            return _isPlaying;
-        }
-    }
-
     /// <summary>
     /// Enables picking
     /// </summary>
@@ -192,9 +213,7 @@ public class HumanPlayer : Player
         _pickerScript.enabled = false;
     }
 
-
-
-
+    #endregion Input 
 
     #region Tile stuff
 
@@ -306,6 +325,8 @@ public class HumanPlayer : Player
 
     void BeginMovement(Tile t)
     {
+        UIManager.Instance.HideUI();
+
         isInMovement = true;
 
         _selectedTile.Deselect();
@@ -427,5 +448,5 @@ public class HumanPlayer : Player
 
     #endregion
 
-
+    #endregion Methods
 }
