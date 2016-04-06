@@ -55,6 +55,15 @@ public class Map_Movement : MonoBehaviour {
             pos.z = Mathf.Clamp(pos.z, _bounds.min.y, _bounds.max.y);
 
             transform.position = pos;
+
+            if (input(KeyCode.KeypadPlus))
+            {
+                Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize - Time.deltaTime, _bounds.Zoom.x, _bounds.Zoom.y);
+            }
+            else if (input(KeyCode.KeypadMinus))
+            {
+                Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize + Time.deltaTime, _bounds.Zoom.x, _bounds.Zoom.y);
+            }
         }
 
         if (syncPosition != Vector3.zero)
@@ -87,6 +96,10 @@ public class Map_Movement : MonoBehaviour {
         syncPosition.z -= 10; // If I did my math right (z - tan(45) [which is 1] * 10)
     }
 
+    bool input(KeyCode k)
+    {
+        return Input.GetKey(k);
+    }
     bool input(string s)
     {
         return Input.GetKey(s);

@@ -5,4 +5,6 @@ using System.Collections;
 public struct Boundary   {
     public Vector2 min;
     public Vector2 max;
+
+    public Vector2 Zoom;
 }
