@@ -246,7 +246,7 @@ public class HumanPlayer : Player
         if (SelectedCharacter == null)
         {
             // Nothing on tile
-            if (t._player == null)
+            if (!t.HasPlayer)
             {
                 // TODO: Something
                 Debug.Log("NO CHARACTER");
@@ -254,16 +254,16 @@ public class HumanPlayer : Player
             else
             {
                 // Check if mine or not
-                if (IsMine(t._player))
+                if (IsMine(t._character))
                 {
                     // Activated?
-                    if (!t._player.IsActivated)
+                    if (!t._character.IsActivated)
                     {
                         Debug.Log("DEACTIVATED");
                         return;
                     }
 
-                    SelectCharacter(t._player);
+                    SelectCharacter(t._character);
                 }
                 // Not mine, check stats?
                 else
@@ -278,22 +278,26 @@ public class HumanPlayer : Player
         {
             // Selected tile contains something
             // TODO: Add more, check for chars only right now
-            if (t._player != null)
+            if (t.HasPlayer)
             {
-                if (selectableTiles != null && CanBeSelected(t) && !IsMine(t._player))
+                if (selectableTiles != null && CanBeSelected(t) && !IsMine(t._character))
                 {
-                    UIManager.Instance.CreateAcceptButtonAttack(t._player);
+                    UIManager.Instance.CreateAcceptButtonAttack(t._character);
                     return;
                 }
 
-                if (IsMine(t._player) && !SelectedCharacter.Moved && t._player.IsActivated)
+                if (IsMine(t._character) && !SelectedCharacter.Moved && t._character.IsActivated)
                 {
                     ClearSelection();
-                    SelectCharacter(t._player);
+                    SelectCharacter(t._character);
                 }
 
                 Debug.Log("CONTAINS CHARACTER");
                 return;
+            }
+            else if (t.HasObstacle)
+            {
+                // ?
             }
             else
             {
@@ -413,7 +417,7 @@ public class HumanPlayer : Player
 
     public void HandleHover(Tile t)
     {
-        if (isInMovement || _showingAttack || t._player == null)
+        if (isInMovement || _showingAttack || !t.HasPlayer)
             return;
 
         if (SelectedCharacter != null)
@@ -423,7 +427,7 @@ public class HumanPlayer : Player
 
     public void HandleHoverOut(Tile t)
     {
-        if (isInMovement || _showingAttack || t._player == null)
+        if (isInMovement || _showingAttack || !t.HasPlayer)
             return;
 
         ClearCharacterRange(t);

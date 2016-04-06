@@ -97,9 +97,9 @@ public abstract class SquadBaseState : IState
     public List<Character> GetEnemiesInRange()
     {
         return SquadState.Squad.GetReachableTiles().
-            Where(kvp => kvp.Key._player != null &&
-                kvp.Key._player.ControllingPlayer != SquadState.Squad._controlling)
-            .Select(kvp => kvp.Key._player).ToList();
+            Where(kvp => kvp.Key.HasPlayer &&
+                kvp.Key._character.ControllingPlayer != SquadState.Squad._controlling)
+            .Select(kvp => kvp.Key._character).ToList();
     }
 
     /// <summary>
@@ -320,7 +320,7 @@ public class SquadWander : SquadBaseState
     {
         // Search for a tile around the squad tile.
         // For now, first unit will always go to this tile
-        if (number++ == 0 && !squadTile.HasPlayer)
+        if (number++ == 0 && !squadTile.IsOccupied)
             SquadState.Squad.Wander(squadTile);
         else
         {

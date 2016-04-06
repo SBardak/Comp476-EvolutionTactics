@@ -79,7 +79,7 @@ public class Unit : MonoBehaviour
             Debug.Log(name + " Collect tile");
             nextTile = collecTile;
         }
-        else if (nextTile._player != null)
+        else if (nextTile.IsOccupied)
         {
             nextTile = FindNewTileAround(t, possibleTiles);
         }
@@ -118,7 +118,7 @@ public class Unit : MonoBehaviour
 
     private void MoveTo(Tile nextTile)
     {
-        if (nextTile != null && nextTile._player == null)
+        if (nextTile != null && !nextTile.IsOccupied)
         {
             _pathfinding.SetPath(nextTile);
         }
@@ -210,7 +210,7 @@ public class Unit : MonoBehaviour
 
         foreach (Tile tt in aroundT.Keys)
         {
-            if (possibleTiles.ContainsKey(tt) && tt._player == null)
+            if (possibleTiles.ContainsKey(tt) && !tt.HasPlayer)
             {
                 float distance = Vector3.Distance(Character._currentTile.transform.position, tt.transform.position);
                 if (newTile == null || distance < closest)
@@ -252,7 +252,7 @@ public class Unit : MonoBehaviour
         //get a list of the tiles in range that contain an enemy
         foreach (Tile t in possibleTiles.Keys)
         {
-            if (t._player != null && t._player.tag == "Human")
+            if (t.HasPlayer && t._character.tag == "Human")
             {
                 tilesWithEnemy.Add(t);
             }
@@ -270,11 +270,11 @@ public class Unit : MonoBehaviour
             {
                 bestTile = tilesWithEnemy[0].neighbours[0];
                 // when no player on the tile, break
-                if (possibleTiles[t] <= movementRange && bestTile._player == null)
+                if (possibleTiles[t] <= movementRange && !bestTile.HasPlayer)
                 {
-                    highestDamage = attack.GetDamage(tilesWithEnemy[0]._player, bestTile);
-                    enemyToAttack = tilesWithEnemy[0]._player;
-                    if (bestTile._player.GetComponent<PokemonStats>()._currentHealth - highestDamage <= 0)
+                    highestDamage = attack.GetDamage(tilesWithEnemy[0]._character, bestTile);
+                    enemyToAttack = tilesWithEnemy[0]._character;
+                    if (bestTile._character.GetComponent<PokemonStats>()._currentHealth - highestDamage <= 0)
                     {
                         return bestTile;
                     }
@@ -294,18 +294,18 @@ public class Unit : MonoBehaviour
                 foreach (Tile tt in possibleAttackingTiles.Keys)
                 {
                     // if (neighbour is empty or neighbour is where we currently are) and (this neighbour is in range)
-                    if ((tt._player == null || tt._player == Character) && (possibleTiles.ContainsKey(tt) && possibleTiles[tt] <= movementRange))
+                    if ((!tt.HasPlayer || tt._character == Character) && (possibleTiles.ContainsKey(tt) && possibleTiles[tt] <= movementRange))
                     {
-                        int damage = attack.GetDamage(t._player, tt);
+                        int damage = attack.GetDamage(t._character, tt);
                         int rangeDistance = possibleTiles[tt];
 
                         // if this tile would do more damage, set it as best tile
                         // TODO add more conditions, like damage received?
-                        if (bestTile._player.GetComponent<PokemonStats>()._currentHealth - damage <= 0)
+                        if (bestTile._character.GetComponent<PokemonStats>()._currentHealth - damage <= 0)
                         {
                             bestTile = tt;
                             highestDamage = damage;
-                            enemyToAttack = t._player;
+                            enemyToAttack = t._character;
                             return bestTile;
                         }
                     }
@@ -326,7 +326,7 @@ public class Unit : MonoBehaviour
         //get a list of the tiles in range that contain an enemy
         foreach (Tile t in possibleTiles.Keys)
         {
-            if (t._player != null && t._player.tag == "Human")
+            if (t.HasPlayer && t._character.tag == "Human")
             {
                 tilesWithEnemy.Add(t);
             }
@@ -344,10 +344,10 @@ public class Unit : MonoBehaviour
             {
                 bestTile = tilesWithEnemy[0].neighbours[0];
                 // when no player on the tile, break
-                if (possibleTiles[t] <= movementRange && bestTile._player == null)
+                if (possibleTiles[t] <= movementRange && !bestTile.HasPlayer)
                 {
-                    highestDamage = attack.GetDamage(tilesWithEnemy[0]._player, bestTile);
-                    enemyToAttack = tilesWithEnemy[0]._player;
+                    highestDamage = attack.GetDamage(tilesWithEnemy[0]._character, bestTile);
+                    enemyToAttack = tilesWithEnemy[0]._character;
                     bestTile = t;
                     break;
                 }
@@ -361,9 +361,9 @@ public class Unit : MonoBehaviour
                 foreach (Tile tt in possibleAttackingTiles.Keys)
                 {
                     // if (neighbour is empty or neighbour is where we currently are) and (this neighbour is in range)
-                    if ((tt._player == null || tt._player == Character) && (possibleTiles.ContainsKey(tt) && possibleTiles[tt] <= movementRange))
+                    if ((!tt.HasPlayer || tt._character == Character) && (possibleTiles.ContainsKey(tt) && possibleTiles[tt] <= movementRange))
                     {
-                        int damage = attack.GetDamage(t._player, tt);
+                        int damage = attack.GetDamage(t._character, tt);
                         int rangeDistance = possibleTiles[tt];
 
                         // if this tile would do more damage, set it as best tile
@@ -372,7 +372,7 @@ public class Unit : MonoBehaviour
                         {
                             bestTile = tt;
                             highestDamage = damage;
-                            enemyToAttack = t._player;
+                            enemyToAttack = t._character;
                         }
                     }
                 }

@@ -43,6 +43,9 @@ public class TileGenerator : MonoBehaviour
     Dictionary<string, TileStats.type> dict = new Dictionary<string, TileStats.type>();
 
     float yPos = 0;
+
+    [SerializeField]
+    TileObstacleList _obstacles;
     #endregion Fields
     //=========================================================================
     #region Properties
@@ -213,7 +216,7 @@ public class TileGenerator : MonoBehaviour
     /// <summary>
     /// Generates a random map
     /// </summary>
-    private void CreateMap()
+    void CreateMap()
     {
         var table = GenerateProbabilityRanges();
 
@@ -228,11 +231,32 @@ public class TileGenerator : MonoBehaviour
 
                 var tile = Instantiate(tilePrefab, new Vector3(i, yPos, j), Quaternion.identity) as Tile;
                 SetTileType(GetTileType(table, tileIndex), tile.gameObject);
+                SetTileObstacle(tile);
+
                 tiles[i, j] = tile;
                 tiles[i, j].transform.parent = map.transform;
                 tiles[i, j].name = "TILE " + (i * mapWidth + j);
             }
         }
+    }
+
+    void SetTileObstacle(Tile t)
+    {
+        if (Random.Range(0, 100) < 90)
+            return;
+
+        var type = t.GetComponent<TileStats>().MyType;
+        var obs = _obstacles.GetObstacles(type);
+
+        if (obs.Count == 0)
+            return;
+
+        var rand = Random.Range(0, obs.Count);
+        var obj = (TileObstacle)Instantiate(obs[rand], t.transform.position, Quaternion.identity);
+
+        obj.SetType(type);
+        obj.transform.parent = t.transform;
+        t._obstacle = obj;
     }
 
     /// <summary>
@@ -330,7 +354,7 @@ public class TileGenerator : MonoBehaviour
         
         int height = Random.Range(0, mapHeight - 1), width = Random.Range(0, mapWidth - 1);
         Tile t = Tiles[height, width];
-        while (t._player != null)
+        while (t.IsOccupied)
         {
             height = Random.Range(0, mapHeight - 1);
             width = Random.Range(0, mapWidth - 1);
@@ -362,7 +386,7 @@ public class TileGenerator : MonoBehaviour
     public Tile GetSurroundingAvailableTile(Tile t, int range)
     {
         var tiles = t.GetTilesAny(range);
-        return tiles.First(kvp => !kvp.Key.HasPlayer).Key;
+        return tiles.First(kvp => !kvp.Key.IsOccupied).Key;
     }
 
     #endregion Methods

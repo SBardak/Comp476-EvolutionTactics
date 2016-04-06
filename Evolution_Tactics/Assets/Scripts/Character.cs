@@ -199,7 +199,7 @@ public class Character : MonoBehaviour
 
         foreach (Tile t in possibleAttackingTiles.Keys)
         {
-            Character neighbourCharacter = t._player;
+            Character neighbourCharacter = t._character;
             if (neighbourCharacter != null && neighbourCharacter.ControllingPlayer != ControllingPlayer)
             {
                 return true;
@@ -217,12 +217,12 @@ public class Character : MonoBehaviour
     {
         if (_currentTile != null)
         {
-            _currentTile._player = null;
+            _currentTile._character = null;
         }
 
-        if (tile._player == null)
+        if (!tile.HasPlayer)
         {
-            tile._player = this;
+            tile._character = this;
             _currentTile = tile;
         }
         
@@ -254,7 +254,7 @@ public class Character : MonoBehaviour
     void HandleDeath()
     {
         if (_currentTile != null)
-            _currentTile._player = null;
+            _currentTile._character = null;
 
         if (OnDeath != null)
             OnDeath(this);

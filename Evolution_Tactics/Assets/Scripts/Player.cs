@@ -33,7 +33,7 @@ public class Player : MonoBehaviour
                 x = Random.Range(0, TileGenerator.Instance.mapWidth - 1);
                 z = Random.Range(0, TileGenerator.Instance.mapHeight - 1);
                 t = TileGenerator.Instance.Tiles[x, z];
-            } while (t._player != null);
+            } while (t.IsOccupied);
         }
         else
         {
@@ -55,7 +55,7 @@ public class Player : MonoBehaviour
 
                 t = TileGenerator.Instance.Tiles[xx, zz];
                 ++count;
-            } while (t._player != null);
+            } while (t.IsOccupied);
         }
         character.SetCurrentTile(t);
         character.transform.position = new Vector3(t.transform.position.x, t.transform.position.y, t.transform.position.z);

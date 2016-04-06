@@ -14,9 +14,10 @@ public enum TileDecorationType
 public class Tile : MonoBehaviour
 {
     #region Fields
-    public Character _player;
+    public Character _character;
     // TODO: add more collectibles?
     public HealingCollectible _hCollectible;
+    public TileObstacle _obstacle;
 
     public List<Tile> neighbours;
     public float costSoFar, heuristicValue, totalEstimatedValue;
@@ -30,12 +31,20 @@ public class Tile : MonoBehaviour
     #region Properties
     public bool HasPlayer
     {
-        get { return _player != null; }
+        get { return _character != null; }
+    }
+    public bool HasObstacle
+    {
+        get { return _obstacle != null; }
+    }
+    public bool IsOccupied
+    {
+        get { return HasPlayer || HasObstacle; }
     }
     #endregion Properties
     //=========================================================================
     #region Methods 
-    
+
     //-------------------------------------------------------------------------
     #region UI decorations
 
@@ -88,10 +97,10 @@ public class Tile : MonoBehaviour
     /// </summary>
     public void MovementUI()
     {
-        if (_player == null)
+        if (_character == null)
             return;
 
-        int movementRange = _player.GetComponent<PokemonStats>().MovementRange;
+        int movementRange = _character.GetComponent<PokemonStats>().MovementRange;
 
         // Set decorations
         foreach (var item in GetTiles())
@@ -108,10 +117,10 @@ public class Tile : MonoBehaviour
     /// </summary>
     public void AttackUI()
     {
-        if (_player == null)
+        if (_character == null)
             return;
 
-        int attackRange = _player.GetComponent<PokemonStats>().AttackRange;
+        int attackRange = _character.GetComponent<PokemonStats>().AttackRange;
 
         foreach (var item in GetTiles(0, attackRange))
         {
@@ -127,10 +136,10 @@ public class Tile : MonoBehaviour
     /// </summary>
     public void ClearAttackUI()
     {
-        if (_player == null)
+        if (_character == null)
             return;
 
-        int maxAttackRange = _player.GetComponent<PokemonStats>().AttackRange;
+        int maxAttackRange = _character.GetComponent<PokemonStats>().AttackRange;
         foreach (var item in GetTiles(0, maxAttackRange))
             item.Key.ResetDecoration();
     }
@@ -164,7 +173,7 @@ public class Tile : MonoBehaviour
     /// <returns></returns>
     bool ContainsEnemy(Tile t, Player p)
     {
-        return t.HasPlayer && t._player.ControllingPlayer != p;
+        return t.HasPlayer && t._character.ControllingPlayer != p;
     }
 
     /// <summary>
@@ -172,11 +181,11 @@ public class Tile : MonoBehaviour
     /// </summary>
     public void ClearMovementUI()
     {
-        if (_player == null)
+        if (_character == null)
             return;
 
-        int maxAttackRange = _player.GetComponent<PokemonStats>().AttackRange;
-        int movementRange = _player.GetComponent<PokemonStats>().MovementRange + maxAttackRange;
+        int maxAttackRange = _character.GetComponent<PokemonStats>().AttackRange;
+        int movementRange = _character.GetComponent<PokemonStats>().MovementRange + maxAttackRange;
         //ClearMovementUIRecursive(movementRange);
         foreach (var item in GetTiles())
             item.Key.ResetDecoration();
@@ -252,8 +261,8 @@ public class Tile : MonoBehaviour
     public Dictionary<Tile, int> GetTiles()
     {
         PokemonStats stats;
-        if (_player == null ||
-            (stats = _player.GetComponent<PokemonStats>()) == null)
+        if (_character == null ||
+            (stats = _character.GetComponent<PokemonStats>()) == null)
             return null;
 
         int maxAttackRange = stats.AttackRange;
@@ -270,8 +279,8 @@ public class Tile : MonoBehaviour
     public Dictionary<Tile, int> GetTiles(int movementRange)
     {
         PokemonStats stats;
-        if (_player == null ||
-            (stats = _player.GetComponent<PokemonStats>()) == null)
+        if (_character == null ||
+            (stats = _character.GetComponent<PokemonStats>()) == null)
             return null;
 
         int maxAttackRange = stats.AttackRange;
@@ -347,7 +356,7 @@ public class Tile : MonoBehaviour
                 continue;
 
             // Tile contains an enemy, no point doing anything. Set reach to total to be seen as attack
-            if (takePlayerIntoAccount && ContainsEnemy(kvp.Key, _player.ControllingPlayer))
+            if (takePlayerIntoAccount && ContainsEnemy(kvp.Key, _character.ControllingPlayer))
             {
                 closed.Add(kvp.Key, total);
                 if (r <= reach)
@@ -363,7 +372,7 @@ public class Tile : MonoBehaviour
                 {
                     foreach (var n in kvp.Key.neighbours)
                     {
-                        if (ContainsEnemy(n, _player.ControllingPlayer))
+                        if (ContainsEnemy(n, _character.ControllingPlayer))
                             ++r;
                     }
                     // Went to far, but still want to consider 'attack' count of Tiles to add

@@ -59,7 +59,7 @@ public class Pathfinding : MonoBehaviour
                     for (int i = 0; i < collisionArray.Length; i++)
                     {          
                         // Check if arrived
-                        if ((counter > movementRange && pathList[counter]._player == null) || collisionArray[i].GetComponent(typeof(Tile)) == _endNode)
+                        if ((counter > movementRange && !pathList[counter].HasPlayer) || collisionArray[i].GetComponent(typeof(Tile)) == _endNode)
                         {
                             GoalAttained = true;
                             _endNode = pathList[counter];
@@ -128,7 +128,7 @@ public class Pathfinding : MonoBehaviour
             Debug.Log("SAME TILE");   
         }
         // if player select a non-empty tile
-        if (_endNode._player != null)
+        if (_endNode.IsOccupied)
         {
             Debug.Log("Need to select empty tile");
             return;
@@ -181,7 +181,7 @@ public class Pathfinding : MonoBehaviour
 
                 if (closedList.Contains(neighbour) && newCost < neighbour.costSoFar)
                 {
-                    if (neighbour._player == null || (neighbour._player != null && (neighbour._player.tag == gameObject.tag || myType == TileStats.type.Flying)))
+                    if (!neighbour.IsOccupied || (neighbour.HasPlayer && (neighbour._character.tag == gameObject.tag || myType == TileStats.type.Flying)))
                     {
                         neighbour.costSoFar = newCost;
                         neighbour.totalEstimatedValue = neighbour.costSoFar + neighbour.heuristicValue;
@@ -203,7 +203,7 @@ public class Pathfinding : MonoBehaviour
                 }
                 else if (!inClosedList && !inOpenList)
                 {
-                    if (neighbour._player == null || (neighbour._player != null && (neighbour._player.tag == gameObject.tag || myType == TileStats.type.Flying)))
+                    if (!neighbour.IsOccupied || (neighbour.HasPlayer && (neighbour._character.tag == gameObject.tag || myType == TileStats.type.Flying)))
                     {
                         neighbour.costSoFar = newCost;
                         neighbour.totalEstimatedValue = neighbour.costSoFar + neighbour.heuristicValue;
