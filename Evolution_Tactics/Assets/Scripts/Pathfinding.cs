@@ -37,7 +37,6 @@ public class Pathfinding : MonoBehaviour
         {
             _animator = GetComponentInChildren<Animator>();
         }
-        Debug.Log(_animator);
         myType = stats.MyType;
         movementRange = stats.MovementRange;
     }

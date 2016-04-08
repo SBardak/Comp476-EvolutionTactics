@@ -87,8 +87,8 @@ public class Unit : MonoBehaviour
 
         if (Character._unitType == UnitType.ATTACKER)
         {
-            Debug.Log(name + " Attacker");
             nextTile = FindBestTile(c);
+            Debug.LogWarning(nextTile);
         }
         else if (Character._unitType == UnitType.TANKER)
         {
@@ -98,7 +98,6 @@ public class Unit : MonoBehaviour
         else if (Character._unitType == UnitType.LONG_RANGE)
         {
             nextTile = BestRangedAttack(c, possibleTiles);
-            Debug.Log("Bitch " + enemyToAttack + nextTile);
             if (nextTile == null)
             {
                 nextTile = BestRangedAttack(possibleTiles);
@@ -280,7 +279,6 @@ public class Unit : MonoBehaviour
         }
         else if (possible.Count == 1)
         {
-            Debug.Log("Allo");
             return possible[0];
         }
         else
@@ -437,7 +435,7 @@ public class Unit : MonoBehaviour
         {
             Tile bestTile = null;
             AttackAlgorithm attack = GetComponentInChildren<AttackAlgorithm>();
-            int highestDamage = 0;
+            float highestCost = 0f;
             //Find an initial empty best tile
             foreach (Tile t in tilesWithEnemy)
             {
@@ -445,7 +443,8 @@ public class Unit : MonoBehaviour
                 // when no player on the tile, break
                 if (possibleTiles[t] <= movementRange && !bestTile.HasPlayer)
                 {
-                    highestDamage = attack.GetDamage(tilesWithEnemy[0]._character, bestTile);
+                    //highestDamage = attack.GetDamage(tilesWithEnemy[0]._character, bestTile);
+                    highestCost = AttackCost(tilesWithEnemy[0]._character, bestTile);
                     enemyToAttack = tilesWithEnemy[0]._character;
                     bestTile = t;
                     break;
@@ -462,15 +461,16 @@ public class Unit : MonoBehaviour
                     // if (neighbour is empty or neighbour is where we currently are) and (this neighbour is in range)
                     if ((!tt.HasPlayer || tt._character == Character) && (possibleTiles.ContainsKey(tt) && possibleTiles[tt] <= movementRange))
                     {
-                        int damage = attack.GetDamage(t._character, tt);
+                        //int cost = attack.GetDamage(t._character, tt);
+                        float cost = AttackCost(t._character, tt);
                         int rangeDistance = possibleTiles[tt];
 
                         // if this tile would do more damage, set it as best tile
                         // TODO add more conditions, like damage received?
-                        if (damage > highestDamage || (bestTile != _char._currentTile && damage == highestDamage && rangeDistance > possibleTiles[bestTile]))
+                        if (cost > highestCost || (bestTile != _char._currentTile && cost == highestCost && rangeDistance > possibleTiles[bestTile]))
                         {
                             bestTile = tt;
-                            highestDamage = damage;
+                            highestCost = cost;
                             enemyToAttack = t._character;
                         }
                     }
@@ -479,6 +479,17 @@ public class Unit : MonoBehaviour
             return bestTile;
         }
         return null;
+    }
+
+    private float AttackCost(Character target, Tile goToTile)
+    {
+        AttackAlgorithm attack = GetComponentInChildren<AttackAlgorithm>();
+        int damageDone = attack.GetDamage(target, goToTile);
+        int damageReceived = target.GetComponentInChildren<AttackAlgorithm>().GetDamage(GetComponent<Character>(), target._currentTile);
+
+        float cost = damageDone - (0.5f * damageReceived);
+
+        return cost;
     }
 
     private Tile CollectibleInRange(Dictionary<Tile, int> possibleTiles)
