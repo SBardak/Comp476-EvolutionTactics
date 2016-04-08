@@ -15,10 +15,13 @@ public class Walking : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		vert = Input.GetAxis("Vertical");
-		anim.SetFloat("Walk", vert);
-
-		if (vert > 0.1f){
+		if (vert > 0.1f || vert < -0.1f){
+			anim.SetBool("Walk", true);
 			transform.position += transform.forward * vert * speed * Time.deltaTime;
+		}else{
+			anim.SetBool("Walk", false);
 		}
+
+
 	}
 }

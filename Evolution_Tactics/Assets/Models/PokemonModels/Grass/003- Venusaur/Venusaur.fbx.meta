@@ -1,0 +1,142 @@
+fileFormatVersion: 2
+guid: acf4a0e805e1a3a4b87510c49dc62042
+timeCreated: 1460095116
+licenseType: Free
+ModelImporter:
+  serializedVersion: 18
+  fileIDToRecycleName:
+    100000: Armature
+    100002: Bone
+    100004: Bone.001
+    100006: Bone.001_end
+    100008: Bone.003
+    100010: Bone.003_end
+    100012: Bone.005
+    100014: Bone.005_end
+    100016: Bone.007
+    100018: Bone.008
+    100020: Bone.008_end
+    100022: Bone.009
+    100024: Bone.010
+    100026: Bone.011
+    100028: Bone.011_L
+    100030: Bone.011_L.001
+    100032: Bone.011_L.003
+    100034: Bone.011_L.003_end
+    100036: Bone.011_R
+    100038: Bone.011_R.001
+    100040: Bone.011_R.003
+    100042: Bone.011_R.003_end
+    100044: Bone.013_L
+    100046: Bone.013_L.001
+    100048: Bone.013_L.003
+    100050: Bone.013_L.003_end
+    100052: Bone.013_R
+    100054: Bone.013_R.001
+    100056: Bone.013_R.003
+    100058: Bone.013_R.003_end
+    100060: Camera
+    100062: fushigibana
+    100064: Lamp
+    100066: Sun
+    100068: //RootNode
+    400000: Armature
+    400002: Bone
+    400004: Bone.001
+    400006: Bone.001_end
+    400008: Bone.003
+    400010: Bone.003_end
+    400012: Bone.005
+    400014: Bone.005_end
+    400016: Bone.007
+    400018: Bone.008
+    400020: Bone.008_end
+    400022: Bone.009
+    400024: Bone.010
+    400026: Bone.011
+    400028: Bone.011_L
+    400030: Bone.011_L.001
+    400032: Bone.011_L.003
+    400034: Bone.011_L.003_end
+    400036: Bone.011_R
+    400038: Bone.011_R.001
+    400040: Bone.011_R.003
+    400042: Bone.011_R.003_end
+    400044: Bone.013_L
+    400046: Bone.013_L.001
+    400048: Bone.013_L.003
+    400050: Bone.013_L.003_end
+    400052: Bone.013_R
+    400054: Bone.013_R.001
+    400056: Bone.013_R.003
+    400058: Bone.013_R.003_end
+    400060: Camera
+    400062: fushigibana
+    400064: Lamp
+    400066: Sun
+    400068: //RootNode
+    4300000: fushigibana
+    9500000: //RootNode
+    13700000: fushigibana
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
