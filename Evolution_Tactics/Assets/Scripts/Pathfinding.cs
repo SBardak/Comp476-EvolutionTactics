@@ -26,11 +26,17 @@ public class Pathfinding : MonoBehaviour
     private TileStats.type myType;
     private int movementRange;
     private PokemonStats stats;
+    private Animator _animator;
 
     void Start()
     {
         Graph();
         stats = GetComponent<PokemonStats>();
+        _animator = GetComponent<Animator>();
+        if (_animator == null)
+        {
+            _animator = GetComponentInChildren<Animator>();
+        }
         myType = stats.MyType;
         movementRange = stats.MovementRange;
     }
@@ -48,7 +54,7 @@ public class Pathfinding : MonoBehaviour
             // if end node attained
             if (!_goalAttained)
             {
-                if (counter <= movementRange || pathList.Count > counter && _endNode == pathList[pathList.Count - 1])
+                if (/*counter <= movementRange ||*/ pathList.Count > counter && _endNode == pathList[pathList.Count - 1])
                 {
                     bool tileCollision = false;
 
@@ -59,7 +65,7 @@ public class Pathfinding : MonoBehaviour
                     for (int i = 0; i < collisionArray.Length; i++)
                     {          
                         // Check if arrived
-                        if ((counter > movementRange && !pathList[counter].HasPlayer) || collisionArray[i].GetComponent(typeof(Tile)) == _endNode)
+                        if (/*(counter > movementRange && !pathList[counter].HasPlayer) ||*/ collisionArray[i].GetComponent(typeof(Tile)) == _endNode)
                         {
                             GoalAttained = true;
                             _endNode = pathList[counter];
@@ -93,6 +99,10 @@ public class Pathfinding : MonoBehaviour
                 {
                     _middleOfTheNodeAttained = true;
                     _hasPath = false;
+
+                    if (_animator != null)
+                        _animator.SetBool("Walk", false);
+                    
                     if (OnReachEnd != null)
                         OnReachEnd();
                 }
@@ -109,6 +119,11 @@ public class Pathfinding : MonoBehaviour
     {
         StartNode = player._currentTile;
         _endNode = end;
+
+        if (_animator != null)
+        {
+            _animator.SetBool("Walk", true);
+        }
 
         CalculateNewPath();
     }

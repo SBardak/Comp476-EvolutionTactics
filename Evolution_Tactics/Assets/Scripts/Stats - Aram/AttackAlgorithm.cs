@@ -109,12 +109,10 @@ public class AttackAlgorithm : MonoBehaviour
             }
         }
 
-
-
         return modifier;
     }
 
-    public int GetDamage(Character target)
+    public int GetDamage(Character target, bool initialAttack = true)
     {
         getStats(target);
 
@@ -130,8 +128,22 @@ public class AttackAlgorithm : MonoBehaviour
         }
         damage = (int)((float)damage * typeAdvantage(target));
 
-        Debug.LogWarning("It would do " + damage + " damages to " + target.name);
+        if (initialAttack)
+        {
+            float distance = Vector3.Distance(target.transform.position, transform.position);
+            bool isInRangeToCounter = distance <= target.GetComponent<PokemonStats>().AttackRange;
 
+            Debug.LogWarning("It would do " + damage + " damage to " + target.name);
+            if (isInRangeToCounter)
+            {
+                int receivedDamage = target.GetComponent<AttackAlgorithm>().GetDamage(this.GetComponent<Character>(), false);
+                Debug.LogWarning("And you would receive " + receivedDamage + " damage.");
+            }
+            else
+            {
+                Debug.LogWarning(" And you would receive no damage.");
+            }
+        }
         return damage;
     }
 
@@ -156,21 +168,25 @@ public class AttackAlgorithm : MonoBehaviour
 
     public void DoDamage(Character target)
     {
-        Debug.LogWarning(gameObject.name + " attacks " + target.name + " and do " + damage + " damages.");
 
         float rand = Random.Range(0, 100);
-        if (rand <= Accuracy)
+        //if (rand <= Accuracy)
+        //{
+        Debug.LogWarning(gameObject.name + " attacks " + target.name + " and do " + damage + " damages.");
+        target.GetComponent<PokemonStats>().CurrentHealth -= damage;
+
+        StartCoroutine(UIManager.Instance.CreateNewDamageLabel(damage));
+        StartCoroutine(AttackAnimation());
+
+        if (target.GetComponent<PokemonStats>().CurrentHealth <= 0)
         {
-            target.GetComponent<PokemonStats>().CurrentHealth -= damage;
-
-            StartCoroutine(UIManager.Instance.CreateNewDamageLabel(damage));
-            StartCoroutine(AttackAnimation());
-
-            if (target.GetComponent<PokemonStats>().CurrentHealth <= 0)
-            {
-                // transform.GetComponent<Experience>().gainXP(target.GetComponent<PokemonStats>().XP_on_Death);
-            }
+            // transform.GetComponent<Experience>().gainXP(target.GetComponent<PokemonStats>().XP_on_Death);
         }
+        /* }
+        else
+        {
+            Debug.LogWarning("MISS");
+        }*/
     }
 
     private IEnumerator AttackAnimation()

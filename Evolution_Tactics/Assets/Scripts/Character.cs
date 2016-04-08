@@ -2,16 +2,26 @@
 using System.Collections;
 using System.Collections.Generic;
 
+public enum UnitType
+{
+    ATTACKER,
+    TANKER,
+    LONG_RANGE
+}
+
 public class Character : MonoBehaviour
 {
     #region Delegate
+
     public delegate void CharacterHandler(Character c);
+
     public event CharacterHandler OnDeath;
+
     #endregion Delegate
 
     #region Fields
+
     public Rigidbody _rb;
-    private Animator _animator;
 
     public float _targetRadius;
     public float _slowRadius;
@@ -28,9 +38,13 @@ public class Character : MonoBehaviour
 
     public bool Moved;
     public bool IsActivated;
+
+    public UnitType _unitType = UnitType.TANKER;
+
     #endregion Fields
 
     #region Properties
+
     public Player ControllingPlayer
     {
         get { return _controllerPlayer; }
@@ -43,6 +57,7 @@ public class Character : MonoBehaviour
             }
         }
     }
+
     #endregion Properties
 
     #region Methods
@@ -50,7 +65,6 @@ public class Character : MonoBehaviour
     void Awake()
     {
         _rb = GetComponent<Rigidbody>();
-        _animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -62,8 +76,40 @@ public class Character : MonoBehaviour
 
     public void Attack(Character enemyToAttack)
     {
+        AttackAction(enemyToAttack);
+
+        if (enemyToAttack != null)
+        {
+            StartCoroutine(enemyToAttack.CounterAttack(this));
+        }
+    }
+
+    public IEnumerator CounterAttack(Character enemyToAttack)
+    {
+        yield return new WaitForSeconds(0.5f);
+        if (enemyToAttack != null && CanAttack(enemyToAttack))
+        {
+            AttackAction(enemyToAttack);
+        }
+    }
+
+    private void AttackAction(Character enemyToAttack)
+    {
         RotateDirectly(enemyToAttack.transform.position);
-        GetComponent<AttackAlgorithm>().DoDamage(enemyToAttack);
+        AttackAlgorithm a = GetComponent<AttackAlgorithm>();
+        //a.GetDamage(enemyToAttack);
+        a.DoDamage(enemyToAttack);
+    }
+
+    public bool CanAttack(Character target)
+    {
+        float distance = Vector3.Distance(target.transform.position, transform.position);
+
+        if (distance <= GetComponent<PokemonStats>().AttackRange)
+        {
+            return true;
+        }
+        return false;
     }
 
     public bool MoveTo(Vector3 location, Vector3 previousLocation)
