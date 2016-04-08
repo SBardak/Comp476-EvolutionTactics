@@ -26,11 +26,18 @@ public class Pathfinding : MonoBehaviour
     private TileStats.type myType;
     private int movementRange;
     private PokemonStats stats;
+    private Animator _animator;
 
     void Start()
     {
         Graph();
         stats = GetComponent<PokemonStats>();
+        _animator = GetComponent<Animator>();
+        if (_animator == null)
+        {
+            _animator = GetComponentInChildren<Animator>();
+        }
+        Debug.Log(_animator);
         myType = stats.MyType;
         movementRange = stats.MovementRange;
     }
@@ -93,6 +100,10 @@ public class Pathfinding : MonoBehaviour
                 {
                     _middleOfTheNodeAttained = true;
                     _hasPath = false;
+
+                    if (_animator != null)
+                        _animator.SetBool("Walk", false);
+                    
                     if (OnReachEnd != null)
                         OnReachEnd();
                 }
@@ -109,6 +120,11 @@ public class Pathfinding : MonoBehaviour
     {
         StartNode = player._currentTile;
         _endNode = end;
+
+        if (_animator != null)
+        {
+            _animator.SetBool("Walk", true);
+        }
 
         CalculateNewPath();
     }
