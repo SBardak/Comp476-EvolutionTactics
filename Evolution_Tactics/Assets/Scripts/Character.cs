@@ -87,7 +87,7 @@ public class Character : MonoBehaviour
     public IEnumerator CounterAttack(Character enemyToAttack)
     {
         yield return new WaitForSeconds(0.5f);
-        if (CanAttack(enemyToAttack))
+        if (enemyToAttack != null && CanAttack(enemyToAttack))
         {
             AttackAction(enemyToAttack);
         }

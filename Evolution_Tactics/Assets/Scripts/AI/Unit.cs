@@ -88,7 +88,10 @@ public class Unit : MonoBehaviour
         if (Character._unitType == UnitType.ATTACKER)
         {
             nextTile = FindBestTile(c);
-            Debug.LogWarning(nextTile);
+            if (nextTile._character != null)
+            {
+                Debug.Log("JKLAHSDLKAHS");
+            }
         }
         else if (Character._unitType == UnitType.TANKER)
         {
