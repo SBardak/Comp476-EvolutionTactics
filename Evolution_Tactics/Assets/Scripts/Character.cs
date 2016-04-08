@@ -2,14 +2,25 @@
 using System.Collections;
 using System.Collections.Generic;
 
+public enum UnitType
+{
+    ATTACKER,
+    TANKER,
+    LONG_RANGE
+}
+
 public class Character : MonoBehaviour
 {
     #region Delegate
+
     public delegate void CharacterHandler(Character c);
+
     public event CharacterHandler OnDeath;
+
     #endregion Delegate
 
     #region Fields
+
     public Rigidbody _rb;
     private Animator _animator;
 
@@ -28,9 +39,13 @@ public class Character : MonoBehaviour
 
     public bool Moved;
     public bool IsActivated;
+
+    public UnitType _unitType = UnitType.TANKER;
+
     #endregion Fields
 
     #region Properties
+
     public Player ControllingPlayer
     {
         get { return _controllerPlayer; }
@@ -43,6 +58,7 @@ public class Character : MonoBehaviour
             }
         }
     }
+
     #endregion Properties
 
     #region Methods

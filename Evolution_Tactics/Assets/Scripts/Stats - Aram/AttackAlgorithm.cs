@@ -156,21 +156,25 @@ public class AttackAlgorithm : MonoBehaviour
 
     public void DoDamage(Character target)
     {
-        Debug.LogWarning(gameObject.name + " attacks " + target.name + " and do " + damage + " damages.");
 
         float rand = Random.Range(0, 100);
-        if (rand <= Accuracy)
+        //if (rand <= Accuracy)
+        //{
+        Debug.LogWarning(gameObject.name + " attacks " + target.name + " and do " + damage + " damages.");
+        target.GetComponent<PokemonStats>().CurrentHealth -= damage;
+
+        StartCoroutine(UIManager.Instance.CreateNewDamageLabel(damage));
+        StartCoroutine(AttackAnimation());
+
+        if (target.GetComponent<PokemonStats>().CurrentHealth <= 0)
         {
-            target.GetComponent<PokemonStats>().CurrentHealth -= damage;
-
-            StartCoroutine(UIManager.Instance.CreateNewDamageLabel(damage));
-            StartCoroutine(AttackAnimation());
-
-            if (target.GetComponent<PokemonStats>().CurrentHealth <= 0)
-            {
-                // transform.GetComponent<Experience>().gainXP(target.GetComponent<PokemonStats>().XP_on_Death);
-            }
+            // transform.GetComponent<Experience>().gainXP(target.GetComponent<PokemonStats>().XP_on_Death);
         }
+        /* }
+        else
+        {
+            Debug.LogWarning("MISS");
+        }*/
     }
 
     private IEnumerator AttackAnimation()

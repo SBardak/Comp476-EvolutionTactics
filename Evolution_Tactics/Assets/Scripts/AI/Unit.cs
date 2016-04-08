@@ -2,13 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public enum UnitType
-{
-    ATTACKER,
-    TANKER,
-    LONG_RANGE
-}
-
 public class Unit : MonoBehaviour
 {
     public delegate void UnitHandler(Unit u);
@@ -19,8 +12,6 @@ public class Unit : MonoBehaviour
     Character _char;
     Pathfinding _pathfinding;
     PokemonStats _stats;
-
-    public UnitType _unitType = UnitType.ATTACKER;
 
     Character Character
     {
@@ -94,23 +85,30 @@ public class Unit : MonoBehaviour
         Dictionary<Tile, int> possibleTiles = Character._currentTile.GetTiles();
         Tile nextTile = null;
 
-        if (_unitType == UnitType.ATTACKER)
+        if (Character._unitType == UnitType.ATTACKER)
         {
             Debug.Log(name + " Attacker");
-            nextTile = FindBestTile(possibleTiles);
+            nextTile = FindBestTile(c);
         }
-        else if (_unitType == UnitType.TANKER)
+        else if (Character._unitType == UnitType.TANKER)
         {
             nextTile = CanKillInRange(possibleTiles);
+
+        }
+        else if (Character._unitType == UnitType.LONG_RANGE)
+        {
+            nextTile = BestRangedAttack(c, possibleTiles);
+            Debug.Log("Bitch " + enemyToAttack + nextTile);
             if (nextTile == null)
             {
-                nextTile = FurthestNeighbourTileFrom(c);
-                enemyToAttack = null;
+                nextTile = BestRangedAttack(possibleTiles);
             }
         }
-        else if (_unitType == UnitType.LONG_RANGE)
-        {
 
+        if (nextTile == null)
+        {
+            nextTile = FindNewTileAround(c._currentTile, possibleTiles);
+            enemyToAttack = null;
         }
 
         MoveTo(nextTile);
@@ -202,6 +200,95 @@ public class Unit : MonoBehaviour
 
     #region Search for tile helper methods
 
+    private Tile BestRangedAttack(Dictionary<Tile, int> possibleTiles)
+    {
+        List<Tile> possible = new List<Tile>();
+        List<Tile> tilesWithEnemy = new List<Tile>();
+        int movementRange = Stats.MovementRange;
+
+        //get a list of the tiles in range that contain an enemy
+        foreach (Tile t in possibleTiles.Keys)
+        {
+            if (t.HasPlayer && t._character.tag == "Human")
+            {
+                tilesWithEnemy.Add(t);
+            }
+        }
+
+        foreach (Tile t in tilesWithEnemy)
+        {
+            Tile tt = BestRangedAttack(t._character, possibleTiles);
+            if (tt != null)
+            {
+                possible.Add(tt);
+            }
+        }
+
+        if (possible.Count > 1)
+        {
+            Tile best = possible[0];
+            float furthest = Vector3.Distance(best.transform.position, transform.position);
+            foreach (Tile t in possible)
+            {
+                float distance = Vector3.Distance(t.transform.position, transform.position);
+                if (distance > furthest)
+                {
+                    best = t;
+                    furthest = distance;
+                }
+            }
+            return best;
+        }
+        else if (possible.Count == 1)
+        {
+            return possible[0];
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private Tile BestRangedAttack(Character target, Dictionary<Tile, int> possibleTiles)
+    {
+        Dictionary<Tile, int> possibleAttack = target._currentTile.GetTiles(0, Stats.AttackRange);
+        List<Tile> possible = new List<Tile>();
+
+        foreach (Tile t in possibleAttack.Keys)
+        {        
+            if (!t.HasPlayer && possibleTiles.ContainsKey(t) && (Mathf.Abs(t.transform.position.x - target.transform.position.x) == Stats.AttackRange || Mathf.Abs(t.transform.position.y - target.transform.position.y) == Stats.AttackRange))
+            {
+                enemyToAttack = target;
+                possible.Add(t);
+            }
+        }
+
+        if (possible.Count > 1)
+        {
+            Tile best = possible[0];
+            float furthest = Vector3.Distance(best.transform.position, transform.position);
+            foreach (Tile t in possible)
+            {
+                float distance = Vector3.Distance(t.transform.position, transform.position);
+                if (distance > furthest)
+                {
+                    best = t;
+                    furthest = distance;
+                }
+            }
+            return best;
+        }
+        else if (possible.Count == 1)
+        {
+            Debug.Log("Allo");
+            return possible[0];
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     private Tile FindNewTileAround(Tile t, Dictionary<Tile, int> possibleTiles)
     {
         Tile newTile = null;
@@ -246,6 +333,7 @@ public class Unit : MonoBehaviour
     {
         // Get all possible tiles, including the ones where character can't move bu can attack to
         List<Tile> tilesWithEnemy = new List<Tile>();
+        List<Unit> squadMembers = GetComponentInParent<Squad>().Units;
 
         int movementRange = Stats.MovementRange;
 
@@ -301,7 +389,7 @@ public class Unit : MonoBehaviour
 
                         // if this tile would do more damage, set it as best tile
                         // TODO add more conditions, like damage received?
-                        if (bestTile._character.GetComponent<PokemonStats>()._currentHealth - damage <= 0)
+                        if (t._character.GetComponent<PokemonStats>()._currentHealth - damage <= 0)
                         {
                             bestTile = tt;
                             highestDamage = damage;
@@ -316,20 +404,31 @@ public class Unit : MonoBehaviour
         return null;
     }
 
-    public Tile FindBestTile(Dictionary<Tile, int> possibleTiles)
+    public Tile FindBestTile(Character c)
+    {
+        Dictionary<Tile, int> possibleTiles = c._currentTile.GetTiles(0, Stats.AttackRange);
+        return FindBestTile(possibleTiles, c);
+    }
+
+    public Tile FindBestTile(Dictionary<Tile, int> possibleTiles, Character enemy = null)
     {
         // Get all possible tiles, including the ones where character can't move bu can attack to
         List<Tile> tilesWithEnemy = new List<Tile>();
-
         int movementRange = Stats.MovementRange;
-
-        //get a list of the tiles in range that contain an enemy
-        foreach (Tile t in possibleTiles.Keys)
+        if (enemy == null)
         {
-            if (t.HasPlayer && t._character.tag == "Human")
+            //get a list of the tiles in range that contain an enemy
+            foreach (Tile t in possibleTiles.Keys)
             {
-                tilesWithEnemy.Add(t);
+                if (t.HasPlayer && t._character.tag == "Human")
+                {
+                    tilesWithEnemy.Add(t);
+                }
             }
+        }
+        else
+        {
+            tilesWithEnemy.Add(enemy._currentTile);
         }
 
         //if there are at least one enemy in range

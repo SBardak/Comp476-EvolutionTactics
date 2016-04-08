@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Map_Movement : MonoBehaviour {
+public class Map_Movement : MonoBehaviour
+{
 
     public static Map_Movement Instance;
 
@@ -33,8 +34,9 @@ public class Map_Movement : MonoBehaviour {
         //Cursor.SetCursor(_cursor, _hotSpot, _cursorMode);
     }
 
-	// Update is called once per frame
-	void Update () {
+    // Update is called once per frame
+    void Update()
+    {
         if (_enabled)
         {
             Vector3 pos = transform.position;
@@ -100,6 +102,7 @@ public class Map_Movement : MonoBehaviour {
     {
         return Input.GetKey(k);
     }
+
     bool input(string s)
     {
         return Input.GetKey(s);
