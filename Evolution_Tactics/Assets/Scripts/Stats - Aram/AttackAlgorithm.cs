@@ -161,15 +161,18 @@ public class AttackAlgorithm : MonoBehaviour
             float distance = Vector3.Distance(target.transform.position, transform.position);
             bool isInRangeToCounter = distance <= target.GetComponent<PokemonStats>().AttackRange;
 
-            Debug.LogWarning("It would do " + damage + " damage to " + target.name);
+            var n = target.name.Split("("[0]);
+
+            UIManager.Instance.AddAction("It would do " + damage + " damage to " + n[0] + ".");
             if (isInRangeToCounter)
             {
                 int receivedDamage = target.GetComponent<AttackAlgorithm>().GetDamage(this.GetComponent<Character>(), false);
-                Debug.LogWarning("And you would receive " + receivedDamage + " damage.");
+
+                UIManager.Instance.AddAction("And you would receive " + receivedDamage + " damage.");
             }
             else
             {
-                Debug.LogWarning(" And you would receive no damage.");
+                UIManager.Instance.AddAction(" And you would receive no damage.");
             }
         }
         return damage;
@@ -200,7 +203,9 @@ public class AttackAlgorithm : MonoBehaviour
         float rand = Random.Range(0, 100);
         //if (rand <= Accuracy)
         //{
-        Debug.LogWarning(gameObject.name + " attacks " + target.name + " and do " + damage + " damages.");
+        var n = target.name.Split("("[0]);
+        var nn = name.Split("("[0]);
+        UIManager.Instance.AddAction(nn[0] + " attacks " + n[0] + " and do " + damage + " damage.");
         target.GetComponent<PokemonStats>().CurrentHealth -= damage;
 
         StartCoroutine(UIManager.Instance.CreateNewDamageLabel(damage));

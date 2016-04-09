@@ -13,7 +13,8 @@ public class UIManager : MonoBehaviour
     private bool _activateUI = false;
     private GameObject[] _humanUI;
 
-    public GameObject statsPanel;
+    public GameObject _actionPanel;
+    public GameObject _statsPanel;
     public Button _attackButton;
     public Button _waitButton;
     public Button _attackWhereButton;
@@ -31,6 +32,12 @@ public class UIManager : MonoBehaviour
         _humanUI = GameObject.FindGameObjectsWithTag("HumanUI");
 
         buttonSounds = GetComponents<AudioSource>();
+
+        Transform canvas = GameObject.Find("Canvas").transform;
+        _panel2 = Instantiate(_actionPanel, Vector3.zero, Quaternion.identity) as GameObject;
+        _panel2.GetComponentInChildren<Text>().text = "";
+        _panel2.transform.SetParent(canvas);
+        _panel2.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, 0, 0);
     }
 
     public void OnClickEndHumanTurn()
@@ -264,7 +271,7 @@ public class UIManager : MonoBehaviour
 
     private void InstantiatePanel(string message, Transform canvas)
     {
-        _panel = Instantiate(statsPanel, Vector3.zero, Quaternion.identity) as GameObject;
+        _panel = Instantiate(_statsPanel, Vector3.zero, Quaternion.identity) as GameObject;
         _panel.GetComponentInChildren<Text>().text = message;
         _panel.transform.SetParent(canvas);
         _panel.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, 0, 0);
@@ -274,5 +281,32 @@ public class UIManager : MonoBehaviour
     {
         _currentStats = null;
         Destroy(_panel);
+    }
+
+    private List<string> actionList = new List<string>();
+    private GameObject _panel2 = null;
+
+    public void AddAction(string action)
+    {
+        actionList.Add(action);
+
+        if (actionList.Count > 7)
+        {
+            _panel2.GetComponentInChildren<Text>().text = "";
+            for (int i = 0; i < actionList.Count; i++)
+            {
+                if (i < actionList.Count - 1)
+                {
+                    actionList[i] = actionList[i + 1];
+                    _panel2.GetComponentInChildren<Text>().text += "- " + actionList[i] + "\n";
+                }
+                else
+                    actionList.RemoveAt(i);
+            }
+        }
+        else
+        {
+            _panel2.GetComponentInChildren<Text>().text += "- " + action + "\n";
+        }
     }
 }
