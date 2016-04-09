@@ -8,6 +8,7 @@ public class HumanPlayer : Player
     #region Fields
     public Character SelectedCharacter;
     private Tile _selectedTile;
+    private Tile _hoveredTile = null;
     [SerializeField]
     private Character[] _characters;
     private List<Character> _charactersList;
@@ -420,6 +421,11 @@ public class HumanPlayer : Player
         if (isInMovement || _showingAttack || !t.HasPlayer)
             return;
 
+        // 'Cache' hovered tile
+        if (_hoveredTile == t)
+            return;
+        _hoveredTile = t;
+
         if (SelectedCharacter != null)
             ClearCharacterRange(_selectedTile);
         ShowCharacterRange(t);
@@ -429,6 +435,8 @@ public class HumanPlayer : Player
     {
         if (isInMovement || _showingAttack || !t.HasPlayer)
             return;
+
+        _hoveredTile = null;
 
         ClearCharacterRange(t);
         if (SelectedCharacter != null)
@@ -448,6 +456,9 @@ public class HumanPlayer : Player
         SelectedCharacter._currentTile.Deselect();
         Debug.Log("Clear selection");
         SelectedCharacter = null;
+
+        if (_hoveredTile != null)
+            HandleHoverOut(_hoveredTile);
     }
 
     #endregion

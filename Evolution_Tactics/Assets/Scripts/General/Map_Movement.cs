@@ -27,9 +27,19 @@ public class Map_Movement : MonoBehaviour {
     [SerializeField]
     float _damp = 1.5f;
 
+    [SerializeField]
+    float _zoomDamp = 10f;
+
     void Start()
     {
         Instance = this;
+
+        _bounds.min.x = _bounds.min.y = 0;
+        _bounds.max.x = TileGenerator.Instance.mapWidth;
+        _bounds.max.y = TileGenerator.Instance.mapHeight;
+
+        _bounds.min.y -= 10;
+        _bounds.max.y -= 10;
         //Cursor.SetCursor(_cursor, _hotSpot, _cursorMode);
     }
 
@@ -56,13 +66,13 @@ public class Map_Movement : MonoBehaviour {
 
             transform.position = pos;
 
-            if (input(KeyCode.KeypadPlus))
+            if (input(KeyCode.KeypadPlus) || input("r"))
             {
-                Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize - Time.deltaTime, _bounds.Zoom.x, _bounds.Zoom.y);
+                Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize - Time.deltaTime * _zoomDamp, _bounds.Zoom.x, _bounds.Zoom.y);
             }
-            else if (input(KeyCode.KeypadMinus))
+            else if (input(KeyCode.KeypadMinus) || input("f"))
             {
-                Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize + Time.deltaTime, _bounds.Zoom.x, _bounds.Zoom.y);
+                Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize + Time.deltaTime * _zoomDamp, _bounds.Zoom.x, _bounds.Zoom.y);
             }
         }
 
