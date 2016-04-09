@@ -1,6 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public enum Effectiveness
+{
+    NOTEFFECTIVE,
+    NORMAL,
+    SUPEREFFECTIVE
+}
+
 public class AttackAlgorithm : MonoBehaviour
 {
     int MaxHealth;
@@ -17,6 +24,14 @@ public class AttackAlgorithm : MonoBehaviour
 
     TileStats.type myType;
     int damage;
+
+    private Effectiveness effect;
+    private SoundManager sm;
+
+    void Awake()
+    {
+        sm = GameObject.Find("SoundManager").GetComponent<SoundManager>();
+    }
 
     void getStats(Character target)
     {
@@ -109,6 +124,19 @@ public class AttackAlgorithm : MonoBehaviour
             }
         }
 
+        if (modifier == 1.5)
+        {
+            effect = Effectiveness.SUPEREFFECTIVE;
+        }
+        else if (modifier == 1.0)
+        {
+            effect = Effectiveness.NORMAL;
+        }
+        else if (modifier == 0.5)
+        {
+            effect = Effectiveness.NOTEFFECTIVE;
+        }
+
         return modifier;
     }
 
@@ -192,7 +220,24 @@ public class AttackAlgorithm : MonoBehaviour
     private IEnumerator AttackAnimation()
     {
         transform.position += (transform.forward * 0.5f);
+        PlayAttackSound();
         yield return new WaitForSeconds(0.1f);
         transform.position -= (transform.forward * 0.5f);
+    }
+
+    private void PlayAttackSound()
+    {
+        if (effect == Effectiveness.NOTEFFECTIVE)
+        {
+            AudioSource.PlayClipAtPoint(sm.notEffective, Vector3.zero);
+        }
+        else if (effect == Effectiveness.NORMAL)
+        {
+            AudioSource.PlayClipAtPoint(sm.normal, Vector3.zero);
+        }
+        else if (effect == Effectiveness.SUPEREFFECTIVE)
+        {
+            AudioSource.PlayClipAtPoint(sm.superEffective, Vector3.zero);
+        }
     }
 }

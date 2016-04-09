@@ -20,12 +20,16 @@ public class UIManager : MonoBehaviour
 
     private static List<Button> buttonList;
 
+    private AudioSource[] buttonSounds;
+
     void Start()
     {
         UIManager.Instance = this;
 
         _human = GameObject.Find("Human").GetComponent<HumanPlayer>();
         _humanUI = GameObject.FindGameObjectsWithTag("HumanUI");
+
+        buttonSounds = GetComponents<AudioSource>();
     }
 
     public void OnClickEndHumanTurn()
@@ -36,6 +40,7 @@ public class UIManager : MonoBehaviour
 
     public void OnClickEndSelectedCharacterTurn()
     {
+        buttonSounds[0].Play();
         Debug.Log("Wait Button clicked");
 
         EndCurrentPokemonAction();
@@ -46,6 +51,8 @@ public class UIManager : MonoBehaviour
 
     public void OnClickAttack()
     {
+        buttonSounds[1].Play();
+        
         Debug.Log("Attack button clicked");
         buttonList[0].enabled = false;
         buttonList[0].GetComponent<Image>().color = new Color(0.5f, 0.5f, 0.5f);
@@ -56,6 +63,7 @@ public class UIManager : MonoBehaviour
         _human.ShowAttackRange();
         Debug.LogWarning("Select an enemy to attack");
     }
+
     public void CancelAttack()
     {
         buttonList[0].enabled = true;
@@ -105,6 +113,7 @@ public class UIManager : MonoBehaviour
 
     public void Attack()
     {
+        //buttonSounds[1].Play();
         _human.SelectedCharacter.Attack(selectedEnemy);
         EndCurrentPokemonAction();
     }
@@ -132,14 +141,17 @@ public class UIManager : MonoBehaviour
         else
             HideUI();
     }
+
     public void ShowUI()
     {
         ChangeUI(true);
     }
+
     public void HideUI()
     {
         ChangeUI(false);
     }
+
     void ChangeUI(bool enabled)
     {
         foreach (GameObject o in _humanUI)

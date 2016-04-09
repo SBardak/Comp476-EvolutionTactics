@@ -71,7 +71,8 @@ public class Pathfinding : MonoBehaviour
                             _endNode = pathList[counter];
                             if (_endNode._hCollectible != null)
                             {
-                                stats.GiveHealth(_endNode._hCollectible.healthGiven);
+                                HealingCollectible hc = _endNode._hCollectible;
+                                stats.GiveHealth(hc.healthGiven);
                                 TileGenerator.Instance.SetNewCollectibleTile();
                             }
                         }
