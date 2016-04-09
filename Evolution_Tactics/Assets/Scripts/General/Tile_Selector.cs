@@ -45,6 +45,15 @@ public class Tile_Selector : Selector
 
         _myTile.OnHover();
 
+        if (_myTile._character != null)
+            UIManager.Instance.ShowStats(_myTile._character);
+        else if (_myTile._hCollectible != null)
+            UIManager.Instance.ShowCollectible(_myTile._hCollectible);
+        else if (_myTile._obstacle != null)
+            UIManager.Instance.ShowObstacle(_myTile._obstacle);
+        else
+            UIManager.Instance.RemoveStats();
+
         // Not a human player's turn
         var player = GameManager.Instance.GetActivePlayer();
         //UIManager.Ins

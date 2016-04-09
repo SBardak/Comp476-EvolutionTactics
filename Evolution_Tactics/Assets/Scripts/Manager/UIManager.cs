@@ -13,6 +13,7 @@ public class UIManager : MonoBehaviour
     private bool _activateUI = false;
     private GameObject[] _humanUI;
 
+    public GameObject statsPanel;
     public Button _attackButton;
     public Button _waitButton;
     public Button _attackWhereButton;
@@ -202,5 +203,76 @@ public class UIManager : MonoBehaviour
             }
         }
         buttonList = null;
+    }
+
+    private GameObject _currentStats = null;
+    private GameObject _panel = null;
+
+    public void ShowStats(Character c)
+    {
+        if (_currentStats != c.gameObject)
+        {
+            RemoveStats();
+            _currentStats = c.gameObject;
+            Transform canvas = GameObject.Find("Canvas").transform;
+            PokemonStats stats = c.GetComponent<PokemonStats>();
+            var n = c.name.Split("("[0]);
+
+            string statsString =
+                n[0] +
+                "\nType: " + stats.MyType +
+                "\n Level: " + stats.Level +
+                "\n Health: " + stats._currentHealth + "/" + stats.MaxHealth +
+                "\n Attack: " + stats.Attack +
+                "\n Defense: " + stats.Defense;
+
+            InstantiatePanel(statsString, canvas);
+        }
+    }
+
+    public void ShowCollectible(HealingCollectible c)
+    {
+        if (_currentStats != c.gameObject)
+        {
+            RemoveStats();
+            _currentStats = c.gameObject;
+            Transform canvas = GameObject.Find("Canvas").transform;
+
+            string statsString = 
+                "Potion" +
+                "\nGive " + c.healthGiven + " health.";
+
+            InstantiatePanel(statsString, canvas);
+        }
+    }
+
+    public void ShowObstacle(TileObstacle t)
+    {
+        if (_currentStats != t.gameObject)
+        {
+            RemoveStats();
+            _currentStats = t.gameObject;
+            Transform canvas = GameObject.Find("Canvas").transform;
+            var n = t.name.Split("("[0]);
+
+            string statsString = 
+                n[0];
+
+            InstantiatePanel(statsString, canvas);
+        }
+    }
+
+    private void InstantiatePanel(string message, Transform canvas)
+    {
+        _panel = Instantiate(statsPanel, Vector3.zero, Quaternion.identity) as GameObject;
+        _panel.GetComponentInChildren<Text>().text = message;
+        _panel.transform.SetParent(canvas);
+        _panel.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, 0, 0);
+    }
+
+    public void RemoveStats()
+    {
+        _currentStats = null;
+        Destroy(_panel);
     }
 }
