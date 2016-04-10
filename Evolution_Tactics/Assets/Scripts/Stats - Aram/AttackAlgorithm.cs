@@ -206,7 +206,7 @@ public class AttackAlgorithm : MonoBehaviour
         var n = target.name.Split("("[0]);
         var nn = name.Split("("[0]);
         UIManager.Instance.AddAction(nn[0] + " attacks " + n[0] + " and do " + damage + " damage.");
-        pokeStats.CurrentHealth -= damage;
+        pokeStats.CurrentHealth = pokeStats.CurrentHealth - damage;
 
         UIManager.Instance.CreateNewDamageLabel(damage, target.transform.position);
         StartCoroutine(AttackAnimation());
@@ -217,7 +217,7 @@ public class AttackAlgorithm : MonoBehaviour
         {
             int xpGain = pokeStats.XP_on_Death;
             if (pokeStats.CurrentHealth > 0)
-                xpGain = (int)(xpGain*0.2f);
+                xpGain = (int)(xpGain * 0.2f);
         
             exp.gainXP(xpGain);
         }

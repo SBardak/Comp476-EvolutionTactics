@@ -67,7 +67,7 @@ public class Unit : MonoBehaviour
         //if collectible in range and is the more hurt in squad
         if (collecTile != null && IsMoreHurtInSquad())
         {
-            Debug.Log(name + " Collect tile");
+            Debug.Log(name + " Collect health");
             nextTile = collecTile;
         }
         else if (nextTile.IsOccupied)
@@ -88,15 +88,15 @@ public class Unit : MonoBehaviour
         if (Character._unitType == UnitType.ATTACKER)
         {
             nextTile = FindBestTile(c);
-            if (nextTile._character != null)
+            if (enemyToAttack != null)
             {
-                Debug.Log("JKLAHSDLKAHS");
+                Debug.Log("Attackkkkkkk");
             }
         }
         else if (Character._unitType == UnitType.TANKER)
         {
-            nextTile = CanKillInRange(possibleTiles);
-
+            // nextTile = CanKillInRange(possibleTiles);
+            nextTile = FindBestTile(c);
         }
         else if (Character._unitType == UnitType.LONG_RANGE)
         {
@@ -159,7 +159,7 @@ public class Unit : MonoBehaviour
     void ReachedDestination()
     {
         // Attack ?
-        if (enemyToAttack != null)
+        if (enemyToAttack != null && Attackable(enemyToAttack))
         {
             Attack();
         }
@@ -258,7 +258,7 @@ public class Unit : MonoBehaviour
 
         foreach (Tile t in possibleAttack.Keys)
         {        
-            if (!t.HasPlayer && possibleTiles.ContainsKey(t) && (Mathf.Abs(t.transform.position.x - target.transform.position.x) == Stats.AttackRange || Mathf.Abs(t.transform.position.y - target.transform.position.y) == Stats.AttackRange))
+            if (!t.HasPlayer && possibleTiles.ContainsKey(t) && Attackable(t))
             {
                 enemyToAttack = target;
                 possible.Add(t);
@@ -531,6 +531,27 @@ public class Unit : MonoBehaviour
             return true;
         else
             return false;
+    }
+
+    private bool Attackable(Character target)
+    {
+        Debug.LogWarning(target.transform.position + " " + transform.position);
+        return LukasIsTheBest(target.transform.position);
+    }
+
+    private bool Attackable(Tile t)
+    {
+        return LukasIsTheBest(t.transform.position);
+    }
+
+    private bool LukasIsTheBest(Vector3 position)
+    {
+        float x = Mathf.Abs(position.x - transform.position.x);
+        float z = Mathf.Abs(position.z - transform.position.z);
+
+        return /*(x == Stats.AttackRange && y == 0) ||
+        (y == Stats.AttackRange && x == 0) ||*/
+        z + x == Stats.AttackRange;
     }
 
     #endregion Search for tile helper methods

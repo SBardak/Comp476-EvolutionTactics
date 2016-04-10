@@ -138,12 +138,14 @@ public class UIManager : MonoBehaviour
 
         StartCoroutine(ShowFloatingLabel(go));
     }
+
     public void CreateNewLevelUpLabel(string message, Vector3 target)
     {
         var go = CreateFloatingLabel(message, target, new Vector2(20, -20));
         go.GetComponent<Text>().color = Color.green;
         StartCoroutine(ShowFloatingLabel(go));
     }
+
     private GameObject CreateFloatingLabel(string message, Vector3 target, Vector2 offsets)
     {
         GameObject text = Instantiate(damageText, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
@@ -158,6 +160,7 @@ public class UIManager : MonoBehaviour
 
         return text;
     }
+
     public IEnumerator ShowFloatingLabel(GameObject obj)
     {
         // Set live time
@@ -335,5 +338,10 @@ public class UIManager : MonoBehaviour
         {
             _panel2.GetComponentInChildren<Text>().text += "- " + action + "\n";
         }
+    }
+
+    private IEnumerator PanelDissapear()
+    {
+        //Color color = _panel.GetComponent<Image>().Color;
     }
 }

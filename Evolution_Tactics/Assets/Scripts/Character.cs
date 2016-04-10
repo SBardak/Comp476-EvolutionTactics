@@ -39,7 +39,7 @@ public class Character : MonoBehaviour
     public bool Moved;
     public bool IsActivated;
 
-    public UnitType _unitType = UnitType.TANKER;
+    public UnitType _unitType;
 
     #endregion Fields
 
@@ -65,11 +65,17 @@ public class Character : MonoBehaviour
     void Awake()
     {
         _rb = GetComponent<Rigidbody>();
-    }
-
-    void Update()
-    {
-//        _animator.SetFloat("Walk", _rb.velocity.magnitude);
+        if (tag == "AI")
+        {
+            if (_unitType == UnitType.ATTACKER || _unitType == UnitType.TANKER)
+            {
+                GetComponent<PokemonStats>().AttackRange = 1;
+            }
+            else if (_unitType == UnitType.LONG_RANGE)
+            {
+                GetComponent<PokemonStats>().AttackRange = 2;
+            }  
+        }
     }
 
     #region Locomotion
@@ -103,7 +109,8 @@ public class Character : MonoBehaviour
 
     public bool CanAttack(Character target)
     {
-        if (target == null) return false;
+        if (target == null)
+            return false;
 
         float distance = Vector3.Distance(target.transform.position, transform.position);
 

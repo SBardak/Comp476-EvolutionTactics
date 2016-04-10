@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : Singleton<GameManager>
 {
     #region Fields
+
     public int CurrentTurn = 1;
     public int CurrentPlayer = 0;
 
@@ -21,11 +22,14 @@ public class GameManager : Singleton<GameManager>
     AvailableCharactersList[] AvailableCharacters;
 
     public bool isPlaying = false;
+
     #endregion Fields
 
     #region Methonds
 
-    protected GameManager() { }
+    protected GameManager()
+    {
+    }
 
     #region Unity
 
@@ -63,7 +67,7 @@ public class GameManager : Singleton<GameManager>
         StartTurn();
         UIManager.Instance.ActivateUI();
     }
-    
+
     /// <summary>
     /// Switch to the next player's turn. If a whole rotation has occured, turn count + 1
     /// </summary>
@@ -185,7 +189,8 @@ public class GameManager : Singleton<GameManager>
     void GenerateAI(AIPlayer ai)
     {
         int mapLevel = 0;
-        if (_players.Length == 0) mapLevel = 1;
+        if (_players.Length == 0)
+            mapLevel = 1;
         else
         {
             foreach (var p in _players)
@@ -226,7 +231,8 @@ public class GameManager : Singleton<GameManager>
                 if (j == ai.MaxUnitCountPerSquad - 1 && Random.Range(0, 1f) < 0.5f)
                     selected = 1;
                 var instance = (GameObject)Instantiate(chars[selected], Vector3.zero, Quaternion.identity);
-                instance.transform.parent = squad.transform;
+                instance.transform.parent = squad.transform;        
+                instance.tag = "AI";
 
                 instance.GetComponent<PokemonStats>().SetLevel(mapLevel + selected);
             }
@@ -240,7 +246,7 @@ public class GameManager : Singleton<GameManager>
         squadContainer.transform.parent = ai.transform;
         TileGenerator.Instance.SetNewCollectibleTile();
     }
-    
+
     #endregion Player generation
 
     #endregion Methonds

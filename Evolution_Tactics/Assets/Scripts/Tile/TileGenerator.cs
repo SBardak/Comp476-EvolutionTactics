@@ -255,6 +255,7 @@ public class TileGenerator : MonoBehaviour
             }
         }
     }
+
     void SetRandomTileObstacle(Tile t)
     {
         if (Random.Range(0, 100) < 90)
@@ -262,6 +263,7 @@ public class TileGenerator : MonoBehaviour
 
         SetTileObstacle(t);
     }
+
     void SetTileObstacle(Tile t)
     {
         var type = t.GetComponent<TileStats>().MyType;
@@ -376,6 +378,7 @@ public class TileGenerator : MonoBehaviour
         }
         
         int height = Random.Range(0, mapHeight - 1), width = Random.Range(0, mapWidth - 1);
+        Debug.LogWarning(mapHeight + " " + height + " " + mapWidth + " " + width);
         Tile t = Tiles[height, width];
         while (t.IsOccupied)
         {
