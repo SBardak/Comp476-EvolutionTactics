@@ -126,7 +126,7 @@ public class Pathfinding : MonoBehaviour
         }
 
         CalculateNewPath();
-        if (pathList.Count > movementRange)
+        if (pathList.Count > movementRange + 1)
             GetPathInRange();
     }
 

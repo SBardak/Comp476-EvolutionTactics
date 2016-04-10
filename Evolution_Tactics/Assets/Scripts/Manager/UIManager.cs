@@ -38,6 +38,7 @@ public class UIManager : MonoBehaviour
         _panel2.GetComponentInChildren<Text>().text = "";
         _panel2.transform.SetParent(canvas);
         _panel2.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, 0, 0);
+        initialAlpha = _panel2.GetComponent<Image>().color.a;
     }
 
     public void OnClickEndHumanTurn()
@@ -315,9 +316,13 @@ public class UIManager : MonoBehaviour
 
     private List<string> actionList = new List<string>();
     private GameObject _panel2 = null;
+    float initialAlpha;
 
     public void AddAction(string action)
     {
+        StopCoroutine(PanelDissapear());
+        _panel2.GetComponent<Image>().color = new Color(0, 0, 0, initialAlpha);
+        _panel2.GetComponentInChildren<Text>().color = new Color(1, 1, 1, 1);
         actionList.Add(action);
 
         if (actionList.Count > 7)
@@ -338,10 +343,21 @@ public class UIManager : MonoBehaviour
         {
             _panel2.GetComponentInChildren<Text>().text += "- " + action + "\n";
         }
+        StartCoroutine(PanelDissapear());
     }
 
     private IEnumerator PanelDissapear()
     {
-        //Color color = _panel.GetComponent<Image>().Color;
+        Image panel = _panel2.GetComponent<Image>();
+        Text text = _panel2.GetComponentInChildren<Text>();
+
+        while (text.color.a > 0)
+        {
+            panel.color = new Color(panel.color.r, panel.color.g, panel.color.b, panel.color.a - (0.01f * Time.deltaTime));
+            text.color = new Color(text.color.r, text.color.g, text.color.b, text.color.a - (0.05f * Time.deltaTime));
+
+            yield return new WaitForSeconds(0.005f);
+        }
+        actionList.Clear();
     }
 }
