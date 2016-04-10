@@ -23,6 +23,7 @@ public class TileGeneratorInspector
 public class TileGenerator : MonoBehaviour
 {
     #region Fields
+
     public static TileGenerator Instance;
 
     public GameObject player;
@@ -46,8 +47,11 @@ public class TileGenerator : MonoBehaviour
 
     [SerializeField]
     TileObstacleList _obstacles;
+
     #endregion Fields
+
     //=========================================================================
+
     #region Properties
 
     /// <summary>
@@ -59,10 +63,13 @@ public class TileGenerator : MonoBehaviour
     }
 
     #endregion Properties
+
     //=========================================================================
+
     #region Methods
 
     //-------------------------------------------------------------------------
+
     #region Map file reading
 
     /// <summary>
@@ -210,7 +217,9 @@ public class TileGenerator : MonoBehaviour
     }
 
     #endregion Map file reading
+
     //-------------------------------------------------------------------------
+
     #region Random map generation
 
     /// <summary>
@@ -303,7 +312,9 @@ public class TileGenerator : MonoBehaviour
     }
 
     #endregion Random map generation
+
     //-------------------------------------------------------------------------
+
     #region Boundaries
 
     /// <summary>
@@ -338,7 +349,9 @@ public class TileGenerator : MonoBehaviour
     }
 
     #endregion Boundaries
+
     //-------------------------------------------------------------------------
+
     #region Collectible (health for now)
 
     /// <summary>
@@ -368,6 +381,7 @@ public class TileGenerator : MonoBehaviour
     }
 
     #endregion Collectible (health for now)
+
     //-------------------------------------------------------------------------
 
     void Awake()

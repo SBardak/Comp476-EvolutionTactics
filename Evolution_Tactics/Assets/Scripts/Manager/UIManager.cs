@@ -13,6 +13,8 @@ public class UIManager : MonoBehaviour
     private bool _activateUI = false;
     private GameObject[] _humanUI;
 
+    public GameObject _actionPanel;
+    public GameObject _statsPanel;
     public Button _attackButton;
     public Button _waitButton;
     public Button _attackWhereButton;
@@ -20,12 +22,22 @@ public class UIManager : MonoBehaviour
 
     private static List<Button> buttonList;
 
+    private AudioSource[] buttonSounds;
+
     void Start()
     {
         UIManager.Instance = this;
 
         _human = GameObject.Find("Human").GetComponent<HumanPlayer>();
         _humanUI = GameObject.FindGameObjectsWithTag("HumanUI");
+
+        buttonSounds = GetComponents<AudioSource>();
+
+        Transform canvas = GameObject.Find("Canvas").transform;
+        _panel2 = Instantiate(_actionPanel, Vector3.zero, Quaternion.identity) as GameObject;
+        _panel2.GetComponentInChildren<Text>().text = "";
+        _panel2.transform.SetParent(canvas);
+        _panel2.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, 0, 0);
     }
 
     public void OnClickEndHumanTurn()
@@ -36,6 +48,7 @@ public class UIManager : MonoBehaviour
 
     public void OnClickEndSelectedCharacterTurn()
     {
+        buttonSounds[0].Play();
         Debug.Log("Wait Button clicked");
 
         EndCurrentPokemonAction();
@@ -46,6 +59,8 @@ public class UIManager : MonoBehaviour
 
     public void OnClickAttack()
     {
+        buttonSounds[1].Play();
+        
         Debug.Log("Attack button clicked");
         buttonList[0].enabled = false;
         buttonList[0].GetComponent<Image>().color = new Color(0.5f, 0.5f, 0.5f);
@@ -56,6 +71,7 @@ public class UIManager : MonoBehaviour
         _human.ShowAttackRange();
         Debug.LogWarning("Select an enemy to attack");
     }
+
     public void CancelAttack()
     {
         buttonList[0].enabled = true;
@@ -105,6 +121,7 @@ public class UIManager : MonoBehaviour
 
     public void Attack()
     {
+        //buttonSounds[1].Play();
         _human.SelectedCharacter.Attack(selectedEnemy);
         EndCurrentPokemonAction();
     }
@@ -132,14 +149,17 @@ public class UIManager : MonoBehaviour
         else
             HideUI();
     }
+
     public void ShowUI()
     {
         ChangeUI(true);
     }
+
     public void HideUI()
     {
         ChangeUI(false);
     }
+
     void ChangeUI(bool enabled)
     {
         foreach (GameObject o in _humanUI)
@@ -190,5 +210,103 @@ public class UIManager : MonoBehaviour
             }
         }
         buttonList = null;
+    }
+
+    private GameObject _currentStats = null;
+    private GameObject _panel = null;
+
+    public void ShowStats(Character c)
+    {
+        if (_currentStats != c.gameObject)
+        {
+            RemoveStats();
+            _currentStats = c.gameObject;
+            Transform canvas = GameObject.Find("Canvas").transform;
+            PokemonStats stats = c.GetComponent<PokemonStats>();
+            var n = c.name.Split("("[0]);
+
+            string statsString =
+                n[0] +
+                "\nType: " + stats.MyType +
+                "\n Level: " + stats.Level +
+                "\n Health: " + stats._currentHealth + "/" + stats.MaxHealth +
+                "\n Attack: " + stats.Attack +
+                "\n Defense: " + stats.Defense;
+
+            InstantiatePanel(statsString, canvas);
+        }
+    }
+
+    public void ShowCollectible(HealingCollectible c)
+    {
+        if (_currentStats != c.gameObject)
+        {
+            RemoveStats();
+            _currentStats = c.gameObject;
+            Transform canvas = GameObject.Find("Canvas").transform;
+
+            string statsString = 
+                "Potion" +
+                "\nGive " + c.healthGiven + " health.";
+
+            InstantiatePanel(statsString, canvas);
+        }
+    }
+
+    public void ShowObstacle(TileObstacle t)
+    {
+        if (_currentStats != t.gameObject)
+        {
+            RemoveStats();
+            _currentStats = t.gameObject;
+            Transform canvas = GameObject.Find("Canvas").transform;
+            var n = t.name.Split("("[0]);
+
+            string statsString = 
+                n[0];
+
+            InstantiatePanel(statsString, canvas);
+        }
+    }
+
+    private void InstantiatePanel(string message, Transform canvas)
+    {
+        _panel = Instantiate(_statsPanel, Vector3.zero, Quaternion.identity) as GameObject;
+        _panel.GetComponentInChildren<Text>().text = message;
+        _panel.transform.SetParent(canvas);
+        _panel.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, 0, 0);
+    }
+
+    public void RemoveStats()
+    {
+        _currentStats = null;
+        Destroy(_panel);
+    }
+
+    private List<string> actionList = new List<string>();
+    private GameObject _panel2 = null;
+
+    public void AddAction(string action)
+    {
+        actionList.Add(action);
+
+        if (actionList.Count > 7)
+        {
+            _panel2.GetComponentInChildren<Text>().text = "";
+            for (int i = 0; i < actionList.Count; i++)
+            {
+                if (i < actionList.Count - 1)
+                {
+                    actionList[i] = actionList[i + 1];
+                    _panel2.GetComponentInChildren<Text>().text += "- " + actionList[i] + "\n";
+                }
+                else
+                    actionList.RemoveAt(i);
+            }
+        }
+        else
+        {
+            _panel2.GetComponentInChildren<Text>().text += "- " + action + "\n";
+        }
     }
 }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 public class HumanPlayer : Player
 {
     #region Fields
+
     public Character SelectedCharacter;
     private Tile _selectedTile;
     private Tile _hoveredTile = null;
@@ -20,9 +21,11 @@ public class HumanPlayer : Player
         _awaitingTurn = false, 
         _showingAttack = false,
         _isPlaying;
+
     #endregion Fields
 
     #region Properties
+
     public bool IsPlaying
     {
         get
@@ -30,6 +33,7 @@ public class HumanPlayer : Player
             return _isPlaying;
         }
     }
+
     #endregion Properties
 
     #region Methods
@@ -147,7 +151,7 @@ public class HumanPlayer : Player
 
     #endregion Turn
 
-    #region Input 
+    #region Input
 
     void Update()
     {
@@ -214,7 +218,7 @@ public class HumanPlayer : Player
         _pickerScript.enabled = false;
     }
 
-    #endregion Input 
+    #endregion Input
 
     #region Tile stuff
 
@@ -339,8 +343,9 @@ public class HumanPlayer : Player
         DisablePicker();
 
         var pathFinder = SelectedCharacter.GetComponent<Pathfinding>();
-        pathFinder._endNode = t;
-        pathFinder.CalculateNewPath();
+        /* pathFinder._endNode = t;
+        pathFinder.CalculateNewPath();*/
+        pathFinder.SetPath(t);
     }
 
     /// <summary>
@@ -392,6 +397,7 @@ public class HumanPlayer : Player
         if (SelectedCharacter != null)
             ShowAttackRange(SelectedCharacter._currentTile);
     }
+
     public void ShowAttackRange(Tile t)
     {
         if (t == null)
@@ -403,11 +409,13 @@ public class HumanPlayer : Player
         t.AttackUI();
         _showingAttack = true;
     }
+
     public void ClearAttackRange()
     {
         if (SelectedCharacter != null)
             ClearAttackRange(SelectedCharacter._currentTile);
     }
+
     public void ClearAttackRange(Tile t)
     {
         if (t == null)

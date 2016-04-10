@@ -6,8 +6,16 @@ public class HealingCollectible : MonoBehaviour
     public Tile _currentTile;
     public int healthGiven = 20;
 
+    public AudioClip healingSound;
+
     void Update()
     {
         transform.Rotate(new Vector3(15, 30, 45) * Time.deltaTime);
+    }
+
+    void OnDestroy()
+    {
+        AudioSource.PlayClipAtPoint(healingSound, Vector3.zero);
+
     }
 }
