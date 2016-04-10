@@ -47,6 +47,9 @@ public class Map_Movement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown("`"))
+            _enabled = !_enabled;
+
         if (_enabled)
         {
             Vector3 pos = transform.position;

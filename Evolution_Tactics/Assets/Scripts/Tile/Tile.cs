@@ -336,6 +336,12 @@ public class Tile : MonoBehaviour
     {
         // Variables
         takePlayerIntoAccount &= HasPlayer;
+
+        PokemonStats stats = null;
+        if (HasPlayer)
+            stats = _character.GetComponent<PokemonStats>();
+        bool handleObstacle = stats != null && takePlayerIntoAccount;
+
         int total = reach + attack;
         int r = 0; // r is Tile current reach
 
@@ -354,6 +360,15 @@ public class Tile : MonoBehaviour
             // Out of bounds (This limits the open list)
             if (r > total)
                 continue;
+
+            // Handle obstacle
+            if (kvp.Key.HasObstacle && handleObstacle)
+            {
+                if (!stats.MyType.Equals(TileStats.type.Flying) || r == reach)
+                {
+                    r = Mathf.Max(reach + 1, r);
+                }
+            }
 
             // Tile contains an enemy, no point doing anything. Set reach to total to be seen as attack
             if (takePlayerIntoAccount && ContainsEnemy(kvp.Key, _character.ControllingPlayer))

@@ -103,6 +103,8 @@ public class Character : MonoBehaviour
 
     public bool CanAttack(Character target)
     {
+        if (target == null) return false;
+
         float distance = Vector3.Distance(target.transform.position, transform.position);
 
         if (distance <= GetComponent<PokemonStats>().AttackRange)

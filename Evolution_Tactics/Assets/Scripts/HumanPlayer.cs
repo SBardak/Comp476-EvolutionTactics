@@ -33,6 +33,18 @@ public class HumanPlayer : Player
             return _isPlaying;
         }
     }
+    public int AverageLevel
+    {
+        get
+        {
+            if (_charactersList.Count == 0) return 1;
+
+            int avg = 0;
+            foreach (var c in _charactersList)
+                avg += c.GetComponent<PokemonStats>().Level;
+            return Mathf.Max(avg / _charactersList.Count, 1);
+        }
+    }
 
     #endregion Properties
 
@@ -57,6 +69,8 @@ public class HumanPlayer : Player
             c.OnDeath += Character_OnDeath;
             c.ControllingPlayer = this;
         }
+
+        PositionCharacter(_charactersList);
     }
 
     private void Character_OnDeath(Character c)
@@ -66,8 +80,6 @@ public class HumanPlayer : Player
 
     void Start()
     {
-        PositionCharacter(_charactersList);
-
         _finishedStart = true;
         if (_awaitingTurn)
             StartTurn();

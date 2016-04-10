@@ -132,14 +132,41 @@ public class UIManager : MonoBehaviour
         DeleteHumanPlayerActionUI();
     }
 
-    public IEnumerator CreateNewDamageLabel(int d)
+    public void CreateNewDamageLabel(int d, Vector3 target)
+    {
+        var go = CreateFloatingLabel(d.ToString() + "!", target, new Vector2(10, -20));
+
+        StartCoroutine(ShowFloatingLabel(go));
+    }
+    public void CreateNewLevelUpLabel(string message, Vector3 target)
+    {
+        var go = CreateFloatingLabel(message, target, new Vector2(20, -20));
+        go.GetComponent<Text>().color = Color.green;
+        StartCoroutine(ShowFloatingLabel(go));
+    }
+    private GameObject CreateFloatingLabel(string message, Vector3 target, Vector2 offsets)
     {
         GameObject text = Instantiate(damageText, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
-        text.GetComponent<Text>().text = d.ToString() + "!";
+        text.GetComponent<Text>().text = message;
         text.transform.SetParent(GameObject.Find("Canvas").transform);
-        text.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(20, 0, 0);
-        yield return new WaitForSeconds(2.0f);
-        Destroy(text.gameObject);
+        //text.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(20, 0, 0);
+
+        var screenPos = Camera.main.WorldToScreenPoint(target);
+        screenPos.x -= offsets.x;
+        screenPos.y -= offsets.y;
+        text.GetComponent<RectTransform>().position = screenPos;
+
+        return text;
+    }
+    public IEnumerator ShowFloatingLabel(GameObject obj)
+    {
+        // Set live time
+        var fct = obj.GetComponent<FloatingCombatText>();
+        float liveTime = 2.0f;
+        if (fct != null)
+            liveTime = fct.float_time;
+        yield return new WaitForSeconds(liveTime);
+        Destroy(obj.gameObject);
     }
 
     public void ActivateUI()

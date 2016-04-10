@@ -199,22 +199,29 @@ public class AttackAlgorithm : MonoBehaviour
 
     public void DoDamage(Character target)
     {
-
+        var pokeStats = target.GetComponent<PokemonStats>();
         float rand = Random.Range(0, 100);
         //if (rand <= Accuracy)
         //{
         var n = target.name.Split("("[0]);
         var nn = name.Split("("[0]);
         UIManager.Instance.AddAction(nn[0] + " attacks " + n[0] + " and do " + damage + " damage.");
-        target.GetComponent<PokemonStats>().CurrentHealth -= damage;
+        pokeStats.CurrentHealth -= damage;
 
-        StartCoroutine(UIManager.Instance.CreateNewDamageLabel(damage));
+        UIManager.Instance.CreateNewDamageLabel(damage, target.transform.position);
         StartCoroutine(AttackAnimation());
 
-        if (target.GetComponent<PokemonStats>().CurrentHealth <= 0)
+
+        var exp = transform.GetComponent<Experience>();
+        if (exp != null)
         {
-            // transform.GetComponent<Experience>().gainXP(target.GetComponent<PokemonStats>().XP_on_Death);
+            int xpGain = pokeStats.XP_on_Death;
+            if (pokeStats.CurrentHealth > 0)
+                xpGain = (int)(xpGain*0.2f);
+        
+            exp.gainXP(xpGain);
         }
+
         /* }
         else
         {

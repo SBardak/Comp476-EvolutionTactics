@@ -44,10 +44,7 @@ public class AIPlayer : Player
 
         foreach (var s in _squads)
             s.SetControllingPlayer(this);
-    }
 
-    void Start()
-    {
         foreach (var s in _squads)
             PositionCharacter(new List<Character>(s.GetComponentsInChildren<Character>()));
     }

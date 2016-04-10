@@ -1,22 +1,22 @@
 Evo_Map
 w:22;h:20
-y y y y y y y y f f f f f f y y y y y y y y 
-d y y y y y y y f f f f f f y y y y y y y d 
+y:o y y y y y y y f f f f f f y y y y y y y y:o 
+d y y y y y y y f:o f f f f f:o y y y y y y y d 
 d d w w w y y y y e f f e y y y y w w w d d 
 d d w w w w w w g e f f e g w w w w w w d d 
 d d w w w w w w g e f f e g w w w w w w d d 
 d d w w w w w g g e e e e g g w w w w w d d 
 d d w w w w w g g e e e e g g w w w w w d d 
-d d w w w w w g g e e e e g g w w w w w d d 
-d d w w w w w g g e e e e g g w w w w w d d 
+d d w w w:o w w g g e e e e g g w w w:o w w d d 
+d d w w w:o w w g g e:o e e e:o g g w w w:o w w d d 
+d d w w w:o w w g g:o g e e g g:o g w w w:o w w d d 
 d d w w w w w g g g e e g g g w w w w w d d 
-d d w w w w w g g g e e g g g w w w w w d d 
-d d w w w w w g g g e e g g g w w w w w d d 
-d d w w w w w g g g e e g g g w w w w w d d 
+d d w w w:o w w g g g e e g g g w w w:o w w d d 
+d d w w w:o w w g g g e e g g g w w w:o w w d d 
+d d w w w:o w w g g g g g g g g w w w:o w w d d 
 d d w w w w w g g g g g g g g w w w w w d d 
 d d w w w w w g g g g g g g g w w w w w d d 
-d d w w w w w g g g g g g g g w w w w w d d 
-d d d w w w w w g g g g g g w w w w w d d d 
-d d d d w w w w g g g g g g w w w w d d d d 
-d d d d d w w w g g g g g g w w w d d d d d 
-d d d d d d d d g g g g g g d d d d d d d d 
+d d d w w w w w g g g:o g:o g g w w w w w d d d 
+d d:o d:o d w w w w g g:o g:o g:o g:o g w w w w d d:o d:o d 
+d d d:o d d w w w g g g:o g:o g g w w w d d d:o d d 
+d:o d d d d d d d g g g g g g d d d d d d d d:o 
