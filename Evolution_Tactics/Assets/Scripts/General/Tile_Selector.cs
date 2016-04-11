@@ -78,7 +78,7 @@ public class Tile_Selector : Selector
         var player = GameManager.Instance.GetActivePlayer();
         if (!(player is HumanPlayer))
         {
-            Debug.Log("Not human");
+            //Debug.Log("Not human");
             return;
         }
         var human = (HumanPlayer)player;

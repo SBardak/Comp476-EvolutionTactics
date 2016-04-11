@@ -169,8 +169,15 @@ public class Unit : MonoBehaviour
                 {
                     Attack();
                 }
+                else
+                {
+                    FinishedMove();
+                }
             }
-            FinishedMove();
+            else
+            { 
+                FinishedMove();
+            }
         }
     }
 
@@ -460,15 +467,18 @@ public class Unit : MonoBehaviour
             {
                 for (int i = 0; i < t.neighbours.Count; i++)
                 {
-                    bestTile = t.neighbours[i];
-                    // when no player on the tile, break
-                    if (possibleTiles.ContainsKey(t) && possibleTiles[t] <= movementRange && !bestTile.HasPlayer)
+                    if (possibleTiles.ContainsKey(t.neighbours[i]))
                     {
-                        //highestDamage = attack.GetDamage(tilesWithEnemy[0]._character, bestTile);
-                        highestCost = AttackCost(tilesWithEnemy[0]._character, bestTile);
-                        enemyToAttack = tilesWithEnemy[0]._character;
-                        bestTile = t;
-                        break;
+                        bestTile = t.neighbours[i];
+                        // when no player on the tile, break
+                        if (possibleTiles.ContainsKey(t) && possibleTiles[t] <= movementRange && !bestTile.HasPlayer)
+                        {
+                            //highestDamage = attack.GetDamage(tilesWithEnemy[0]._character, bestTile);
+                            highestCost = AttackCost(tilesWithEnemy[0]._character, bestTile);
+                            enemyToAttack = tilesWithEnemy[0]._character;
+                            bestTile = t;
+                            break;
+                        }
                     }
                 }
             }
@@ -577,26 +587,30 @@ public class Unit : MonoBehaviour
         Dictionary<Tile, int> possibleAttacks = Character._currentTile.GetTiles(0);
         List<Tile> attackable = new List<Tile>();
 
-        foreach (Tile t in possibleAttacks.Keys)
-        {
-            if (Attackable(t))
-            {
-                attackable.Add(t);
-            }
-        } 
-
         float highestCost = 0;
         Tile bestTile = null;
         enemyToAttack = null;
 
-        foreach (Tile t in attackable)
+        if (possibleAttacks.Count > 0)
         {
-            float cost = AttackCost(t._character, Character._currentTile);
-            if (cost > highestCost)
+            foreach (Tile t in possibleAttacks.Keys)
             {
-                bestTile = t;
-                enemyToAttack = t._character;
-                highestCost = cost;
+                if (Attackable(t))
+                {
+                    attackable.Add(t);
+                }
+            } 
+
+
+            foreach (Tile t in attackable)
+            {
+                float cost = AttackCost(t._character, Character._currentTile);
+                if (cost > highestCost)
+                {
+                    bestTile = t;
+                    enemyToAttack = t._character;
+                    highestCost = cost;
+                }
             }
         }
 

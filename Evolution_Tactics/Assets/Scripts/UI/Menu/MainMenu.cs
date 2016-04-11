@@ -10,6 +10,7 @@ public class MainMenu : MonoBehaviour
     public Button[] _newGameButtons;
     public Button[] _pokemonButtons;
     public Text[] _pokemonTexts;
+    public Text currentPokemon;
 
     public List<string> _selectedCharacters = new List<string>();
 
@@ -20,6 +21,9 @@ public class MainMenu : MonoBehaviour
 
     private void Init(int option)
     {
+        currentPokemon.gameObject.SetActive(true);
+        ShowCurrentPokemon();
+
         if (option == 1 || option == 2)
         {
             logo.gameObject.SetActive(true);
@@ -79,6 +83,20 @@ public class MainMenu : MonoBehaviour
         }
     }
 
+    private void ShowCurrentPokemon()
+    {
+        currentPokemon.text = "Selected: ";
+        int i = 0;
+        foreach (string s in _selectedCharacters)
+        {
+            string ss = s;
+            if (i < 5)
+                ss += ", ";
+            currentPokemon.text += ss;
+            i++;
+        }
+    }
+
     public void NewGame()
     {
         Init(2);
@@ -124,7 +142,7 @@ public class MainMenu : MonoBehaviour
             string s = pokemon;
             if (_selectedCharacters.Count <= 5)
                 s += ", ";
-            _pokemonTexts[1].GetComponent<Text>().text += s;
+            currentPokemon.GetComponent<Text>().text += s;
         }
 
         if (_selectedCharacters.Count == 6)
@@ -154,14 +172,14 @@ public class MainMenu : MonoBehaviour
                 b.interactable = false;
             i++;
         }
-        _pokemonTexts[1].GetComponent<Text>().text = "Chosen: ";
+        currentPokemon.GetComponent<Text>().text = "Chosen: ";
     }
 
     public void Accept()
     {
         if (_selectedCharacters.Count == 6)
         {
-            Init(1);
+            Init(2);
         }
     }
 }
