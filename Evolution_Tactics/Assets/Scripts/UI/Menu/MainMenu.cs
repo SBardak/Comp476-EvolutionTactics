@@ -88,7 +88,8 @@ public class MainMenu : MonoBehaviour
 
     public void RandomMap()
     {
-        
+		GameManager.Instance.isPlaying = true;
+		Application.LoadLevel(2);
     }
 
     public void DefaultMap()
