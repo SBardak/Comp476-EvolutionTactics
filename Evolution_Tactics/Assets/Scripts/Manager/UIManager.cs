@@ -353,7 +353,7 @@ public class UIManager : MonoBehaviour
 
         while (text.color.a > 0)
         {
-            panel.color = new Color(panel.color.r, panel.color.g, panel.color.b, panel.color.a - (0.01f * Time.deltaTime));
+            panel.color = new Color(panel.color.r, panel.color.g, panel.color.b, panel.color.a - (0.025f * Time.deltaTime));
             text.color = new Color(text.color.r, text.color.g, text.color.b, text.color.a - (0.05f * Time.deltaTime));
 
             yield return new WaitForSeconds(0.005f);

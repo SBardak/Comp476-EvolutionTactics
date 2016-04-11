@@ -133,12 +133,12 @@ public class Pathfinding : MonoBehaviour
     private void GetPathInRange()
     {
         List<Tile> newPath = new List<Tile>();
-        for (int i = 0; i < movementRange; i++)
+        for (int i = 0; i <= movementRange; i++)
         {
             newPath.Add(pathList[i]);
         }
 
-        for (int i = movementRange - 1; i >= 0; i--)
+        for (int i = movementRange; i >= 0; i--)
         {
             if (newPath[i]._character != null)
             {

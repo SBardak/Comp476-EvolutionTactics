@@ -21,6 +21,8 @@ public class GameManager : Singleton<GameManager>
     [SerializeField]
     AvailableCharactersList[] AvailableCharacters;
 
+    private List<string> _selectedCharacters;
+
     public bool isPlaying = false;
 
     #endregion Fields
@@ -37,11 +39,6 @@ public class GameManager : Singleton<GameManager>
     {
         DontDestroyOnLoad(gameObject);
         //GameManager.Instance = this;
-    }
-
-    void Start()
-    {
-
     }
 
     void OnLevelWasLoaded(int level)
@@ -100,6 +97,11 @@ public class GameManager : Singleton<GameManager>
     #endregion Turn logic
 
     #region Player generation
+
+    public void SetPlayers(List<string> players)
+    {
+        _selectedCharacters = new List<string>(players);
+    }
 
     /// <summary>
     /// Generates the players and their teams
