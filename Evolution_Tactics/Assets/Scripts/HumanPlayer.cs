@@ -139,6 +139,7 @@ public class HumanPlayer : Player
             c.Activate();
 
         // Select first character
+        UIManager.Instance.DeleteHumanPlayerActionUI();
         SelectCharacter(_charactersList[0]);
         Map_Movement.Instance.CenterOn(_charactersList[0].gameObject);
 
