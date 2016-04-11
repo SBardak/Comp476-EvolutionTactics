@@ -473,7 +473,7 @@ public class Unit : MonoBehaviour
             //Find an initial empty best tile
             foreach (Tile t in tilesWithEnemy)
             {
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < t.neighbours.Count; i++)
                 {
                     bestTile = t.neighbours[i];
                     // when no player on the tile, break

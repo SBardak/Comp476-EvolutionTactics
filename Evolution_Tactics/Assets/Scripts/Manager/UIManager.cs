@@ -237,6 +237,7 @@ public class UIManager : MonoBehaviour
         {
             foreach (Button b in buttonList)
             {
+                if (b == null || b.gameObject == null) continue;
                 Destroy(b.gameObject);
             }
         }
@@ -359,5 +360,39 @@ public class UIManager : MonoBehaviour
             yield return new WaitForSeconds(0.005f);
         }
         actionList.Clear();
+    }
+
+
+    public GameEnd GameEndOptions;
+
+    public void OnDestroy()
+    {
+        Instance = null;
+    }
+}
+
+[System.Serializable]
+public class GameEnd
+{
+    [SerializeField]
+    Text Label,
+        dynamicLabel;
+
+    public void ShowVictory()
+    {
+        Label.gameObject.SetActive(true);
+        Label.color = new Color(0, 1, 0, 0.5f);
+        Label.text = "You win!";
+    }
+    public void ShowDefeat()
+    {
+        Label.gameObject.SetActive(true);
+        Label.color = new Color(1, 0, 0, 0.5f);
+        Label.text = "You lose...";
+    }
+    public void UpdateLabel(string text)
+    {
+        dynamicLabel.gameObject.SetActive(true);
+        dynamicLabel.text = text;
     }
 }

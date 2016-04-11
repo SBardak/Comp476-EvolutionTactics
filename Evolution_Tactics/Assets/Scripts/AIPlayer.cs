@@ -17,37 +17,65 @@ using System.Collections.Generic;
 /// </summary>
 public class AIPlayer : Player
 {
+    #region Fields
     public int SquadCount = 3;
     public int MaxUnitCountPerSquad = 3;
 
     [SerializeField]
     Squad[] _squads;
+    List<Squad> _squadList;
     int _selectedSquad = 0;
 
     bool _isPlaying;
+    #endregion Fields
+
+    #region Properties
+    public bool IsPlaying
+    {
+        get
+        {
+            return _isPlaying;
+        }
+    }
+    #endregion Properties
+
+    #region Methods
+
+    #region Squad
 
     void Awake()
     {
+        _squadList = new List<Squad>(_squads);
         PrepareSquads();
     }
 
     public void SetSquads(List<Squad> squads)
     {
-        _squads = squads.ToArray();
+        _squadList = squads;
         PrepareSquads();
     }
     void PrepareSquads()
     {
         // Move this somewhere else probably
-        foreach (var s in _squads)
+        foreach (var s in _squadList)
+        {
             s.MovementComplete += MovedSquad;
-
-        foreach (var s in _squads)
             s.SetControllingPlayer(this);
-
-        foreach (var s in _squads)
             PositionCharacter(new List<Character>(s.GetComponentsInChildren<Character>()));
+            s.OnDeath += Squad_OnDeath;
+        }
     }
+
+    private void Squad_OnDeath(Squad s)
+    {
+        _squadList.Remove(s);
+        if (_squadList.Count == 0)
+            GameManager.Instance.DeadAI(this);
+    }
+
+    #endregion Squad
+
+    #region Turn
 
     /// <summary>
     /// Start the AIs turn
@@ -56,7 +84,7 @@ public class AIPlayer : Player
     {
         Debug.Log("Ai Start turn");
         // This shouldn't happen
-        if (_squads.Length == 0)
+        if (_squadList.Count == 0)
         {
             EndTurn();
             return;
@@ -65,7 +93,7 @@ public class AIPlayer : Player
         _isPlaying = true;
 
         // Reactivate all units
-        foreach (var s in _squads)
+        foreach (var s in _squadList)
             s.ReactivateSquad();
 
         // Select first squad
@@ -83,7 +111,7 @@ public class AIPlayer : Player
     /// </summary>
     void MoveSquad()
     { 
-        var s = _squads[_selectedSquad];
+        var s = _squadList[_selectedSquad];
 
         s.MoveSquad();
     }
@@ -122,21 +150,11 @@ public class AIPlayer : Player
     /// <returns></returns>
     bool AllSquadsMoved()
     {
-        return _selectedSquad >= _squads.Length;
+        return _selectedSquad >= _squadList.Count;
     }
+    
+    #endregion Turn
 
-    //IEnumerator ExecuteTurn()
-    //{
-    //    yield return null;
+    #endregion Methods
 
-    //    //GameManager.Instance.NextTurn();
-    //}
-
-    public bool IsPlaying
-    {
-        get
-        {
-            return _isPlaying;
-        }
-    }
 }

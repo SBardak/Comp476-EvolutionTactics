@@ -197,7 +197,7 @@ public class AttackAlgorithm : MonoBehaviour
         return damage;
     }
 
-    public void DoDamage(Character target)
+    public bool DoDamage(Character target)
     {
         var pokeStats = target.GetComponent<PokemonStats>();
         float rand = Random.Range(0, 100);
@@ -221,6 +221,9 @@ public class AttackAlgorithm : MonoBehaviour
         
             exp.gainXP(xpGain);
         }
+
+        return pokeStats.CurrentHealth <= 0;
+            
 
         /* }
         else

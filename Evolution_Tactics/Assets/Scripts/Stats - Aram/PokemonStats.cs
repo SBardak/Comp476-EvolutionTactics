@@ -94,7 +94,7 @@ public class PokemonStats : MonoBehaviour
         {
             _currentHealth = value;
             if (GetComponent<HP_Tracker>() != null)
-                GetComponent<HP_Tracker>().SetHp(_currentHealth);
+                GetComponent<HP_Tracker>().SetHP();
             healthCheck();
         }
         get

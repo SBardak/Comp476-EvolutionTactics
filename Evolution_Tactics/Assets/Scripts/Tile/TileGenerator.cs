@@ -379,7 +379,7 @@ public class TileGenerator : MonoBehaviour
         
         int height = Random.Range(0, mapHeight - 1), width = Random.Range(0, mapWidth - 1);
         Debug.LogWarning(mapHeight + " " + height + " " + mapWidth + " " + width);
-        Tile t = Tiles[height, width];
+        Tile t = Tiles[width, height];
         while (t.IsOccupied)
         {
             height = Random.Range(0, mapHeight - 1);

@@ -14,9 +14,10 @@ public class HP_Tracker : MonoBehaviour
     private Image _instantiated;
     private RectTransform _rect;
 
-    public int _maxHp, _currentHp;
+    public int _currentHp;
 
-    Color c = Color.black;
+    private Color c = Color.black;
+    private PokemonStats _stats;
     #endregion Fields
     //=========================================================================
     #region Methods
@@ -34,9 +35,8 @@ public class HP_Tracker : MonoBehaviour
         _instantiated.transform.SetParent(GameObject.Find("Canvas").transform.Find("HP_Container").transform, false);
         _rect = _instantiated.GetComponent<RectTransform>();
 
-        PokemonStats stats = GetComponent<PokemonStats>();
-        _maxHp = stats.MaxHealth;
-        _currentHp = stats.CurrentHealth;
+        _stats = GetComponent<PokemonStats>();
+        _currentHp = _stats.CurrentHealth;
 
         SetColor(c);
         SetHP();
@@ -78,15 +78,10 @@ public class HP_Tracker : MonoBehaviour
         SetColorHP(new Color(r, g, b));
     }
 
-    private void SetHP()
+    public void SetHP()
     {
         if (_instantiated != null)
-            _instantiated.GetComponent<HP_Tracker_UI>().SetHP(_currentHp, _maxHp);
-    }
-    public void SetHp(int currentHp)
-    {
-        _currentHp = currentHp;
-        SetHP();
+            _instantiated.GetComponent<HP_Tracker_UI>().SetHP(_stats.CurrentHealth, _stats.MaxHealth);
     }
 
     #endregion Setters & Activators

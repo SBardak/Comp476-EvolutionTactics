@@ -82,9 +82,9 @@ public class Character : MonoBehaviour
 
     public void Attack(Character enemyToAttack)
     {
-        AttackAction(enemyToAttack);
+        bool killedEnemy = AttackAction(enemyToAttack);
 
-        if (enemyToAttack != null)
+        if (!killedEnemy && enemyToAttack != null)
         {
             StartCoroutine(enemyToAttack.CounterAttack(this));
         }
@@ -99,17 +99,17 @@ public class Character : MonoBehaviour
         }
     }
 
-    private void AttackAction(Character enemyToAttack)
+    private bool AttackAction(Character enemyToAttack)
     {
         RotateDirectly(enemyToAttack.transform.position);
         AttackAlgorithm a = GetComponent<AttackAlgorithm>();
         //a.GetDamage(enemyToAttack);
-        a.DoDamage(enemyToAttack);
+        return a.DoDamage(enemyToAttack);
     }
 
     public bool CanAttack(Character target)
     {
-        if (target == null)
+        if (target == null || target.gameObject == null)
             return false;
 
         float distance = Vector3.Distance(target.transform.position, transform.position);

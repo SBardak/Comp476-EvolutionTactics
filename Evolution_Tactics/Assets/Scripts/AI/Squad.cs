@@ -10,9 +10,10 @@ public class Squad : MonoBehaviour
 {
     #region Events
 
-    public delegate void MovementCompleteHandler(Squad s);
+    public delegate void SquadEventHandler(Squad s);
 
-    public event MovementCompleteHandler MovementComplete;
+    public event SquadEventHandler MovementComplete;
+    public event SquadEventHandler OnDeath;
 
     #endregion Events
     //=========================================================================
@@ -145,6 +146,8 @@ public class Squad : MonoBehaviour
     private void UnitDeath(Unit u)
     {
         _units.Remove(u);
+        if (_units.Count == 0 && OnDeath != null)
+            OnDeath(this);
     }
 
     /// <summary>
@@ -257,10 +260,32 @@ public class Squad : MonoBehaviour
         MoveUnit(target);
     }
 
-    public void Flee(Tile t)
+    public void Flee(Tile t, Squad closest, Vector3 closest_avg)
     {
         Debug.Log("Flee " + t);
+        var u = GetCurrentUnit();
+        if ((closest_avg - u.transform.position).sqrMagnitude < 3 * 3)
+        {
+            Debug.Log("Joining new squad!");
+            LeaveSquad(closest);
+            return;
+        }
         MoveUnit(t);
+    }
+    void LeaveSquad(Squad newSquad)
+    {
+        var u = GetCurrentUnit();
+        UnitDeath(u);
+
+        newSquad.JoinSquad(u);
+
+        // Reduce current and next 
+        --_selectedUnit;
+        SelectNextUnit();
+    }
+    void JoinSquad(Unit u)
+    {
+        _units.Add(u);
     }
 
     public void Idle()

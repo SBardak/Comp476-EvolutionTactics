@@ -24,7 +24,6 @@ public class Pathfinding : MonoBehaviour
     public bool _hasPath = false;
 
     private TileStats.type myType;
-    private int movementRange;
     private PokemonStats stats;
     private Animator _animator;
 
@@ -38,7 +37,6 @@ public class Pathfinding : MonoBehaviour
             _animator = GetComponentInChildren<Animator>();
         }
         myType = stats.MyType;
-        movementRange = stats.MovementRange;
     }
 
     void Graph()
@@ -126,19 +124,19 @@ public class Pathfinding : MonoBehaviour
         }
 
         CalculateNewPath();
-        if (pathList.Count > movementRange + 1)
+        if (pathList.Count > stats.MovementRange + 1)
             GetPathInRange();
     }
 
     private void GetPathInRange()
     {
         List<Tile> newPath = new List<Tile>();
-        for (int i = 0; i <= movementRange; i++)
+        for (int i = 0; i <= stats.MovementRange; i++)
         {
             newPath.Add(pathList[i]);
         }
 
-        for (int i = movementRange; i >= 0; i--)
+        for (int i = stats.MovementRange; i >= 0; i--)
         {
             if (newPath[i]._character != null)
             {

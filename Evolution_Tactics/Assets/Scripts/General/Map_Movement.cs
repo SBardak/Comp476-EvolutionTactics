@@ -39,6 +39,11 @@ public class Map_Movement : MonoBehaviour
         _bounds.max.x = TileGenerator.Instance.mapWidth;
         _bounds.max.y = TileGenerator.Instance.mapHeight;
 
+        var p = transform.position;
+        p.x = _bounds.max.x / 2;
+        p.z = _bounds.max.y / 2 - 10;
+        transform.position = p;
+
         _bounds.min.y -= 10;
         _bounds.max.y -= 10;
         //Cursor.SetCursor(_cursor, _hotSpot, _cursorMode);
