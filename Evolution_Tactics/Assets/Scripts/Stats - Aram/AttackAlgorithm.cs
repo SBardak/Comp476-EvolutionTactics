@@ -143,6 +143,7 @@ public class AttackAlgorithm : MonoBehaviour
     public int GetDamage(Character target, bool initialAttack = true)
     {
         getStats(target);
+        Debug.LogWarning(gameObject.name + " " + Time.deltaTime);
 
         damage = Attack - Enemy_Defense;
 
