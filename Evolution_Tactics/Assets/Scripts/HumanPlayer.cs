@@ -167,10 +167,18 @@ public class HumanPlayer : Player
 
     void Update()
     {
-        if (Input.GetKeyDown("e"))
-            EndTurn();
-        if (Input.GetMouseButtonDown(1))
-            HandleRightMouse();
+        if (IsPlaying)
+        {
+            if (Input.GetKeyDown("e"))
+                EndTurn();
+            if (Input.GetMouseButtonDown(1))
+                HandleRightMouse();
+
+            if (Input.GetKeyDown("1"))
+                GameManager.Instance.DeadPlayer(this);
+            if (Input.GetKeyDown("2"))
+                GameManager.Instance.DeadAI(new AIPlayer());
+        }
     }
 
     public void HandleRightMouse()

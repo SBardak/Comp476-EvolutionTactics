@@ -10,9 +10,10 @@ public class Squad : MonoBehaviour
 {
     #region Events
 
-    public delegate void MovementCompleteHandler(Squad s);
+    public delegate void SquadEventHandler(Squad s);
 
-    public event MovementCompleteHandler MovementComplete;
+    public event SquadEventHandler MovementComplete;
+    public event SquadEventHandler OnDeath;
 
     #endregion Events
     //=========================================================================
@@ -145,6 +146,8 @@ public class Squad : MonoBehaviour
     private void UnitDeath(Unit u)
     {
         _units.Remove(u);
+        if (_units.Count == 0 && OnDeath != null)
+            OnDeath(this);
     }
 
     /// <summary>

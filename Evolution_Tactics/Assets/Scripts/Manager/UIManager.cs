@@ -336,4 +336,33 @@ public class UIManager : MonoBehaviour
             _panel2.GetComponentInChildren<Text>().text += "- " + action + "\n";
         }
     }
+
+
+    public GameEnd GameEndOptions;
+}
+
+[System.Serializable]
+public class GameEnd
+{
+    [SerializeField]
+    Text Label,
+        dynamicLabel;
+
+    public void ShowVictory()
+    {
+        Label.gameObject.SetActive(true);
+        Label.color = new Color(0, 1, 0, 0.5f);
+        Label.text = "You win!";
+    }
+    public void ShowDefeat()
+    {
+        Label.gameObject.SetActive(true);
+        Label.color = new Color(1, 0, 0, 0.5f);
+        Label.text = "You lose...";
+    }
+    public void UpdateLabel(string text)
+    {
+        dynamicLabel.gameObject.SetActive(true);
+        dynamicLabel.text = text;
+    }
 }

@@ -21,16 +21,25 @@ public class GameManager : Singleton<GameManager>
     AvailableCharactersList[] AvailableCharacters;
 
     public bool isPlaying = false;
+    bool isDuplicate = false;
     #endregion Fields
 
     #region Methonds
 
-    protected GameManager() { }
+    protected GameManager() {
+    }
 
     #region Unity
 
     void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            isDuplicate = true;
+            DestroyImmediate(this.gameObject);
+            return;
+        }
+
         DontDestroyOnLoad(gameObject);
         //GameManager.Instance = this;
     }
@@ -47,6 +56,12 @@ public class GameManager : Singleton<GameManager>
             if (GameManager.Instance.isPlaying)
                 GeneratePlayers();
         }
+    }
+
+    public void OnDestroy()
+    {
+        if (!isDuplicate)
+            base.OnDestroy();
     }
 
     #endregion Unity
@@ -91,6 +106,50 @@ public class GameManager : Singleton<GameManager>
         if (CurrentPlayer >= _allPlayers.Count)
             return null;
         return _allPlayers[CurrentPlayer];
+    }
+
+    public void DeadAI(AIPlayer player)
+    {
+        // Hard coded for single AI
+        UIManager.Instance.GameEndOptions.ShowVictory();
+        StartCoroutine(Victory());
+    }
+    public void DeadPlayer(HumanPlayer player)
+    {
+        // Hard coded for single player
+        UIManager.Instance.GameEndOptions.ShowDefeat();
+        StartCoroutine(Defeat());
+    }
+    IEnumerator Victory()
+    {
+        // 5 seconds
+        for (int i = 5; i > 0; --i)
+        {
+            UIManager.Instance.GameEndOptions.UpdateLabel("New map in...\n" + i);
+            yield return new WaitForSeconds(1);
+        }
+        Application.LoadLevel(1);
+    }
+    IEnumerator Defeat()
+    {
+        for (int i = 5; i > 0; --i)
+        {
+            UIManager.Instance.GameEndOptions.UpdateLabel("Back to menu in...\n" + i);
+            yield return new WaitForSeconds(1);
+        }
+
+        foreach (var p in _allPlayers)
+            for (int i = p.transform.childCount - 1; i >= 0; i--)
+                DestroyImmediate(p.transform.GetChild(i).gameObject);
+        GameManager.Instance.isPlaying = false;
+
+        //DestroyImmediate(gameObject);
+        Application.LoadLevel(0);
+    }
+    void Reset()
+    {
+        CurrentTurn = 0;
+        CurrentPlayer = 0;
     }
 
     #endregion Turn logic
@@ -139,6 +198,7 @@ public class GameManager : Singleton<GameManager>
     IEnumerator WaitForCharacterLoad()
     {
         yield return new WaitForEndOfFrame();
+        TileGenerator.Instance.SetNewCollectibleTile();
         StartTurn();
     }
 
@@ -238,7 +298,6 @@ public class GameManager : Singleton<GameManager>
 
         // Set ai as parent
         squadContainer.transform.parent = ai.transform;
-        TileGenerator.Instance.SetNewCollectibleTile();
     }
     
     #endregion Player generation

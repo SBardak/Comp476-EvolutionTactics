@@ -17,37 +17,65 @@ using System.Collections.Generic;
 /// </summary>
 public class AIPlayer : Player
 {
+    #region Fields
     public int SquadCount = 3;
     public int MaxUnitCountPerSquad = 3;
 
     [SerializeField]
     Squad[] _squads;
+    List<Squad> _squadList;
     int _selectedSquad = 0;
 
     bool _isPlaying;
+    #endregion Fields
+
+    #region Properties
+    public bool IsPlaying
+    {
+        get
+        {
+            return _isPlaying;
+        }
+    }
+    #endregion Properties
+
+    #region Methods
+
+    #region Squad
 
     void Awake()
     {
+        _squadList = new List<Squad>(_squads);
         PrepareSquads();
     }
 
     public void SetSquads(List<Squad> squads)
     {
-        _squads = squads.ToArray();
+        _squadList = squads;
         PrepareSquads();
     }
     void PrepareSquads()
     {
         // Move this somewhere else probably
-        foreach (var s in _squads)
+        foreach (var s in _squadList)
+        {
             s.MovementComplete += MovedSquad;
-
-        foreach (var s in _squads)
             s.SetControllingPlayer(this);
-
-        foreach (var s in _squads)
             PositionCharacter(new List<Character>(s.GetComponentsInChildren<Character>()));
+            s.OnDeath += Squad_OnDeath;
+        }
     }
+
+    private void Squad_OnDeath(Squad s)
+    {
+        _squadList.Remove(s);
+        if (_squadList.Count == 0)
+            GameManager.Instance.DeadAI(this);
+    }
+
+    #endregion Squad
+
+    #region Turn
 
     /// <summary>
     /// Start the AIs turn
@@ -124,19 +152,9 @@ public class AIPlayer : Player
     {
         return _selectedSquad >= _squads.Length;
     }
+    
+    #endregion Turn
 
-    //IEnumerator ExecuteTurn()
-    //{
-    //    yield return null;
+    #endregion Methods
 
-    //    //GameManager.Instance.NextTurn();
-    //}
-
-    public bool IsPlaying
-    {
-        get
-        {
-            return _isPlaying;
-        }
-    }
 }

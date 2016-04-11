@@ -1,13 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+using UnityEngine.EventSystems;
+
 public class Picker : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
         if (Input.GetMouseButtonDown(0))
         {
-            GetClickObjects();
+            if (!EventSystem.current.IsPointerOverGameObject())
+                GetClickObjects();
         }
     }
 
