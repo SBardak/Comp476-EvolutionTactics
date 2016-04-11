@@ -84,7 +84,7 @@ public class AIPlayer : Player
     {
         Debug.Log("Ai Start turn");
         // This shouldn't happen
-        if (_squads.Length == 0)
+        if (_squadList.Count == 0)
         {
             EndTurn();
             return;
@@ -93,7 +93,7 @@ public class AIPlayer : Player
         _isPlaying = true;
 
         // Reactivate all units
-        foreach (var s in _squads)
+        foreach (var s in _squadList)
             s.ReactivateSquad();
 
         // Select first squad
@@ -111,7 +111,7 @@ public class AIPlayer : Player
     /// </summary>
     void MoveSquad()
     { 
-        var s = _squads[_selectedSquad];
+        var s = _squadList[_selectedSquad];
 
         s.MoveSquad();
     }
@@ -150,7 +150,7 @@ public class AIPlayer : Player
     /// <returns></returns>
     bool AllSquadsMoved()
     {
-        return _selectedSquad >= _squads.Length;
+        return _selectedSquad >= _squadList.Count;
     }
     
     #endregion Turn

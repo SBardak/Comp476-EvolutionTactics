@@ -67,7 +67,7 @@ public class Unit : MonoBehaviour
         //if collectible in range and is the more hurt in squad
         if (collecTile != null && IsMoreHurtInSquad())
         {
-            Debug.Log(name + " Collect tile");
+            Debug.Log(name + " Collect health");
             nextTile = collecTile;
         }
         else if (nextTile.IsOccupied)
@@ -87,23 +87,43 @@ public class Unit : MonoBehaviour
 
         if (Character._unitType == UnitType.ATTACKER)
         {
-            nextTile = FindBestTile(c);
-            if (nextTile._character != null)
+            Debug.Log("Attacker");
+            nextTile = FindBestTile(possibleTiles, c);
+            if (enemyToAttack != null)
             {
-                Debug.Log("JKLAHSDLKAHS");
+                Debug.Log("AttackkkkkkkA");
+            }
+            if (enemyToAttack == null)
+            {
+                nextTile = FindBestTile(possibleTiles);
             }
         }
         else if (Character._unitType == UnitType.TANKER)
         {
-            nextTile = CanKillInRange(possibleTiles);
+            // nextTile = CanKillInRange(possibleTiles);
+            Debug.Log("Tanker");
+            nextTile = FindBestTile(possibleTiles, c);
 
+            if (enemyToAttack != null)
+            {
+                Debug.Log("AttackkkkkkkT");
+            }
+            if (enemyToAttack == null)
+            {
+                nextTile = FindBestTile(possibleTiles);
+            }
         }
         else if (Character._unitType == UnitType.LONG_RANGE)
         {
+            Debug.Log("Ranger");
             nextTile = BestRangedAttack(c, possibleTiles);
             if (nextTile == null)
             {
                 nextTile = BestRangedAttack(possibleTiles);
+            }
+            if (enemyToAttack != null)
+            {
+                Debug.Log("AttackkkkkkkLR");
             }
         }
 
@@ -159,7 +179,7 @@ public class Unit : MonoBehaviour
     void ReachedDestination()
     {
         // Attack ?
-        if (enemyToAttack != null)
+        if (enemyToAttack != null && Attackable(enemyToAttack))
         {
             Attack();
         }
@@ -258,7 +278,7 @@ public class Unit : MonoBehaviour
 
         foreach (Tile t in possibleAttack.Keys)
         {        
-            if (!t.HasPlayer && possibleTiles.ContainsKey(t) && (Mathf.Abs(t.transform.position.x - target.transform.position.x) == Stats.AttackRange || Mathf.Abs(t.transform.position.y - target.transform.position.y) == Stats.AttackRange))
+            if (!t.HasPlayer && possibleTiles.ContainsKey(t) && Attackable(t))
             {
                 enemyToAttack = target;
                 possible.Add(t);
@@ -357,21 +377,24 @@ public class Unit : MonoBehaviour
             //Find an initial empty best tile
             foreach (Tile t in tilesWithEnemy)
             {
-                bestTile = tilesWithEnemy[0].neighbours[0];
-                // when no player on the tile, break
-                if (possibleTiles[t] <= movementRange && !bestTile.HasPlayer)
+                for (int i = 0; i < 4; i++)
                 {
-                    highestDamage = attack.GetDamage(tilesWithEnemy[0]._character, bestTile);
-                    enemyToAttack = tilesWithEnemy[0]._character;
-                    if (bestTile._character.GetComponent<PokemonStats>()._currentHealth - highestDamage <= 0)
+                    bestTile = t.neighbours[i];
+                    // when no player on the tile, break
+                    if (possibleTiles.ContainsKey(t) && possibleTiles[t] <= movementRange && !bestTile.HasPlayer)
                     {
-                        return bestTile;
+                        highestDamage = attack.GetDamage(t._character, bestTile);
+                        enemyToAttack = t._character;
+                        if (bestTile._character.GetComponent<PokemonStats>()._currentHealth - highestDamage <= 0)
+                        {
+                            return bestTile;
+                        }
+                        break;
                     }
-                    break;
-                }
-                else
-                {
-                    bestTile = null;
+                    else
+                    {
+                        bestTile = null;
+                    }
                 }
             }
 
@@ -405,11 +428,19 @@ public class Unit : MonoBehaviour
         return null;
     }
 
-    public Tile FindBestTile(Character c)
+    /* public Tile FindBestTile(Character c, Dictionary<Tile, int> possible)
     {
-        Dictionary<Tile, int> possibleTiles = c._currentTile.GetTiles(0, Stats.AttackRange);
+        Dictionary<Tile, int> possibleTiles = c._currentTile.GetTiles(0, 1);
+        foreach (Tile t in possibleTiles.Keys)
+        {
+            if (!possible.ContainsKey(t))
+            {
+                possibleTiles.Remove(t);
+            }
+        }
+
         return FindBestTile(possibleTiles, c);
-    }
+    }*/
 
     public Tile FindBestTile(Dictionary<Tile, int> possibleTiles, Character enemy = null)
     {
@@ -442,15 +473,18 @@ public class Unit : MonoBehaviour
             //Find an initial empty best tile
             foreach (Tile t in tilesWithEnemy)
             {
-                bestTile = tilesWithEnemy[0].neighbours[0];
-                // when no player on the tile, break
-                if (possibleTiles[t] <= movementRange && !bestTile.HasPlayer)
+                for (int i = 0; i < t.neighbours.Count; i++)
                 {
-                    //highestDamage = attack.GetDamage(tilesWithEnemy[0]._character, bestTile);
-                    highestCost = AttackCost(tilesWithEnemy[0]._character, bestTile);
-                    enemyToAttack = tilesWithEnemy[0]._character;
-                    bestTile = t;
-                    break;
+                    bestTile = t.neighbours[i];
+                    // when no player on the tile, break
+                    if (possibleTiles.ContainsKey(t) && possibleTiles[t] <= movementRange && !bestTile.HasPlayer)
+                    {
+                        //highestDamage = attack.GetDamage(tilesWithEnemy[0]._character, bestTile);
+                        highestCost = AttackCost(tilesWithEnemy[0]._character, bestTile);
+                        enemyToAttack = tilesWithEnemy[0]._character;
+                        bestTile = t;
+                        break;
+                    }
                 }
             }
 
@@ -531,6 +565,26 @@ public class Unit : MonoBehaviour
             return true;
         else
             return false;
+    }
+
+    private bool Attackable(Character target)
+    {
+        return LukasIsTheBest(target.transform.position);
+    }
+
+    private bool Attackable(Tile t)
+    {
+        return LukasIsTheBest(t.transform.position);
+    }
+
+    private bool LukasIsTheBest(Vector3 position)
+    {
+        float x = Mathf.Abs(position.x - transform.position.x);
+        float z = Mathf.Abs(position.z - transform.position.z);
+
+        return /*(x == Stats.AttackRange && y == 0) ||
+        (y == Stats.AttackRange && x == 0) ||*/
+        z + x == Stats.AttackRange;
     }
 
     #endregion Search for tile helper methods

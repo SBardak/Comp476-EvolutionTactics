@@ -260,10 +260,32 @@ public class Squad : MonoBehaviour
         MoveUnit(target);
     }
 
-    public void Flee(Tile t)
+    public void Flee(Tile t, Squad closest, Vector3 closest_avg)
     {
         Debug.Log("Flee " + t);
+        var u = GetCurrentUnit();
+        if ((closest_avg - u.transform.position).sqrMagnitude < 3 * 3)
+        {
+            Debug.Log("Joining new squad!");
+            LeaveSquad(closest);
+            return;
+        }
         MoveUnit(t);
+    }
+    void LeaveSquad(Squad newSquad)
+    {
+        var u = GetCurrentUnit();
+        UnitDeath(u);
+
+        newSquad.JoinSquad(u);
+
+        // Reduce current and next 
+        --_selectedUnit;
+        SelectNextUnit();
+    }
+    void JoinSquad(Unit u)
+    {
+        _units.Add(u);
     }
 
     public void Idle()

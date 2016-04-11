@@ -165,6 +165,7 @@ public class SquadIdle : SquadBaseState
 
 public class SquadFlee : SquadBaseState
 {
+    Squad _closest;
     Vector3 _targetSquad = Vector3.zero;
 
     public SquadFlee(SquadState ss): base(ss)
@@ -179,7 +180,7 @@ public class SquadFlee : SquadBaseState
     public override void ExecuteAction()
     {
         var tile = TileGenerator.Instance.Tiles[(int)_targetSquad.x, (int)_targetSquad.z];
-        SquadState.Squad.Flee(tile);
+        SquadState.Squad.Flee(tile, _closest, _targetSquad);
     }
 
     public override void Process()
@@ -187,9 +188,9 @@ public class SquadFlee : SquadBaseState
         Debug.Log("Flee");
 
         var squads = GetAISquads().Where(s => s != SquadState.Squad).ToList();
-        Squad closest = squads[0];
-        Vector3 avg = SquadState.Squad.GetAveragePosition();
-        float dist = (closest.GetAveragePosition() - avg).sqrMagnitude;
+        _closest = squads[0];
+        var avg = SquadState.Squad.GetAveragePosition();
+        float dist = (_closest.GetAveragePosition() - avg).sqrMagnitude;
         float distT;
 
         // Search for closest squad (not taking into account objects as of yet
@@ -200,12 +201,17 @@ public class SquadFlee : SquadBaseState
 
             if (distT < dist)
             {
-                closest = s;
+                _closest = s;
                 dist = distT;
             }
         }
 
-        _targetSquad = closest.GetAveragePosition();
+        var dir = _closest.GetAveragePosition() - avg;
+        if (dir.magnitude > SquadState.Squad.GetSmallestMovement())
+            dir = dir.normalized * SquadState.Squad.GetSmallestMovement();
+        _targetSquad = dir.normalized + avg;
+        
+        //_targetSquad = _closest.GetAveragePosition();
     }
 }
 
@@ -360,7 +366,10 @@ public class SquadWander : SquadBaseState
 
                 // Couldn't get a new one, go idle
                 if (redo == 0)
+                {
                     SquadState.ToIdle();
+                    return;
+                }
             }
             else redo = 0;
         } while (redo > 0);

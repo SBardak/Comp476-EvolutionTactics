@@ -4,16 +4,23 @@ using System.Collections;
 public class PokemonStats : MonoBehaviour
 {
     #region Fields
+
     public int Level = 1;
     public int XP_on_Death = 10;
 
     public int MaxHealth { get { return (int)_maxHealth; } }
+
     public int _currentHealth = 100;
+
     public int Attack { get { return (int)_attack; } }
+
     public int Defense { get { return (int)_defense; } }
+
     public int Accuracy = 100;
+
     public int MovementRange { get { return (int)_movementRange; } }
-    public int AttackRange { get { return (int)_attackRange; } }
+
+    public int AttackRange { get { return (int)_attackRange; } set { _attackRange = value; } }
 
     [SerializeField]
     float _maxHealth = 100,
@@ -31,6 +38,7 @@ public class PokemonStats : MonoBehaviour
 
     TileStats.type TileType;
     public TileStats.type MyType = TileStats.type.Fire;
+
     #endregion Fields
 
 
@@ -45,6 +53,7 @@ public class PokemonStats : MonoBehaviour
 
         XP_on_Death = (int)(xp * 0.8);
     }
+
     public void LevelUp()
     {
         UIManager.Instance.CreateNewLevelUpLabel("Level up!", transform.position);
@@ -52,6 +61,7 @@ public class PokemonStats : MonoBehaviour
 
         //transform.GetComponent<Evolve>().EvolveCheck();
     }
+
     private void LevelUpAttributes()
     {
         Level += 1;
@@ -84,7 +94,7 @@ public class PokemonStats : MonoBehaviour
         {
             _currentHealth = value;
             if (GetComponent<HP_Tracker>() != null)
-                GetComponent<HP_Tracker>().SetHp(_currentHealth);
+                GetComponent<HP_Tracker>().SetHP();
             healthCheck();
         }
         get

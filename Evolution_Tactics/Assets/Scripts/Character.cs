@@ -39,7 +39,7 @@ public class Character : MonoBehaviour
     public bool Moved;
     public bool IsActivated;
 
-    public UnitType _unitType = UnitType.TANKER;
+    public UnitType _unitType;
 
     #endregion Fields
 
@@ -65,20 +65,26 @@ public class Character : MonoBehaviour
     void Awake()
     {
         _rb = GetComponent<Rigidbody>();
-    }
-
-    void Update()
-    {
-//        _animator.SetFloat("Walk", _rb.velocity.magnitude);
+        if (tag == "AI")
+        {
+            if (_unitType == UnitType.ATTACKER || _unitType == UnitType.TANKER)
+            {
+                GetComponent<PokemonStats>().AttackRange = 1;
+            }
+            else if (_unitType == UnitType.LONG_RANGE)
+            {
+                GetComponent<PokemonStats>().AttackRange = 2;
+            }  
+        }
     }
 
     #region Locomotion
 
     public void Attack(Character enemyToAttack)
     {
-        AttackAction(enemyToAttack);
+        bool killedEnemy = AttackAction(enemyToAttack);
 
-        if (enemyToAttack != null)
+        if (!killedEnemy && enemyToAttack != null)
         {
             StartCoroutine(enemyToAttack.CounterAttack(this));
         }
@@ -93,17 +99,18 @@ public class Character : MonoBehaviour
         }
     }
 
-    private void AttackAction(Character enemyToAttack)
+    private bool AttackAction(Character enemyToAttack)
     {
         RotateDirectly(enemyToAttack.transform.position);
         AttackAlgorithm a = GetComponent<AttackAlgorithm>();
         //a.GetDamage(enemyToAttack);
-        a.DoDamage(enemyToAttack);
+        return a.DoDamage(enemyToAttack);
     }
 
     public bool CanAttack(Character target)
     {
-        if (target == null) return false;
+        if (target == null || target.gameObject == null)
+            return false;
 
         float distance = Vector3.Distance(target.transform.position, transform.position);
 
