@@ -9,6 +9,7 @@ public class HumanPlayer : Player
 
     public Character SelectedCharacter;
     private Tile _selectedTile;
+    private Tile _hoveredTile = null;
     [SerializeField]
     private Character[] _characters;
     private List<Character> _charactersList;
@@ -30,6 +31,18 @@ public class HumanPlayer : Player
         get
         {
             return _isPlaying;
+        }
+    }
+    public int AverageLevel
+    {
+        get
+        {
+            if (_charactersList.Count == 0) return 1;
+
+            int avg = 0;
+            foreach (var c in _charactersList)
+                avg += c.GetComponent<PokemonStats>().Level;
+            return Mathf.Max(avg / _charactersList.Count, 1);
         }
     }
 
@@ -56,6 +69,8 @@ public class HumanPlayer : Player
             c.OnDeath += Character_OnDeath;
             c.ControllingPlayer = this;
         }
+
+        PositionCharacter(_charactersList);
     }
 
     private void Character_OnDeath(Character c)
@@ -65,8 +80,6 @@ public class HumanPlayer : Player
 
     void Start()
     {
-        PositionCharacter(_charactersList);
-
         _finishedStart = true;
         if (_awaitingTurn)
             StartTurn();
@@ -428,6 +441,11 @@ public class HumanPlayer : Player
         if (isInMovement || _showingAttack || !t.HasPlayer)
             return;
 
+        // 'Cache' hovered tile
+        if (_hoveredTile == t)
+            return;
+        _hoveredTile = t;
+
         if (SelectedCharacter != null)
             ClearCharacterRange(_selectedTile);
         ShowCharacterRange(t);
@@ -437,6 +455,8 @@ public class HumanPlayer : Player
     {
         if (isInMovement || _showingAttack || !t.HasPlayer)
             return;
+
+        _hoveredTile = null;
 
         ClearCharacterRange(t);
         if (SelectedCharacter != null)
@@ -456,6 +476,9 @@ public class HumanPlayer : Player
         SelectedCharacter._currentTile.Deselect();
         Debug.Log("Clear selection");
         SelectedCharacter = null;
+
+        if (_hoveredTile != null)
+            HandleHoverOut(_hoveredTile);
     }
 
     #endregion

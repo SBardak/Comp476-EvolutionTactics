@@ -54,7 +54,7 @@ public class Pathfinding : MonoBehaviour
             // if end node attained
             if (!_goalAttained)
             {
-                if (/*counter <= movementRange ||*/ pathList.Count > counter && _endNode == pathList[pathList.Count - 1])
+                if ((pathList.Count > counter && _endNode == pathList[pathList.Count - 1]))
                 {
                     bool tileCollision = false;
 
@@ -65,13 +65,13 @@ public class Pathfinding : MonoBehaviour
                     for (int i = 0; i < collisionArray.Length; i++)
                     {          
                         // Check if arrived
-                        if (/*(counter > movementRange && !pathList[counter].HasPlayer) ||*/ collisionArray[i].GetComponent(typeof(Tile)) == _endNode)
+                        if (collisionArray[i].GetComponent(typeof(Tile)) == _endNode)
                         {
                             GoalAttained = true;
-                            _endNode = pathList[counter];
                             if (_endNode._hCollectible != null)
                             {
-                                stats.GiveHealth(_endNode._hCollectible.healthGiven);
+                                HealingCollectible hc = _endNode._hCollectible;
+                                stats.GiveHealth(hc.healthGiven);
                                 TileGenerator.Instance.SetNewCollectibleTile();
                             }
                         }
@@ -89,13 +89,13 @@ public class Pathfinding : MonoBehaviour
                 }
                 else
                 {
-                    CalculateNewPath();
+                    // CalculateNewPath();
                 }
             }
             // if not in the middle of the end node
             else if (!_middleOfTheNodeAttained)
             {
-                if (GoToMiddleOfTile())
+                if (GoToMiddleOfTile(counter))
                 {
                     _middleOfTheNodeAttained = true;
                     _hasPath = false;
@@ -110,9 +110,9 @@ public class Pathfinding : MonoBehaviour
         }
     }
 
-    private bool GoToMiddleOfTile()
+    private bool GoToMiddleOfTile(int counter)
     {
-        return player.MoveTo(_endNode.transform.position, pathList[pathList.Count - 2].transform.position);
+        return player.MoveTo(_endNode.transform.position, pathList[counter - 2].transform.position);
     }
 
     public void SetPath(Tile end)
@@ -126,6 +126,31 @@ public class Pathfinding : MonoBehaviour
         }
 
         CalculateNewPath();
+        if (pathList.Count > movementRange + 1)
+            GetPathInRange();
+    }
+
+    private void GetPathInRange()
+    {
+        List<Tile> newPath = new List<Tile>();
+        for (int i = 0; i < movementRange; i++)
+        {
+            newPath.Add(pathList[i]);
+        }
+
+        for (int i = movementRange - 1; i >= 0; i--)
+        {
+            if (newPath[i]._character != null)
+            {
+                newPath.RemoveAt(i);
+            }
+            else
+            {
+                break;
+            }
+        }
+        pathList = new List<Tile>(newPath);
+        _endNode = pathList[newPath.Count - 1];
     }
 
     // Calculate a new path with dijkstra algorithm

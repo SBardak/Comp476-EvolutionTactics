@@ -80,7 +80,8 @@ public class HP_Tracker : MonoBehaviour
 
     private void SetHP()
     {
-        _instantiated.GetComponent<HP_Tracker_UI>().SetHP(_currentHp, _maxHp);
+        if (_instantiated != null)
+            _instantiated.GetComponent<HP_Tracker_UI>().SetHP(_currentHp, _maxHp);
     }
     public void SetHp(int currentHp)
     {

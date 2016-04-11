@@ -13,6 +13,8 @@ public class UIManager : MonoBehaviour
     private bool _activateUI = false;
     private GameObject[] _humanUI;
 
+    public GameObject _actionPanel;
+    public GameObject _statsPanel;
     public Button _attackButton;
     public Button _waitButton;
     public Button _attackWhereButton;
@@ -20,12 +22,23 @@ public class UIManager : MonoBehaviour
 
     private static List<Button> buttonList;
 
+    private AudioSource[] buttonSounds;
+
     void Start()
     {
         UIManager.Instance = this;
 
         _human = GameObject.Find("Human").GetComponent<HumanPlayer>();
         _humanUI = GameObject.FindGameObjectsWithTag("HumanUI");
+
+        buttonSounds = GetComponents<AudioSource>();
+
+        Transform canvas = GameObject.Find("Canvas").transform;
+        _panel2 = Instantiate(_actionPanel, Vector3.zero, Quaternion.identity) as GameObject;
+        _panel2.GetComponentInChildren<Text>().text = "";
+        _panel2.transform.SetParent(canvas);
+        _panel2.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, 0, 0);
+        initialAlpha = _panel2.GetComponent<Image>().color.a;
     }
 
     public void OnClickEndHumanTurn()
@@ -36,6 +49,7 @@ public class UIManager : MonoBehaviour
 
     public void OnClickEndSelectedCharacterTurn()
     {
+        buttonSounds[0].Play();
         Debug.Log("Wait Button clicked");
 
         EndCurrentPokemonAction();
@@ -46,6 +60,8 @@ public class UIManager : MonoBehaviour
 
     public void OnClickAttack()
     {
+        buttonSounds[1].Play();
+        
         Debug.Log("Attack button clicked");
         buttonList[0].enabled = false;
         buttonList[0].GetComponent<Image>().color = new Color(0.5f, 0.5f, 0.5f);
@@ -56,6 +72,7 @@ public class UIManager : MonoBehaviour
         _human.ShowAttackRange();
         Debug.LogWarning("Select an enemy to attack");
     }
+
     public void CancelAttack()
     {
         buttonList[0].enabled = true;
@@ -105,6 +122,7 @@ public class UIManager : MonoBehaviour
 
     public void Attack()
     {
+        //buttonSounds[1].Play();
         _human.SelectedCharacter.Attack(selectedEnemy);
         EndCurrentPokemonAction();
     }
@@ -115,14 +133,44 @@ public class UIManager : MonoBehaviour
         DeleteHumanPlayerActionUI();
     }
 
-    public IEnumerator CreateNewDamageLabel(int d)
+    public void CreateNewDamageLabel(int d, Vector3 target)
+    {
+        var go = CreateFloatingLabel(d.ToString() + "!", target, new Vector2(10, -20));
+
+        StartCoroutine(ShowFloatingLabel(go));
+    }
+
+    public void CreateNewLevelUpLabel(string message, Vector3 target)
+    {
+        var go = CreateFloatingLabel(message, target, new Vector2(20, -20));
+        go.GetComponent<Text>().color = Color.green;
+        StartCoroutine(ShowFloatingLabel(go));
+    }
+
+    private GameObject CreateFloatingLabel(string message, Vector3 target, Vector2 offsets)
     {
         GameObject text = Instantiate(damageText, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;
-        text.GetComponent<Text>().text = d.ToString() + "!";
+        text.GetComponent<Text>().text = message;
         text.transform.SetParent(GameObject.Find("Canvas").transform);
-        text.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(20, 0, 0);
-        yield return new WaitForSeconds(2.0f);
-        Destroy(text.gameObject);
+        //text.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(20, 0, 0);
+
+        var screenPos = Camera.main.WorldToScreenPoint(target);
+        screenPos.x -= offsets.x;
+        screenPos.y -= offsets.y;
+        text.GetComponent<RectTransform>().position = screenPos;
+
+        return text;
+    }
+
+    public IEnumerator ShowFloatingLabel(GameObject obj)
+    {
+        // Set live time
+        var fct = obj.GetComponent<FloatingCombatText>();
+        float liveTime = 2.0f;
+        if (fct != null)
+            liveTime = fct.float_time;
+        yield return new WaitForSeconds(liveTime);
+        Destroy(obj.gameObject);
     }
 
     public void ActivateUI()
@@ -132,14 +180,17 @@ public class UIManager : MonoBehaviour
         else
             HideUI();
     }
+
     public void ShowUI()
     {
         ChangeUI(true);
     }
+
     public void HideUI()
     {
         ChangeUI(false);
     }
+
     void ChangeUI(bool enabled)
     {
         foreach (GameObject o in _humanUI)
@@ -190,5 +241,123 @@ public class UIManager : MonoBehaviour
             }
         }
         buttonList = null;
+    }
+
+    private GameObject _currentStats = null;
+    private GameObject _panel = null;
+
+    public void ShowStats(Character c)
+    {
+        if (_currentStats != c.gameObject)
+        {
+            RemoveStats();
+            _currentStats = c.gameObject;
+            Transform canvas = GameObject.Find("Canvas").transform;
+            PokemonStats stats = c.GetComponent<PokemonStats>();
+            var n = c.name.Split("("[0]);
+
+            string statsString =
+                n[0] +
+                "\nType: " + stats.MyType +
+                "\n Level: " + stats.Level +
+                "\n Health: " + stats._currentHealth + "/" + stats.MaxHealth +
+                "\n Attack: " + stats.Attack +
+                "\n Defense: " + stats.Defense;
+
+            InstantiatePanel(statsString, canvas);
+        }
+    }
+
+    public void ShowCollectible(HealingCollectible c)
+    {
+        if (_currentStats != c.gameObject)
+        {
+            RemoveStats();
+            _currentStats = c.gameObject;
+            Transform canvas = GameObject.Find("Canvas").transform;
+
+            string statsString = 
+                "Potion" +
+                "\nGive " + c.healthGiven + " health.";
+
+            InstantiatePanel(statsString, canvas);
+        }
+    }
+
+    public void ShowObstacle(TileObstacle t)
+    {
+        if (_currentStats != t.gameObject)
+        {
+            RemoveStats();
+            _currentStats = t.gameObject;
+            Transform canvas = GameObject.Find("Canvas").transform;
+            var n = t.name.Split("("[0]);
+
+            string statsString = 
+                n[0];
+
+            InstantiatePanel(statsString, canvas);
+        }
+    }
+
+    private void InstantiatePanel(string message, Transform canvas)
+    {
+        _panel = Instantiate(_statsPanel, Vector3.zero, Quaternion.identity) as GameObject;
+        _panel.GetComponentInChildren<Text>().text = message;
+        _panel.transform.SetParent(canvas);
+        _panel.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, 0, 0);
+    }
+
+    public void RemoveStats()
+    {
+        _currentStats = null;
+        Destroy(_panel);
+    }
+
+    private List<string> actionList = new List<string>();
+    private GameObject _panel2 = null;
+    float initialAlpha;
+
+    public void AddAction(string action)
+    {
+        StopCoroutine(PanelDissapear());
+        _panel2.GetComponent<Image>().color = new Color(0, 0, 0, initialAlpha);
+        _panel2.GetComponentInChildren<Text>().color = new Color(1, 1, 1, 1);
+        actionList.Add(action);
+
+        if (actionList.Count > 7)
+        {
+            _panel2.GetComponentInChildren<Text>().text = "";
+            for (int i = 0; i < actionList.Count; i++)
+            {
+                if (i < actionList.Count - 1)
+                {
+                    actionList[i] = actionList[i + 1];
+                    _panel2.GetComponentInChildren<Text>().text += "- " + actionList[i] + "\n";
+                }
+                else
+                    actionList.RemoveAt(i);
+            }
+        }
+        else
+        {
+            _panel2.GetComponentInChildren<Text>().text += "- " + action + "\n";
+        }
+        StartCoroutine(PanelDissapear());
+    }
+
+    private IEnumerator PanelDissapear()
+    {
+        Image panel = _panel2.GetComponent<Image>();
+        Text text = _panel2.GetComponentInChildren<Text>();
+
+        while (text.color.a > 0)
+        {
+            panel.color = new Color(panel.color.r, panel.color.g, panel.color.b, panel.color.a - (0.01f * Time.deltaTime));
+            text.color = new Color(text.color.r, text.color.g, text.color.b, text.color.a - (0.05f * Time.deltaTime));
+
+            yield return new WaitForSeconds(0.005f);
+        }
+        actionList.Clear();
     }
 }

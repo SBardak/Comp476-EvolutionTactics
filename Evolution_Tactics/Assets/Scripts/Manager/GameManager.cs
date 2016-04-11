@@ -2,12 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
-public class GameManager : MonoBehaviour
+public class GameManager : Singleton<GameManager>
 {
+    #region Fields
+
     public int CurrentTurn = 1;
     public int CurrentPlayer = 0;
-    public static GameManager Instance;
 
     public HumanPlayer[] _players;
     public AIPlayer[] _AI;
@@ -19,15 +21,41 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     AvailableCharactersList[] AvailableCharacters;
 
+    public bool isPlaying = false;
+
+    #endregion Fields
+
+    #region Methonds
+
+    protected GameManager()
+    {
+    }
+
+    #region Unity
+
     void Awake()
     {
-        GameManager.Instance = this;
+        DontDestroyOnLoad(gameObject);
+        //GameManager.Instance = this;
     }
 
     void Start()
     {
-        GeneratePlayers();
+
     }
+
+    void OnLevelWasLoaded(int level)
+    {
+        if (level != 0)
+        {
+            if (GameManager.Instance.isPlaying)
+                GeneratePlayers();
+        }
+    }
+
+    #endregion Unity
+
+    #region Turn logic
 
     /// <summary>
     /// Switches active player and start its turn
@@ -39,7 +67,7 @@ public class GameManager : MonoBehaviour
         StartTurn();
         UIManager.Instance.ActivateUI();
     }
-    
+
     /// <summary>
     /// Switch to the next player's turn. If a whole rotation has occured, turn count + 1
     /// </summary>
@@ -64,8 +92,14 @@ public class GameManager : MonoBehaviour
 
     public Player GetActivePlayer()
     {
+        if (CurrentPlayer >= _allPlayers.Count)
+            return null;
         return _allPlayers[CurrentPlayer];
     }
+
+    #endregion Turn logic
+
+    #region Player generation
 
     /// <summary>
     /// Generates the players and their teams
@@ -140,6 +174,8 @@ public class GameManager : MonoBehaviour
             instance.transform.parent = p.transform;
             instance.tag = "Human";
 
+            instance.AddComponent<Experience>();
+
             characters.Add(instance.GetComponent<Character>());
         }
 
@@ -152,6 +188,16 @@ public class GameManager : MonoBehaviour
     /// <param name="ai"></param>
     void GenerateAI(AIPlayer ai)
     {
+        int mapLevel = 0;
+        if (_players.Length == 0)
+            mapLevel = 1;
+        else
+        {
+            foreach (var p in _players)
+                mapLevel += p.AverageLevel;
+            mapLevel = Mathf.Max(mapLevel / _players.Length, 1);
+        }
+
         List<Squad> squads = new List<Squad>();
         System.Array values = System.Enum.GetValues(typeof(TileStats.type));
         TileStats.type type;
@@ -185,7 +231,10 @@ public class GameManager : MonoBehaviour
                 if (j == ai.MaxUnitCountPerSquad - 1 && Random.Range(0, 1f) < 0.5f)
                     selected = 1;
                 var instance = (GameObject)Instantiate(chars[selected], Vector3.zero, Quaternion.identity);
-                instance.transform.parent = squad.transform;
+                instance.transform.parent = squad.transform;        
+                instance.tag = "AI";
+
+                instance.GetComponent<PokemonStats>().SetLevel(mapLevel + selected);
             }
 
             squads[i].PrepareSquad();
@@ -197,4 +246,8 @@ public class GameManager : MonoBehaviour
         squadContainer.transform.parent = ai.transform;
         TileGenerator.Instance.SetNewCollectibleTile();
     }
+
+    #endregion Player generation
+
+    #endregion Methonds
 }

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
@@ -48,7 +49,9 @@ public class MainMenu : MonoBehaviour
 
     public void DefaultMap()
     {
-        
+        GameManager.Instance.isPlaying = true;
+        SceneManager.LoadScene(1);
+        //Application.LoadLevel(1);
     }
 
     public void Back()

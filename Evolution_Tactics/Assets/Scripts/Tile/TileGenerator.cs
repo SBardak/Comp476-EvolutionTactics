@@ -131,8 +131,15 @@ public class TileGenerator : MonoBehaviour
                 if (c == "")
                     continue;
 
+                var pieces = c.Split(':');
+                var tileChar = pieces[0];
+                bool tileObj = pieces.Length > 1;                    
+
                 var tile = Instantiate(tilePrefab, new Vector3(col, yPos, row), Quaternion.identity) as Tile;
-                SetTileType(c, tile.gameObject);
+                SetTileType(tileChar, tile.gameObject);
+                if (tileObj)
+                    SetTileObstacle(tile);
+
                 tiles[col, row] = tile;
                 tiles[col, row].transform.parent = map.transform;
                 tiles[col, row].name = "TILE " + count;
@@ -240,7 +247,7 @@ public class TileGenerator : MonoBehaviour
 
                 var tile = Instantiate(tilePrefab, new Vector3(i, yPos, j), Quaternion.identity) as Tile;
                 SetTileType(GetTileType(table, tileIndex), tile.gameObject);
-                SetTileObstacle(tile);
+                SetRandomTileObstacle(tile);
 
                 tiles[i, j] = tile;
                 tiles[i, j].transform.parent = map.transform;
@@ -249,11 +256,16 @@ public class TileGenerator : MonoBehaviour
         }
     }
 
-    void SetTileObstacle(Tile t)
+    void SetRandomTileObstacle(Tile t)
     {
         if (Random.Range(0, 100) < 90)
             return;
 
+        SetTileObstacle(t);
+    }
+
+    void SetTileObstacle(Tile t)
+    {
         var type = t.GetComponent<TileStats>().MyType;
         var obs = _obstacles.GetObstacles(type);
 
@@ -366,6 +378,7 @@ public class TileGenerator : MonoBehaviour
         }
         
         int height = Random.Range(0, mapHeight - 1), width = Random.Range(0, mapWidth - 1);
+        Debug.LogWarning(mapHeight + " " + height + " " + mapWidth + " " + width);
         Tile t = Tiles[height, width];
         while (t.IsOccupied)
         {

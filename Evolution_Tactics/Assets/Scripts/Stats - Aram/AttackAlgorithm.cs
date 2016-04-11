@@ -1,6 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public enum Effectiveness
+{
+    NOTEFFECTIVE,
+    NORMAL,
+    SUPEREFFECTIVE
+}
+
 public class AttackAlgorithm : MonoBehaviour
 {
     int MaxHealth;
@@ -17,6 +24,14 @@ public class AttackAlgorithm : MonoBehaviour
 
     TileStats.type myType;
     int damage;
+
+    private Effectiveness effect;
+    private SoundManager sm;
+
+    void Awake()
+    {
+        sm = GameObject.Find("SoundManager").GetComponent<SoundManager>();
+    }
 
     void getStats(Character target)
     {
@@ -109,6 +124,19 @@ public class AttackAlgorithm : MonoBehaviour
             }
         }
 
+        if (modifier == 1.5)
+        {
+            effect = Effectiveness.SUPEREFFECTIVE;
+        }
+        else if (modifier == 1.0)
+        {
+            effect = Effectiveness.NORMAL;
+        }
+        else if (modifier == 0.5)
+        {
+            effect = Effectiveness.NOTEFFECTIVE;
+        }
+
         return modifier;
     }
 
@@ -133,15 +161,18 @@ public class AttackAlgorithm : MonoBehaviour
             float distance = Vector3.Distance(target.transform.position, transform.position);
             bool isInRangeToCounter = distance <= target.GetComponent<PokemonStats>().AttackRange;
 
-            Debug.LogWarning("It would do " + damage + " damage to " + target.name);
+            var n = target.name.Split("("[0]);
+
+            UIManager.Instance.AddAction("It would do " + damage + " damage to " + n[0] + ".");
             if (isInRangeToCounter)
             {
                 int receivedDamage = target.GetComponent<AttackAlgorithm>().GetDamage(this.GetComponent<Character>(), false);
-                Debug.LogWarning("And you would receive " + receivedDamage + " damage.");
+
+                UIManager.Instance.AddAction("And you would receive " + receivedDamage + " damage.");
             }
             else
             {
-                Debug.LogWarning(" And you would receive no damage.");
+                UIManager.Instance.AddAction(" And you would receive no damage.");
             }
         }
         return damage;
@@ -168,20 +199,29 @@ public class AttackAlgorithm : MonoBehaviour
 
     public void DoDamage(Character target)
     {
-
+        var pokeStats = target.GetComponent<PokemonStats>();
         float rand = Random.Range(0, 100);
         //if (rand <= Accuracy)
         //{
-        Debug.LogWarning(gameObject.name + " attacks " + target.name + " and do " + damage + " damages.");
-        target.GetComponent<PokemonStats>().CurrentHealth -= damage;
+        var n = target.name.Split("("[0]);
+        var nn = name.Split("("[0]);
+        UIManager.Instance.AddAction(nn[0] + " attacks " + n[0] + " and do " + damage + " damage.");
+        pokeStats.CurrentHealth = pokeStats.CurrentHealth - damage;
 
-        StartCoroutine(UIManager.Instance.CreateNewDamageLabel(damage));
+        UIManager.Instance.CreateNewDamageLabel(damage, target.transform.position);
         StartCoroutine(AttackAnimation());
 
-        if (target.GetComponent<PokemonStats>().CurrentHealth <= 0)
+
+        var exp = transform.GetComponent<Experience>();
+        if (exp != null)
         {
-            // transform.GetComponent<Experience>().gainXP(target.GetComponent<PokemonStats>().XP_on_Death);
+            int xpGain = pokeStats.XP_on_Death;
+            if (pokeStats.CurrentHealth > 0)
+                xpGain = (int)(xpGain * 0.2f);
+        
+            exp.gainXP(xpGain);
         }
+
         /* }
         else
         {
@@ -192,7 +232,24 @@ public class AttackAlgorithm : MonoBehaviour
     private IEnumerator AttackAnimation()
     {
         transform.position += (transform.forward * 0.5f);
+        PlayAttackSound();
         yield return new WaitForSeconds(0.1f);
         transform.position -= (transform.forward * 0.5f);
+    }
+
+    private void PlayAttackSound()
+    {
+        if (effect == Effectiveness.NOTEFFECTIVE)
+        {
+            AudioSource.PlayClipAtPoint(sm.notEffective, Vector3.zero);
+        }
+        else if (effect == Effectiveness.NORMAL)
+        {
+            AudioSource.PlayClipAtPoint(sm.normal, Vector3.zero);
+        }
+        else if (effect == Effectiveness.SUPEREFFECTIVE)
+        {
+            AudioSource.PlayClipAtPoint(sm.superEffective, Vector3.zero);
+        }
     }
 }
