@@ -23,7 +23,9 @@ public class GameManager : Singleton<GameManager>
     public List<string> _selectedCharacters;
 
     public bool isPlaying = false;
-    bool isDuplicate = false;
+    bool _isDuplicate = false;
+    [SerializeField]
+    bool _generatePlayer = true;
 
     #endregion Fields
 
@@ -39,7 +41,7 @@ public class GameManager : Singleton<GameManager>
     {
         if (Instance != null && Instance != this)
         {
-            isDuplicate = true;
+            _isDuplicate = true;
             DestroyImmediate(this.gameObject);
             return;
         }
@@ -59,7 +61,7 @@ public class GameManager : Singleton<GameManager>
 
     public void OnDestroy()
     {
-        if (!isDuplicate)
+        if (!_isDuplicate)
             base.OnDestroy();
     }
 
@@ -129,6 +131,7 @@ public class GameManager : Singleton<GameManager>
             UIManager.Instance.GameEndOptions.UpdateLabel("New map in...\n" + i);
             yield return new WaitForSeconds(1);
         }
+        _generatePlayer = false;
         Application.LoadLevel(1);
     }
 
@@ -144,6 +147,7 @@ public class GameManager : Singleton<GameManager>
             for (int i = p.transform.childCount - 1; i >= 0; i--)
                 DestroyImmediate(p.transform.GetChild(i).gameObject);
         GameManager.Instance.isPlaying = false;
+        _generatePlayer = true;
 
         //DestroyImmediate(gameObject);
         Application.LoadLevel(0);
@@ -175,13 +179,21 @@ public class GameManager : Singleton<GameManager>
         foreach (var p in _AI)
             _allPlayers.Add(p);
 
+        
         foreach (var p in _players)
         {
-            // Remove everything
-            for (int i = p.transform.childCount - 1; i >= 0; i--)
-                DestroyImmediate(p.transform.GetChild(i).gameObject);
+            if (_generatePlayer)
+            {
+                // Remove everything
+                for (int i = p.transform.childCount - 1; i >= 0; i--)
+                    DestroyImmediate(p.transform.GetChild(i).gameObject);
 
-            GeneratePlayerSquad(p);
+                GeneratePlayerSquad(p);
+            }
+            else
+            {
+                p.PrepareCharacters();
+            }
         }
 
         if (_generateAISquad)

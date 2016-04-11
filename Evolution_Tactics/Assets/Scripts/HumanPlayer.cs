@@ -65,6 +65,10 @@ public class HumanPlayer : Player
     public void PrepareCharacters(List<Character> chars)
     {
         _charactersList = chars;
+        PrepareCharacters();
+    }
+    public void PrepareCharacters()
+    {
         foreach (var c in _charactersList)
         {
             c.GetComponent<Pathfinding>().OnReachEnd += HumanPlayer_OnReachEnd;

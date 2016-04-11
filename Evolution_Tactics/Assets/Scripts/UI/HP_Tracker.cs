@@ -30,7 +30,15 @@ public class HP_Tracker : MonoBehaviour
             Destroy(this);
             return;
         }
-       target = gameObject;
+        Reset();
+    }
+    public void Reset()
+    {
+        target = gameObject;
+
+        if (_instantiated != null)
+            DestroyImmediate(_instantiated);
+
         _instantiated = Instantiate(HP_PREFAB);
         _instantiated.transform.SetParent(GameObject.Find("Canvas").transform.Find("HP_Container").transform, false);
         _rect = _instantiated.GetComponent<RectTransform>();
@@ -44,6 +52,8 @@ public class HP_Tracker : MonoBehaviour
 
     void Update()
     {
+        if (_rect == null) Reset();
+
         var screenPos = Camera.main.WorldToScreenPoint(target.transform.position);
 
         screenPos.x -= xOffset - 9;
