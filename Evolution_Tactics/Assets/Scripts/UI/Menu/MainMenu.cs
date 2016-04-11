@@ -92,12 +92,20 @@ public class MainMenu : MonoBehaviour
     public void RandomMap()
     {
         GameManager.Instance.isPlaying = true;
+
+        if (_selectedCharacters.Count == 6)
+            GameManager.Instance._selectedCharacters = new List<string>(_selectedCharacters);
+        
         Application.LoadLevel(2);
     }
 
     public void DefaultMap()
     {
         GameManager.Instance.isPlaying = true;
+
+        if (_selectedCharacters.Count == 6)
+            GameManager.Instance._selectedCharacters = new List<string>(_selectedCharacters);
+        
         //SceneManager.LoadScene(1);
         Application.LoadLevel(1);
     }

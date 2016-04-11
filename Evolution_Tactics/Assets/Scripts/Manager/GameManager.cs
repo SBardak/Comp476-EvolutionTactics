@@ -20,15 +20,18 @@ public class GameManager : Singleton<GameManager>
     [SerializeField]
     AvailableCharactersList[] AvailableCharacters;
 
-    private List<string> _selectedCharacters;
+    public List<string> _selectedCharacters;
 
     public bool isPlaying = false;
     bool isDuplicate = false;
+
     #endregion Fields
 
     #region Methonds
 
-    protected GameManager() {}
+    protected GameManager()
+    {
+    }
 
     #region Unity
 
@@ -110,12 +113,14 @@ public class GameManager : Singleton<GameManager>
         UIManager.Instance.GameEndOptions.ShowVictory();
         StartCoroutine(Victory());
     }
+
     public void DeadPlayer(HumanPlayer player)
     {
         // Hard coded for single player
         UIManager.Instance.GameEndOptions.ShowDefeat();
         StartCoroutine(Defeat());
     }
+
     IEnumerator Victory()
     {
         // 5 seconds
@@ -126,6 +131,7 @@ public class GameManager : Singleton<GameManager>
         }
         Application.LoadLevel(1);
     }
+
     IEnumerator Defeat()
     {
         for (int i = 5; i > 0; --i)
@@ -142,6 +148,7 @@ public class GameManager : Singleton<GameManager>
         //DestroyImmediate(gameObject);
         Application.LoadLevel(0);
     }
+
     void Reset()
     {
         CurrentTurn = 0;
@@ -217,15 +224,25 @@ public class GameManager : Singleton<GameManager>
         // Add x units
         for (int j = 0; j < 6; j++)
         {
-            do
+            GameObject[] chars = null;
+            if (_selectedCharacters.Count < 6 || _selectedCharacters == null)
             {
-                System.Random random = new System.Random();
-                type = (TileStats.type)values.GetValue(Random.Range(0, values.Length));
-            } while (type == TileStats.type.Obstacle);
+                do
+                {
+                    System.Random random = new System.Random();
+                    type = (TileStats.type)values.GetValue(Random.Range(0, values.Length));
+                } while (type == TileStats.type.Obstacle);
 
-            var chars = AvailableCharacters
+                chars = AvailableCharacters
                 .Where(ac => ac.Type == type)
                 .Select(ac => ac.Characters).First();
+            }
+            else
+            {
+                chars = AvailableCharacters
+                .Where(ac => ac.FirstPokemonName == _selectedCharacters[j])
+                .Select(ac => ac.Characters).First();
+            }
 
             var instance = (GameObject)Instantiate(chars[0], Vector3.zero, Quaternion.identity);
             instance.transform.parent = p.transform;

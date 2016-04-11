@@ -5,7 +5,8 @@ using System;
 [Serializable]
 public class AvailableCharactersList
 {
-    public string Name;
+    public string TypeName;
+    public string FirstPokemonName;
     public TileStats.type Type;
     public GameObject[] Characters;
 }
