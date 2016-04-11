@@ -33,11 +33,13 @@ public class HumanPlayer : Player
             return _isPlaying;
         }
     }
+
     public int AverageLevel
     {
         get
         {
-            if (_charactersList.Count == 0) return 1;
+            if (_charactersList.Count == 0)
+                return 1;
 
             int avg = 0;
             foreach (var c in _charactersList)
@@ -308,7 +310,8 @@ public class HumanPlayer : Player
             {
                 if (selectableTiles != null && CanBeSelected(t) && !IsMine(t._character))
                 {
-                    UIManager.Instance.CreateAcceptButtonAttack(t._character);
+                    if (!UIManager.Instance.created)
+                        UIManager.Instance.CreateAcceptButtonAttack(t._character);
                     return;
                 }
 

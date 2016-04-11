@@ -219,7 +219,7 @@ public class Pathfinding : MonoBehaviour
 
                 if (closedList.Contains(neighbour) && newCost < neighbour.costSoFar)
                 {
-                    if (!neighbour.IsOccupied || (neighbour.HasPlayer && (neighbour._character.tag == gameObject.tag || myType == TileStats.type.Flying)))
+                    if (!neighbour.IsOccupied || ((neighbour.HasPlayer || neighbour.HasObstacle) && (neighbour._character.tag == gameObject.tag || myType == TileStats.type.Flying)))
                     {
                         neighbour.costSoFar = newCost;
                         neighbour.totalEstimatedValue = neighbour.costSoFar + neighbour.heuristicValue;
@@ -241,7 +241,7 @@ public class Pathfinding : MonoBehaviour
                 }
                 else if (!inClosedList && !inOpenList)
                 {
-                    if (!neighbour.IsOccupied || (neighbour.HasPlayer && (neighbour._character.tag == gameObject.tag || myType == TileStats.type.Flying)))
+                    if (!neighbour.IsOccupied || (myType == TileStats.type.Flying && (neighbour.HasPlayer || neighbour.HasObstacle) /*&& (/*neighbour._character.tag == gameObject.tag || myType == TileStats.type.Flying)*/))
                     {
                         neighbour.costSoFar = newCost;
                         neighbour.totalEstimatedValue = neighbour.costSoFar + neighbour.heuristicValue;

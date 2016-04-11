@@ -154,28 +154,6 @@ public class Unit : MonoBehaviour
         }
     }
 
-    public void Move()
-    { 
-        /*if (nextTile != null && nextTile._player == null)
-        {
-            _pathfinding.SetPath(nextTile);
-        }
-        else if (nextTile == Character._currentTile)
-        {
-            ReachedDestination();
-            //Character.GetComponent<Pathfinding>().OnReachEnd();
-        }
-        else
-        {
-        }*/
-
-        // For the moment, only consider going damage made to enemy
-        // TODO: ADD MORE
-
-        // Move the character
-        // _char.Move() (or whatever)
-    }
-
     void ReachedDestination()
     {
         // Attack ?
@@ -185,6 +163,13 @@ public class Unit : MonoBehaviour
         }
         else
         {
+            if (enemyToAttack == null)
+            {
+                if (AttackableInRange())
+                {
+                    Attack();
+                }
+            }
             FinishedMove();
         }
     }
@@ -569,12 +554,12 @@ public class Unit : MonoBehaviour
 
     private bool Attackable(Character target)
     {
-        return LukasIsTheBest(target.transform.position);
+        return target.tag == "Human" && LukasIsTheBest(target.transform.position);
     }
 
     private bool Attackable(Tile t)
     {
-        return LukasIsTheBest(t.transform.position);
+        return t._character != null && t._character.tag == "Human" && LukasIsTheBest(t.transform.position);
     }
 
     private bool LukasIsTheBest(Vector3 position)
@@ -585,6 +570,40 @@ public class Unit : MonoBehaviour
         return /*(x == Stats.AttackRange && y == 0) ||
         (y == Stats.AttackRange && x == 0) ||*/
         z + x == Stats.AttackRange;
+    }
+
+    private bool AttackableInRange()
+    {
+        Dictionary<Tile, int> possibleAttacks = Character._currentTile.GetTiles(0);
+        List<Tile> attackable = new List<Tile>();
+
+        foreach (Tile t in possibleAttacks.Keys)
+        {
+            if (Attackable(t))
+            {
+                attackable.Add(t);
+            }
+        } 
+
+        float highestCost = 0;
+        Tile bestTile = null;
+        enemyToAttack = null;
+
+        foreach (Tile t in attackable)
+        {
+            float cost = AttackCost(t._character, Character._currentTile);
+            if (cost > highestCost)
+            {
+                bestTile = t;
+                enemyToAttack = t._character;
+                highestCost = cost;
+            }
+        }
+
+        if (bestTile != null)
+            return true;
+
+        return false;
     }
 
     #endregion Search for tile helper methods

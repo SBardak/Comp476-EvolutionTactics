@@ -91,33 +91,40 @@ public class UIManager : MonoBehaviour
         _human.ClearAttackRange();
     }
 
+    public bool created = false;
+
     public void CreateAcceptButtonAttack(Character enemy)
     {
-        // Kept for now. Possibly change
-        // What it does : Checks if an accept attack button is already present. If not, add.
-        if (!buttonList.Any(b => b.name == "Accept attack"))
+        if (!created)
         {
-            Transform canvas = GameObject.Find("Canvas").transform;
-            Button actionButton = Instantiate(_attackWhereButton, new Vector3(0, 0, 0), Quaternion.identity) as Button;
-            actionButton.transform.SetParent(canvas);
-            actionButton.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, -25, 0);
-            actionButton.GetComponentInChildren<Text>().text = "Accept attack";
+            created = true;
+            // Kept for now. Possibly change
+            // What it does : Checks if an accept attack button is already present. If not, add.
+            if (!buttonList.Any(b => b.name == "Accept attack"))
+            {
+            
+                Transform canvas = GameObject.Find("Canvas").transform;
+                Button actionButton = Instantiate(_attackWhereButton, new Vector3(0, 0, 0), Quaternion.identity) as Button;
+                actionButton.transform.SetParent(canvas);
+                actionButton.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, -25, 0);
+                actionButton.GetComponentInChildren<Text>().text = "Accept attack";
 
-            actionButton.onClick.AddListener(delegate
-                {
-                    UIManager.Instance.Attack();
-                });
-            buttonList.Add(actionButton);
+                actionButton.onClick.AddListener(delegate
+                    {
+                        UIManager.Instance.Attack();
+                    });
+                buttonList.Add(actionButton);
+            }
+
+            selectedEnemy = enemy;
+
+            Character selected = _human.SelectedCharacter;
+
+            AttackAlgorithm attack = selected.GetComponent<AttackAlgorithm>();
+            damage = attack.GetDamage(enemy);
+
+            Debug.LogWarning("Press middle button to accept");
         }
-
-        selectedEnemy = enemy;
-
-        Character selected = _human.SelectedCharacter;
-
-        AttackAlgorithm attack = selected.GetComponent<AttackAlgorithm>();
-        damage = attack.GetDamage(enemy);
-
-        Debug.LogWarning("Press middle button to accept");
     }
 
     public void Attack()
@@ -233,11 +240,13 @@ public class UIManager : MonoBehaviour
 
     public void DeleteHumanPlayerActionUI()
     {
+        created = false;
         if (buttonList != null)
         {
             foreach (Button b in buttonList)
             {
-                if (b == null || b.gameObject == null) continue;
+                if (b == null || b.gameObject == null)
+                    continue;
                 Destroy(b.gameObject);
             }
         }
@@ -321,12 +330,12 @@ public class UIManager : MonoBehaviour
 
     public void AddAction(string action)
     {
-        StopCoroutine(PanelDissapear());
-        _panel2.GetComponent<Image>().color = new Color(0, 0, 0, initialAlpha);
-        _panel2.GetComponentInChildren<Text>().color = new Color(1, 1, 1, 1);
+        //StopCoroutine(PanelDissapear());
+        //_panel2.GetComponent<Image>().color = new Color(0, 0, 0, initialAlpha);
+        //_panel2.GetComponentInChildren<Text>().color = new Color(1, 1, 1, 1);
         actionList.Add(action);
 
-        if (actionList.Count > 7)
+        if (actionList.Count > 6)
         {
             _panel2.GetComponentInChildren<Text>().text = "";
             for (int i = 0; i < actionList.Count; i++)
@@ -344,22 +353,24 @@ public class UIManager : MonoBehaviour
         {
             _panel2.GetComponentInChildren<Text>().text += "- " + action + "\n";
         }
-        StartCoroutine(PanelDissapear());
+        //StartCoroutine(PanelDissapear());
     }
 
     private IEnumerator PanelDissapear()
     {
         Image panel = _panel2.GetComponent<Image>();
         Text text = _panel2.GetComponentInChildren<Text>();
+        yield return new WaitForSeconds(5.0f);
 
         while (text.color.a > 0)
         {
-            panel.color = new Color(panel.color.r, panel.color.g, panel.color.b, panel.color.a - (0.025f * Time.deltaTime));
-            text.color = new Color(text.color.r, text.color.g, text.color.b, text.color.a - (0.05f * Time.deltaTime));
+            panel.color = new Color(panel.color.r, panel.color.g, panel.color.b, panel.color.a - (0.02f * Time.deltaTime));
+            text.color = new Color(text.color.r, text.color.g, text.color.b, text.color.a - (0.04f * Time.deltaTime));
 
             yield return new WaitForSeconds(0.005f);
         }
         actionList.Clear();
+        text.text = "";
     }
 
 
@@ -384,12 +395,14 @@ public class GameEnd
         Label.color = new Color(0, 1, 0, 0.5f);
         Label.text = "You win!";
     }
+
     public void ShowDefeat()
     {
         Label.gameObject.SetActive(true);
         Label.color = new Color(1, 0, 0, 0.5f);
         Label.text = "You lose...";
     }
+
     public void UpdateLabel(string text)
     {
         dynamicLabel.gameObject.SetActive(true);
