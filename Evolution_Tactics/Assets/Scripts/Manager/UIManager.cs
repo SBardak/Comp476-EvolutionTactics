@@ -100,7 +100,7 @@ public class UIManager : MonoBehaviour
             Transform canvas = GameObject.Find("Canvas").transform;
             Button actionButton = Instantiate(_attackWhereButton, new Vector3(0, 0, 0), Quaternion.identity) as Button;
             actionButton.transform.SetParent(canvas);
-            actionButton.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, 0, 0);
+            actionButton.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, -25, 0);
             actionButton.GetComponentInChildren<Text>().text = "Accept attack";
 
             actionButton.onClick.AddListener(delegate
@@ -203,7 +203,7 @@ public class UIManager : MonoBehaviour
     {
         if (buttonList == null)
         {
-            int yPosition = 0;
+            int yPosition = -25;
             buttonList = new List<Button>();
             Transform canvas = GameObject.Find("Canvas").transform;
 
@@ -211,18 +211,18 @@ public class UIManager : MonoBehaviour
             {
                 Button actionButton = Instantiate(_attackButton, new Vector3(0, 0, 0), Quaternion.identity) as Button;
                 actionButton.transform.SetParent(canvas);
-                actionButton.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, yPosition, 0);
+                actionButton.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(25, yPosition, 0);
                 actionButton.onClick.AddListener(delegate()
                     {
                         UIManager.Instance.OnClickAttack();
                     });
-                yPosition -= 30;
+                yPosition -= 40;
                 buttonList.Add(actionButton);
             }
 
             Button waitButton = Instantiate(_waitButton, new Vector3(0, 0, 0), Quaternion.identity) as Button;
             waitButton.transform.SetParent(canvas);
-            waitButton.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, yPosition, 0);
+            waitButton.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(25, yPosition, 0);
             waitButton.onClick.AddListener(delegate()
                 {
                     UIManager.Instance.OnClickEndSelectedCharacterTurn();

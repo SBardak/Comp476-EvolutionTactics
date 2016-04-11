@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 public class MainMenu : MonoBehaviour
 {
+	public GameObject logo;
     public Button[] _initialButtons;
     public Button[] _newGameButtons;
     public Button[] _pokemonButtons;
@@ -26,6 +27,12 @@ public class MainMenu : MonoBehaviour
 
     private void Init(int option)
     {
+		if (option == 1 || option == 2){
+			logo.gameObject.SetActive(true);
+		}else if (option == 3){
+			logo.gameObject.SetActive(false);
+		}
+
         foreach (Button b in _initialButtons)
         {
             if (option == 1)
