@@ -121,6 +121,11 @@ public class GameManager : Singleton<GameManager>
         StartCoroutine(Defeat());
     }
 
+	public void QuitGame(){
+		Debug.Log ("Quitting to menu");
+		Quit ();
+	}
+
     IEnumerator Victory()
     {
         // 5 seconds
@@ -148,6 +153,15 @@ public class GameManager : Singleton<GameManager>
         //DestroyImmediate(gameObject);
         Application.LoadLevel(0);
     }
+
+	void Quit(){
+		foreach (var p in _allPlayers)
+			for (int i = p.transform.childCount - 1; i >= 0; i--)
+				DestroyImmediate(p.transform.GetChild(i).gameObject);
+		GameManager.Instance.isPlaying = false;
+		
+		Application.LoadLevel(0);
+	}
 
     void Reset()
     {
