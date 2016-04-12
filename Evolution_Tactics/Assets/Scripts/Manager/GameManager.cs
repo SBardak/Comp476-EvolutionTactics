@@ -318,12 +318,12 @@ public class GameManager : Singleton<GameManager>
             squad.transform.parent = squadContainer.transform;
             squad.name = "Squad" + i;
 
-            /* do
+            do
             {
                 System.Random random = new System.Random();
                 type = (TileStats.type)values.GetValue(Random.Range(0, values.Length));
-            } while (type == TileStats.type.Obstacle);*/
-            type = TileStats.type.Grass;
+            } while (type == TileStats.type.Obstacle);
+            //type = TileStats.type.Grass;
 
             var chars = AvailableCharacters
                 .Where(ac => ac.Type == type)
