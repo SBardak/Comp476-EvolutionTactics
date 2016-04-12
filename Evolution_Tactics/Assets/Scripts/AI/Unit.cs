@@ -92,14 +92,17 @@ public class Unit : MonoBehaviour
 
             nextTile = BestRangedAttack(possibleTiles);
 
-            if (enemyToAttack == null && AttackableInRange(c, possibleTiles))
+            if (c != null)
             {
-                nextTile = BestRangedAttack(c, possibleTiles);
-                Debug.LogWarning(name + " attacks target " + c.name + " by going to " + nextTile);
-            }
-            else
-            {
-                Debug.LogWarning(name + " attacks " + c.name + " by going to " + nextTile);
+                if (enemyToAttack == null && AttackableInRange(c, possibleTiles))
+                {
+                    nextTile = BestRangedAttack(c, possibleTiles);
+                    Debug.LogWarning(name + " attacks target " + c.name + " by going to " + nextTile);
+                }
+                else
+                {
+                    Debug.LogWarning(name + " attacks " + c.name + " by going to " + nextTile);
+                }
             }
         }
         else if (Character._unitType == UnitType.ATTACKER)
@@ -108,38 +111,48 @@ public class Unit : MonoBehaviour
 
             nextTile = FindBestTile(possibleTiles);
 
-            if (enemyToAttack == null && AttackableInRange(c, possibleTiles))
+            if (c != null)
             {
-                nextTile = FindBestTile(possibleTiles, c);
-                Debug.LogWarning(name + " attacks target " + c.name + " by going to " + nextTile);
-            }
-            else
-            {
-                Debug.LogWarning(name + " attacks " + c.name + " by going to " + nextTile);
+                if (enemyToAttack == null && AttackableInRange(c, possibleTiles))
+                {
+                    nextTile = FindBestTile(possibleTiles, c);
+                    Debug.LogWarning(name + " attacks target " + c.name + " by going to " + nextTile);
+                }
+                else
+                {
+                    Debug.LogWarning(name + " attacks " + c.name + " by going to " + nextTile);
+                }
             }
         }
         else if (Character._unitType == UnitType.TANKER)
         {
             Debug.LogWarning("Tanker");
 
-            nextTile = FindBestTile(possibleTiles, c);
-
-            if (!AttackableInRange(c, possibleTiles) || enemyToAttack == null)
+            if (c != null)
             {
-                nextTile = FindBestTile(possibleTiles);
-                Debug.LogWarning(name + " attacks target " + c.name + " by going to " + nextTile);
+                nextTile = FindBestTile(possibleTiles, c);
+
+                if (!AttackableInRange(c, possibleTiles) || enemyToAttack == null)
+                {
+                    nextTile = FindBestTile(possibleTiles);
+                    Debug.LogWarning(name + " attacks target " + c.name + " by going to " + nextTile);
+                }
+                else
+                {
+                    Debug.LogWarning(name + " attacks " + c.name + " by going to " + nextTile);
+                }
             }
             else
             {
-                Debug.LogWarning(name + " attacks " + c.name + " by going to " + nextTile);
+                nextTile = FindBestTile(possibleTiles);
             }
         }
 
         if (nextTile == null)
         {
             Debug.LogWarning("Cannot attack anybody");
-            possibleTiles = Character._currentTile.GetTiles();
-            nextTile = FindNewTileAround(c._currentTile, possibleTiles);
+            if (c != null)
+                nextTile = FindNewTileAround(c._currentTile, possibleTiles);
             Debug.LogWarning("Go to " + nextTile);
         }
 
@@ -250,7 +263,7 @@ public class Unit : MonoBehaviour
             Dictionary<Tile, int> possibleAttack = t.GetTiles(0, 2);
             foreach (Tile tt in possibleAttack.Keys)
             {
-                if (!tt.IsOccupied && possibleTiles.ContainsKey(tt) && possibleTiles[tt] <= Stats.MovementRange && Attackable(t, tt))
+                if ((!tt.IsOccupied || tt == Character._currentTile) && possibleTiles.ContainsKey(tt) && possibleTiles[tt] <= Stats.MovementRange && Attackable(t, tt))
                 {
                     possible.Add(tt);
                     enemy.Add(t._character);
@@ -265,7 +278,7 @@ public class Unit : MonoBehaviour
         {
             Tile best = null;
             //float furthest = Vector3.Distance(best.transform.position, transform.position);
-            float highestReward = 0;
+            float highestReward = -1;
 
             // try to go to best tile
             int i = 0;
@@ -274,7 +287,7 @@ public class Unit : MonoBehaviour
                 //float distance = Vector3.Distance(t.transform.position, transform.position);
                 float reward = AttackReward(enemy[i], t);
                 // the higher the reward, the better
-                if (reward >= highestReward)
+                if (reward > highestReward)
                 {
                     best = t;
                     highestReward = reward;
@@ -305,21 +318,14 @@ public class Unit : MonoBehaviour
         Dictionary<Tile, int> possibleAttack = target._currentTile.GetTiles(0, 2);
         List<Tile> possible = new List<Tile>();
 
-        List<Tile> a = new List<Tile>(possibleAttack.Keys);
-        foreach (Tile t in a)
-        {
-            if (Mathf.Abs(t.transform.position.x - target.transform.position.x) <= 1 || Mathf.Abs(t.transform.position.y - target.transform.position.y) <= 1)
-            {
-                possibleAttack.Remove(t);
-            }
-        }
-
         // for each possible attacking tile from
         foreach (Tile t in possibleAttack.Keys)
         {        
+            Debug.LogError(t);
             // if this tile is empty and it can go this tile and can attack from it
-            if (!t.IsOccupied && possibleTiles.ContainsKey(t) && possibleTiles[t] <= Stats.MovementRange && Attackable(target._currentTile, t))
+            if ((!t.IsOccupied || t == Character._currentTile) && possibleTiles.ContainsKey(t) && possibleTiles[t] <= Stats.MovementRange && Attackable(target._currentTile, t))
             {
+                Debug.LogError("2 " + t);
                 // set the target as being the next attack
                 enemyToAttack = target;
                 possible.Add(t);
@@ -370,15 +376,15 @@ public class Unit : MonoBehaviour
     private Tile FindNewTileAround(Tile t, Dictionary<Tile, int> possibleTiles)
     {
         Tile newTile = null;
-        float closest = float.MaxValue;
+        float closest = 5f;
         Dictionary<Tile, int> aroundT = t.GetTiles(4, 0);
 
         foreach (Tile tt in aroundT.Keys)
         {
-            if (possibleTiles.ContainsKey(tt) && !tt.IsOccupied)
+            if (possibleTiles.ContainsKey(tt) && (!tt.IsOccupied || tt == Character._currentTile))
             {
                 float distance = Vector3.Distance(t.transform.position, tt.transform.position);
-                if (newTile == null || distance < closest)
+                if (distance < closest)
                 {
                     closest = distance;
                     newTile = tt;
@@ -532,7 +538,7 @@ public class Unit : MonoBehaviour
             {
                 for (int i = 0; i < t.neighbours.Count; i++)
                 {
-                    if (possibleTiles.ContainsKey(t.neighbours[i]) && !t.neighbours[i].IsOccupied)
+                    if (possibleTiles.ContainsKey(t.neighbours[i]) && (!t.neighbours[i].IsOccupied || t.neighbours[i] == Character._currentTile))
                     {
                         // when no player on the tile, break
                         if (possibleTiles.ContainsKey(t) && possibleTiles[t] <= movementRange)
@@ -588,15 +594,18 @@ public class Unit : MonoBehaviour
         //calculate hypothetical damage done to target
         int damageDone = attack.GetDamage(target, goToTile);
 
+        int targetHealth = target.GetComponent<PokemonStats>().CurrentHealth;
+        int maxHealth = target.GetComponent<PokemonStats>().MaxHealth;
+
         // if attack would kill the target, return high cost
-        if (target.GetComponent<PokemonStats>().CurrentHealth - damageDone < 0)
+        if (targetHealth - damageDone < 0)
             return 1000f;
 
         // calculate hypothetical damage received from target
         int damageReceived = target.GetComponentInChildren<AttackAlgorithm>().GetDamage(GetComponent<Character>(), target._currentTile);
 
         // calculate reward of an attack. Emphasis on damage done over received
-        float reward = damageDone - (0.5f * damageReceived);
+        float reward = damageDone + (maxHealth - targetHealth) / 5 - (0.5f * damageReceived);
 
         return reward;
     }
@@ -656,10 +665,10 @@ public class Unit : MonoBehaviour
 
     private bool LukasIsTheBest(Vector3 position)
     {
-        int x = (int)Mathf.Abs(position.x - transform.position.x);
-        int z = (int)Mathf.Abs(position.z - transform.position.z);
+        int x = (int)Mathf.Round(Mathf.Abs(position.x - transform.position.x));
+        int z = (int)Mathf.Round(Mathf.Abs(position.z - transform.position.z));
 
-        Debug.LogWarning("In Attackable " + (x + z));
+        Debug.LogWarning("In Attackable " + (x + z) + " " + x + " " + z);
 
         return /*(x == Stats.AttackRange && y == 0) ||
         (y == Stats.AttackRange && x == 0) ||*/
@@ -668,8 +677,8 @@ public class Unit : MonoBehaviour
 
     private bool LukasIsTheBest2(Vector3 position, Vector3 position2)
     {
-        int x = (int)Mathf.Abs(position.x - position2.x);
-        int z = (int)Mathf.Abs(position.z - position2.z);
+        int x = (int)Mathf.Round(Mathf.Abs(position.x - position2.x));
+        int z = (int)Mathf.Round(Mathf.Abs(position.z - position2.z));
 
         return /*(x == Stats.AttackRange && y == 0) ||
         (y == Stats.AttackRange && x == 0) ||*/
@@ -690,7 +699,7 @@ public class Unit : MonoBehaviour
         {
             foreach (Tile t in possibleAttacks.Keys)
             {
-                if (t._character != null && t._character.tag == "Human")
+                if (t._character != null && t._character.tag == "Human" && Attackable(t._character))
                 {
                     attackable.Add(t);
                 }
