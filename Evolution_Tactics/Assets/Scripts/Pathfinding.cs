@@ -138,7 +138,7 @@ public class Pathfinding : MonoBehaviour
 
         for (int i = stats.MovementRange; i >= 0; i--)
         {
-            if (newPath[i]._character != null)
+            if (newPath[i].IsOccupied)
             {
                 newPath.RemoveAt(i);
             }
@@ -148,7 +148,7 @@ public class Pathfinding : MonoBehaviour
             }
         }
         pathList = new List<Tile>(newPath);
-        _endNode = pathList[newPath.Count - 1];
+        _endNode = newPath[newPath.Count - 1];
     }
 
     // Calculate a new path with dijkstra algorithm
