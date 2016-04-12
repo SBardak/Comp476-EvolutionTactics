@@ -6,6 +6,7 @@ using System.Collections.Generic;
 public class MainMenu : MonoBehaviour
 {
     public GameObject logo;
+	public GameObject adv, nodamage, advText, nodamageText;
     public Button[] _initialButtons;
     public Button[] _newGameButtons;
     public Button[] _pokemonButtons;
@@ -19,18 +20,26 @@ public class MainMenu : MonoBehaviour
         Init(1);
     }
 
-    private void Init(int option)
+    private void Init(int option) // Option 1- menu, 2-choose map, 3-choose pokemon
     {
         currentPokemon.gameObject.SetActive(true);
         ShowCurrentPokemon();
 
-        if (option == 1 || option == 2)
+        if (option == 1 || option == 2) 
         {
             logo.gameObject.SetActive(true);
+			adv.gameObject.SetActive(false);
+			nodamage.gameObject.SetActive(false);
+			advText.gameObject.SetActive(false);
+			nodamageText.gameObject.SetActive(false);
         }
         else if (option == 3)
         {
             logo.gameObject.SetActive(false);
+			adv.gameObject.SetActive(true);
+			nodamage.gameObject.SetActive(true);
+			advText.gameObject.SetActive(true);
+			nodamageText.gameObject.SetActive(true);
         }
 
         foreach (Button b in _initialButtons)
