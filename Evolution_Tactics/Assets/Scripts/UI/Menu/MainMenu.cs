@@ -6,8 +6,8 @@ using System.Collections.Generic;
 public class MainMenu : MonoBehaviour
 {
     public GameObject logo;
-	public GameObject credits;
-	public GameObject adv, nodamage, advText, nodamageText;
+    public GameObject credits;
+    public GameObject adv, nodamage, advText, nodamageText;
     public Button[] _initialButtons;
     public Button[] _newGameButtons;
     public Button[] _pokemonButtons;
@@ -26,27 +26,30 @@ public class MainMenu : MonoBehaviour
         currentPokemon.gameObject.SetActive(true);
         ShowCurrentPokemon();
 
-        if (option == 1 || option == 2) 
+        if (option == 1 || option == 2)
         {
-			if (option == 1){
-				credits.gameObject.SetActive(true);
-			}else {
-				credits.gameObject.SetActive(false);
-			}
-			logo.gameObject.SetActive(true);
-			adv.gameObject.SetActive(false);
-			nodamage.gameObject.SetActive(false);
-			advText.gameObject.SetActive(false);
-			nodamageText.gameObject.SetActive(false);
+            if (option == 1)
+            {
+                credits.gameObject.SetActive(true);
+            }
+            else
+            {
+                credits.gameObject.SetActive(false);
+            }
+            logo.gameObject.SetActive(true);
+            adv.gameObject.SetActive(false);
+            nodamage.gameObject.SetActive(false);
+            advText.gameObject.SetActive(false);
+            nodamageText.gameObject.SetActive(false);
         }
         else if (option == 3)
         {
-			credits.gameObject.SetActive(false);
+            credits.gameObject.SetActive(false);
             logo.gameObject.SetActive(false);
-			adv.gameObject.SetActive(true);
-			nodamage.gameObject.SetActive(true);
-			advText.gameObject.SetActive(true);
-			nodamageText.gameObject.SetActive(true);
+            adv.gameObject.SetActive(true);
+            nodamage.gameObject.SetActive(true);
+            advText.gameObject.SetActive(true);
+            nodamageText.gameObject.SetActive(true);
         }
 
         foreach (Button b in _initialButtons)
@@ -188,7 +191,7 @@ public class MainMenu : MonoBehaviour
                 b.interactable = false;
             i++;
         }
-        currentPokemon.GetComponent<Text>().text = "Chosen: ";
+        currentPokemon.GetComponent<Text>().text = "Selected Pokemon: ";
     }
 
     public void Accept()
