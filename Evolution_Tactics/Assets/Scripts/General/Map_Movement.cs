@@ -76,14 +76,14 @@ public class Map_Movement : MonoBehaviour
 
             transform.position = pos;
 
+            if (Input.GetAxis("Mouse ScrollWheel") > 0) // forward
+                ChangeSize(++Camera.main.orthographicSize);
+            if (Input.GetAxis("Mouse ScrollWheel") < 0) // back
+                ChangeSize(--Camera.main.orthographicSize);
             if (input(KeyCode.KeypadPlus) || input("r"))
-            {
-                Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize - Time.deltaTime * _zoomDamp, _bounds.Zoom.x, _bounds.Zoom.y);
-            }
+                ChangeSize(Camera.main.orthographicSize - Time.deltaTime * _zoomDamp);
             else if (input(KeyCode.KeypadMinus) || input("f"))
-            {
-                Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize + Time.deltaTime * _zoomDamp, _bounds.Zoom.x, _bounds.Zoom.y);
-            }
+                ChangeSize(Camera.main.orthographicSize + Time.deltaTime * _zoomDamp);
         }
 
         if (syncPosition != Vector3.zero)
@@ -106,6 +106,11 @@ public class Map_Movement : MonoBehaviour
             if ((transform.position - syncPosition).sqrMagnitude < 0.02f)
                 syncPosition = Vector3.zero;
         }
+    }
+
+    void ChangeSize(float size)
+    {
+        Camera.main.orthographicSize = Mathf.Clamp(size, _bounds.Zoom.x, _bounds.Zoom.y);
     }
 
     public void CenterOn(GameObject o)
