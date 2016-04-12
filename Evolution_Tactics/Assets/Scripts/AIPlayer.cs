@@ -19,7 +19,7 @@ public class AIPlayer : Player
 {
     #region Fields
 
-    public int SquadCount = 5;
+    public int SquadCount = 3;
     public int MaxUnitCountPerSquad = 3;
 
     [SerializeField]
