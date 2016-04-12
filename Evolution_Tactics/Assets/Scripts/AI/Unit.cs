@@ -377,10 +377,11 @@ public class Unit : MonoBehaviour
     {
         Tile newTile = null;
         float closest = 5f;
-        Dictionary<Tile, int> aroundT = t.GetTiles(4, 0);
+        Dictionary<Tile, int> aroundT = t.GetTiles(0, 4);
 
         foreach (Tile tt in aroundT.Keys)
         {
+            Debug.LogError(tt);
             if (possibleTiles.ContainsKey(tt) && (!tt.IsOccupied || tt == Character._currentTile))
             {
                 float distance = Vector3.Distance(t.transform.position, tt.transform.position);
@@ -689,7 +690,6 @@ public class Unit : MonoBehaviour
     {
         Dictionary<Tile, int> possibleAttacks = Character._currentTile.GetTiles(0, Stats.AttackRange);
         List<Tile> attackable = new List<Tile>();
-        Debug.LogError("ATTACKABLE IN RANGE");
 
         float highestCost = -1;
         Tile bestTile = null;
@@ -708,7 +708,6 @@ public class Unit : MonoBehaviour
             foreach (Tile t in attackable)
             {
                 float cost = AttackReward(t._character, Character._currentTile);
-                Debug.LogError(cost);
                 if (cost > highestCost)
                 {
                     bestTile = t;
