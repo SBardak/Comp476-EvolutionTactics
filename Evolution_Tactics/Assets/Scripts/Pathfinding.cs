@@ -148,6 +148,8 @@ public class Pathfinding : MonoBehaviour
             }
         }
         pathList = new List<Tile>(newPath);
+        if (newPath.Count == 0)
+            return;
         _endNode = newPath[newPath.Count - 1];
     }
 

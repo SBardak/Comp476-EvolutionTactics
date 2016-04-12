@@ -125,7 +125,8 @@ public class GameManager : Singleton<GameManager>
 
 	public void QuitGame(){
 		Debug.Log ("Quitting to menu");
-		Quit ();
+        _generatePlayer = true;
+        Quit ();
 	}
 
     IEnumerator Victory()
@@ -137,7 +138,8 @@ public class GameManager : Singleton<GameManager>
             yield return new WaitForSeconds(1);
         }
         _generatePlayer = false;
-        Application.LoadLevel(1);
+
+        Application.LoadLevel(Random.Range(1, 3));
     }
 
     IEnumerator Defeat()

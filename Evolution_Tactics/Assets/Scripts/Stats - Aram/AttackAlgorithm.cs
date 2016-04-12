@@ -116,7 +116,7 @@ public class AttackAlgorithm : MonoBehaviour
         {
             if (Enemy_Type == TileStats.type.Electric)
             {
-                modifier += 0;
+                modifier = 0;
             }
             if (Enemy_Type == TileStats.type.Ground)
             {
@@ -142,20 +142,25 @@ public class AttackAlgorithm : MonoBehaviour
 
     public int GetDamage(Character target, bool initialAttack = true)
     {
+        float typeAdv = 0;
+
         getStats(target);
         Debug.LogWarning(gameObject.name + " " + Time.deltaTime);
 
-        damage = Attack - Enemy_Defense;
-
+        // Prepare attack + all bonuses
+        damage = Attack;
         if (GetComponent<PokemonStats>().AttackBonus() == true)
         {
             damage = (int)((float)damage * 1.2f);
         }
+        damage = (int)((float)damage * (typeAdv = typeAdvantage(target)));
+
+        // Remove defence once complete
+        damage -= Enemy_Defense;
         if (damage <= 0)
         {
-            damage = 0;
+            damage = typeAdv == 0 ? 0 : 1;
         }
-        damage = (int)((float)damage * typeAdvantage(target));
 
         if (initialAttack)
         {
@@ -181,19 +186,23 @@ public class AttackAlgorithm : MonoBehaviour
 
     public int GetDamage(Character target, Tile tile)
     {
+        float typeAdv = 0;
         getStats(target);
 
-        damage = Attack - Enemy_Defense;
-
+        // Prepare attack + all bonuses
+        damage = Attack;
         if (GetComponent<PokemonStats>().AttackBonus(tile) == true)
         {
             damage = (int)((float)damage * 1.2f);
         }
+        damage = (int)((float)damage * (typeAdv = typeAdvantage(target)));
+
+        // Remove defence once complete
+        damage -= Enemy_Defense;
         if (damage <= 0)
         {
-            damage = 0;
+            damage = typeAdv == 0 ? 0 : 1;
         }
-        damage = (int)((float)damage * typeAdvantage(target));
 
         return damage;
     }
@@ -204,8 +213,8 @@ public class AttackAlgorithm : MonoBehaviour
         float rand = Random.Range(0, 100);
         //if (rand <= Accuracy)
         //{
-        var n = target.name.Split("("[0]);
-        var nn = name.Split("("[0]);
+        var n = target.name.Split('(');
+        var nn = name.Split('(');
         UIManager.Instance.AddAction(nn[0] + " attacks " + n[0] + " for " + damage + " damage.");
         pokeStats.CurrentHealth = pokeStats.CurrentHealth - damage;
 
@@ -216,9 +225,14 @@ public class AttackAlgorithm : MonoBehaviour
         var exp = transform.GetComponent<Experience>();
         if (exp != null)
         {
+            // Small attack
+            float livePercent = 0.2f;
+            if (pokeStats.MaxHealth != 0 && damage / (float)pokeStats.MaxHealth < 0.1f)
+                livePercent = 0.05f;
+
             int xpGain = pokeStats.XP_on_Death;
             if (pokeStats.CurrentHealth > 0)
-                xpGain = (int)(xpGain * 0.2f);
+                xpGain = (int)(xpGain * livePercent);
         
             exp.gainXP(xpGain);
         }

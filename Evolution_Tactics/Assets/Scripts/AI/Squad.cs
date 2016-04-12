@@ -290,6 +290,7 @@ public class Squad : MonoBehaviour
 
     public void Idle()
     {
+        //UIManager.Instance.CreateNewIdleLabel("Zzz...", transform.position);
         MoveComplete(GetCurrentUnit());
     }
 

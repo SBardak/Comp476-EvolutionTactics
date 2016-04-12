@@ -157,6 +157,13 @@ public class UIManager : MonoBehaviour
         StartCoroutine(ShowFloatingLabel(go));
     }
 
+    public void CreateNewIdleLabel(string message, Vector3 target)
+    {
+        var go = CreateFloatingLabel(message, target, new Vector2(20, -40));
+        go.GetComponent<Text>().color = Color.white;
+        StartCoroutine(ShowFloatingLabel(go));
+    }
+
     private GameObject CreateFloatingLabel(string message, Vector3 target, Vector2 offsets)
     {
         GameObject text = Instantiate(damageText, new Vector3(0, 0, 0), Quaternion.identity) as GameObject;

@@ -28,8 +28,12 @@ public class Evolve : MonoBehaviour {
         }
         Vector3 TempPosition = transform.position;
         //TempPosition.y += 1;   //If needed, move new model
-        GameObject newModel = (GameObject)Instantiate(NextStage, TempPosition, NextStage.transform.rotation);
+        GameObject newModel = (GameObject)Instantiate(NextStage);//, TempPosition, Quaternion.identity);//NextStage.transform.rotation);
         newModel.transform.SetParent(transform);                    //attach new model
+
+        newModel.transform.localPosition = NextStage.transform.position;
+        newModel.transform.localRotation = NextStage.transform.rotation;
+
         DoIEvolve = false;
 
 

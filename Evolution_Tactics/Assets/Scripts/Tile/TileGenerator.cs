@@ -286,6 +286,8 @@ public class TileGenerator : MonoBehaviour
     /// <returns></returns>
     private List<KeyValuePair<int, TileGeneratorInspector>> GenerateProbabilityRanges()
     {
+        SpecificRandom();
+
         int max = 0;
         int totalSoFar = 0;
         List<KeyValuePair<int, TileGeneratorInspector>> table =
@@ -307,6 +309,25 @@ public class TileGenerator : MonoBehaviour
         }
 
         return table;
+    }
+    private void SpecificRandom()
+    {
+        TileStats.type type;
+        System.Array values = System.Enum.GetValues(typeof(TileStats.type));
+
+        do
+        {
+            System.Random random = new System.Random();
+            type = (TileStats.type)values.GetValue(Random.Range(0, values.Length));
+        } while (type == TileStats.type.Obstacle);
+
+        foreach (var tp in _tilePrefabs)
+        {
+            if (tp.Type == type)
+                tp.occurence = 50;
+            else
+                tp.occurence = 10;
+        }
     }
 
     /// <summary>

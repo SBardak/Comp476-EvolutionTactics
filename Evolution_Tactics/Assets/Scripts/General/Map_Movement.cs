@@ -120,6 +120,10 @@ public class Map_Movement : MonoBehaviour
 
         syncPosition.z -= 10; // If I did my math right (z - tan(45) [which is 1] * 10)
     }
+    public void StopCenter()
+    {
+        syncPosition = Vector3.zero;
+    }
 
     bool input(KeyCode k)
     {

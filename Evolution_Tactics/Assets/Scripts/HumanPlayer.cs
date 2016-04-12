@@ -17,8 +17,8 @@ public class HumanPlayer : Player
     private Picker _pickerScript;
     public List<Tile> selectableTiles = null;
 
-    bool _finishedStart = false, 
-        _awaitingTurn = false, 
+    bool _finishedStart = false,
+        _awaitingTurn = false,
         _showingAttack = false,
         _isPlaying;
 
@@ -103,9 +103,13 @@ public class HumanPlayer : Player
         UIManager.Instance.ShowUI();
 
         isInMovement = false;
+        EnablePicker();
+
+        if (SelectedCharacter == null)
+            return;
+
         SelectedCharacter.Moved = true;
         Debug.Log("Human reach end");
-        EnablePicker();
 
         EndMovement();
     }
@@ -118,6 +122,7 @@ public class HumanPlayer : Player
     {
         isInMovement = false;
 
+        SelectedCharacter.Moved = true;
         SelectedCharacter.Deactivate();
         ClearAttackRange();
         ClearSelection();
@@ -144,10 +149,7 @@ public class HumanPlayer : Player
         foreach (var c in _charactersList)
             c.Activate();
 
-        // Select first character
-        UIManager.Instance.DeleteHumanPlayerActionUI();
-        SelectCharacter(_charactersList[0]);
-        Map_Movement.Instance.CenterOn(_charactersList[0].gameObject);
+        SelectAndCenter(_charactersList[0]);
 
         // anything else ?
         _isPlaying = true;
@@ -155,6 +157,16 @@ public class HumanPlayer : Player
         UIManager.Instance.ShowUI();
 
         base.StartTurn();
+    }
+
+    void SelectAndCenter(Character c)
+    {
+        ClearSelection();
+
+        // Select first character
+        UIManager.Instance.DeleteHumanPlayerActionUI();
+        SelectCharacter(c);
+        Map_Movement.Instance.CenterOn(c.gameObject);
     }
 
     public void EndTurn()
@@ -176,15 +188,41 @@ public class HumanPlayer : Player
     {
         if (IsPlaying)
         {
-            if (Input.GetKeyDown("e"))
-                EndTurn();
-            if (Input.GetMouseButtonDown(1))
-                HandleRightMouse();
+            HandlePlayerInput();
+        }
+    }
 
-            if (Input.GetKeyDown("1"))
-                GameManager.Instance.DeadPlayer(this);
-            if (Input.GetKeyDown("2"))
-                GameManager.Instance.DeadAI(new AIPlayer());
+    void HandlePlayerInput()
+    {
+        if (Input.GetKeyDown("e"))
+            EndTurn();
+        if (Input.GetMouseButtonDown(1))
+            HandleRightMouse();
+
+        if (Input.GetKeyDown("q"))
+            SelectNextCharacter();
+
+        if (Input.GetKeyDown("1"))
+            GameManager.Instance.DeadPlayer(this);
+        if (Input.GetKeyDown("2"))
+            GameManager.Instance.DeadAI(new AIPlayer());
+    }
+    void SelectNextCharacter()
+    {
+        if (!isInMovement)
+        {
+            if (_showingAttack || SelectedCharacter != null &&
+                SelectedCharacter.Moved && SelectedCharacter.IsActivated)
+                return;
+
+            foreach (var c in _charactersList)
+            {
+                if (c.IsActivated)
+                {
+                    SelectAndCenter(c);
+                    return;
+                }
+            }
         }
     }
 
@@ -308,6 +346,8 @@ public class HumanPlayer : Player
         // Selected unit
         else
         {
+            Map_Movement.Instance.StopCenter();
+
             // Selected tile contains something
             // TODO: Add more, check for chars only right now
             if (t.HasPlayer)
