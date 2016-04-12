@@ -20,12 +20,15 @@ public class UIManager : MonoBehaviour
     public Button _attackWhereButton;
     public GameObject damageText;
 
+	private bool paused;
+
     private static List<Button> buttonList;
 
     private AudioSource[] buttonSounds;
 
     void Start()
     {
+		paused = false;
         UIManager.Instance = this;
 
         _human = GameObject.Find("Human").GetComponent<HumanPlayer>();
@@ -182,7 +185,7 @@ public class UIManager : MonoBehaviour
 
     public void ActivateUI()
     {
-        if (_human.IsPlaying)
+        if (_human.IsPlaying && !paused)
             ShowUI();
         else
             HideUI();
@@ -376,6 +379,39 @@ public class UIManager : MonoBehaviour
         text.text = "";
     }
 
+	public GameObject escapeMenu;
+
+	public void CreateHumanPlayerActionUI()
+	{ 
+		if (_human.SelectedCharacter != null)
+			CreateHumanPlayerActionUI(_human.SelectedCharacter);
+	}
+
+	void Update()
+	{
+		if (Input.GetKeyDown(KeyCode.Escape)){
+			paused = true;
+			// Hide other UI
+			HideUI();
+			DeleteHumanPlayerActionUI();
+			escapeMenu.gameObject.SetActive(true);
+		}
+
+	}
+
+	public void Resume(){
+		paused = false;
+		escapeMenu.gameObject.SetActive(false);
+		// Show other UI
+		if (_human.IsPlaying){
+			ShowUI();
+			CreateHumanPlayerActionUI();
+		}
+	}
+
+	public void Quit(){
+		GameManager.Instance.QuitGame();
+	}
 
     public GameEnd GameEndOptions;
 

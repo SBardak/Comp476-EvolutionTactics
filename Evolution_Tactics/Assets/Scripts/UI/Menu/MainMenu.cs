@@ -85,7 +85,7 @@ public class MainMenu : MonoBehaviour
 
     private void ShowCurrentPokemon()
     {
-        currentPokemon.text = "Selected: ";
+        currentPokemon.text = "Selected Pokemon: ";
         int i = 0;
         foreach (string s in _selectedCharacters)
         {

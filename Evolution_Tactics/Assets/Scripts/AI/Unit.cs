@@ -85,52 +85,60 @@ public class Unit : MonoBehaviour
         Dictionary<Tile, int> possibleTiles = Character._currentTile.GetTiles();
         Tile nextTile = null;
 
-        if (Character._unitType == UnitType.ATTACKER)
+        // if long range
+        if (Character._unitType == UnitType.LONG_RANGE)
         {
-            Debug.Log("Attacker");
-            nextTile = FindBestTile(possibleTiles, c);
-            if (enemyToAttack != null)
+            Debug.LogWarning("Long Range");
+
+            nextTile = BestRangedAttack(possibleTiles);
+
+            if (enemyToAttack == null && AttackableInRange(c, possibleTiles))
             {
-                Debug.Log("AttackkkkkkkA");
+                nextTile = BestRangedAttack(c, possibleTiles);
+                Debug.LogWarning(name + " attacks target " + c.name + " by going to " + nextTile);
             }
-            if (enemyToAttack == null)
+            else
             {
-                nextTile = FindBestTile(possibleTiles);
+                Debug.LogWarning(name + " attacks " + c.name + " by going to " + nextTile);
+            }
+        }
+        else if (Character._unitType == UnitType.ATTACKER)
+        {
+            Debug.LogWarning("Attacker");
+
+            nextTile = FindBestTile(possibleTiles);
+
+            if (enemyToAttack == null && AttackableInRange(c, possibleTiles))
+            {
+                nextTile = FindBestTile(possibleTiles, c);
+                Debug.LogWarning(name + " attacks target " + c.name + " by going to " + nextTile);
+            }
+            else
+            {
+                Debug.LogWarning(name + " attacks " + c.name + " by going to " + nextTile);
             }
         }
         else if (Character._unitType == UnitType.TANKER)
         {
-            // nextTile = CanKillInRange(possibleTiles);
-            Debug.Log("Tanker");
+            Debug.LogWarning("Tanker");
+
             nextTile = FindBestTile(possibleTiles, c);
 
-            if (enemyToAttack != null)
-            {
-                Debug.Log("AttackkkkkkkT");
-            }
-            if (enemyToAttack == null)
+            if (!AttackableInRange(c, possibleTiles) || enemyToAttack == null)
             {
                 nextTile = FindBestTile(possibleTiles);
+                Debug.LogWarning(name + " attacks target " + c.name + " by going to " + nextTile);
             }
-        }
-        else if (Character._unitType == UnitType.LONG_RANGE)
-        {
-            Debug.Log("Ranger");
-            nextTile = BestRangedAttack(c, possibleTiles);
-            if (nextTile == null)
+            else
             {
-                nextTile = BestRangedAttack(possibleTiles);
-            }
-            if (enemyToAttack != null)
-            {
-                Debug.Log("AttackkkkkkkLR");
+                Debug.LogWarning(name + " attacks " + c.name + " by going to " + nextTile);
             }
         }
 
         if (nextTile == null)
         {
+            Debug.LogWarning("Cannot attack anybody");
             nextTile = FindNewTileAround(c._currentTile, possibleTiles);
-            enemyToAttack = null;
         }
 
         MoveTo(nextTile);
@@ -216,90 +224,145 @@ public class Unit : MonoBehaviour
 
     private Tile BestRangedAttack(Dictionary<Tile, int> possibleTiles)
     {
-        List<Tile> possible = new List<Tile>();
+        // dictionnary that contains the tile to attack from and the target
+        // tile with enemy in range
         List<Tile> tilesWithEnemy = new List<Tile>();
-        int movementRange = Stats.MovementRange;
 
         //get a list of the tiles in range that contain an enemy
         foreach (Tile t in possibleTiles.Keys)
         {
+            // if t has a human player on it
             if (t.HasPlayer && t._character.tag == "Human")
             {
                 tilesWithEnemy.Add(t);
             }
         }
 
+        //Dictionary<Tile, Character> possible = new Dictionary<Tile, Character>();
+        List<Tile> possible = new List<Tile>();
+        List<Character> enemy = new List<Character>();
+
+        // get a list of possible tile it can attack from
         foreach (Tile t in tilesWithEnemy)
         {
-            Tile tt = BestRangedAttack(t._character, possibleTiles);
-            if (tt != null)
+            Dictionary<Tile, int> possibleAttack = t.GetTiles(0, 2);
+            foreach (Tile tt in possibleAttack.Keys)
             {
-                possible.Add(tt);
+                if (!tt.IsOccupied && possibleTiles.ContainsKey(tt) && possibleTiles[tt] <= Stats.MovementRange && Attackable(t, tt))
+                {
+                    possible.Add(tt);
+                    enemy.Add(t._character);
+                }
             }
         }
 
+        enemyToAttack = null;
+
+        // if there are more than 1 possible tiles
         if (possible.Count > 1)
         {
-            Tile best = possible[0];
-            float furthest = Vector3.Distance(best.transform.position, transform.position);
+            Tile best = null;
+            //float furthest = Vector3.Distance(best.transform.position, transform.position);
+            float highestReward = 0;
+
+            // try to go to best tile
+            int i = 0;
             foreach (Tile t in possible)
             {
-                float distance = Vector3.Distance(t.transform.position, transform.position);
-                if (distance > furthest)
+                //float distance = Vector3.Distance(t.transform.position, transform.position);
+                float reward = AttackReward(enemy[i], t);
+                // the higher the reward, the better
+                if (reward >= highestReward)
                 {
                     best = t;
-                    furthest = distance;
+                    highestReward = reward;
+                    enemyToAttack = enemy[i];
                 }
+                i++;
             }
             return best;
         }
         else if (possible.Count == 1)
         {
-            return possible[0];
+            float reward = AttackReward(enemy[0], possible[0]);
+
+            // rewards need to be high enough
+            if (reward >= 0)
+            {
+                enemyToAttack = enemy[0];
+                return possible[0];
+            }
         }
-        else
-        {
-            return null;
-        }
+
+        return null;
     }
 
     private Tile BestRangedAttack(Character target, Dictionary<Tile, int> possibleTiles)
     {
-        Dictionary<Tile, int> possibleAttack = target._currentTile.GetTiles(0, Stats.AttackRange);
+        // possible tile target can be attacked from
+        Dictionary<Tile, int> possibleAttack = target._currentTile.GetTiles(0, 2);
         List<Tile> possible = new List<Tile>();
 
+        List<Tile> a = new List<Tile>(possibleAttack.Keys);
+        foreach (Tile t in a)
+        {
+            if (Mathf.Abs(t.transform.position.x - target.transform.position.x) <= 1 || Mathf.Abs(t.transform.position.y - target.transform.position.y) <= 1)
+            {
+                possibleAttack.Remove(t);
+            }
+        }
+
+        // for each possible attacking tile from
         foreach (Tile t in possibleAttack.Keys)
         {        
-            if (!t.HasPlayer && possibleTiles.ContainsKey(t) && Attackable(t))
+            // if this tile is empty and it can go this tile and can attack from it
+            if (!t.IsOccupied && possibleTiles.ContainsKey(t) && possibleTiles[t] <= Stats.MovementRange && Attackable(target._currentTile, t))
             {
+                // set the target as being the next attack
                 enemyToAttack = target;
                 possible.Add(t);
             }
         }
 
+        // if cannot attack target, then return null
+        if (enemyToAttack == null)
+        {
+            return null;
+        }
+
+        // if more than one possible tile
         if (possible.Count > 1)
         {
-            Tile best = possible[0];
-            float furthest = Vector3.Distance(best.transform.position, transform.position);
+            Tile best = null;
+            //float furthest = Vector3.Distance(best.transform.position, transform.position);
+            float highestReward = 0;
+
+            // try to go to best tile
             foreach (Tile t in possible)
             {
-                float distance = Vector3.Distance(t.transform.position, transform.position);
-                if (distance > furthest)
+                //float distance = Vector3.Distance(t.transform.position, transform.position);
+                float reward = AttackReward(target, t);
+                // the higher the reward, the better
+                if (reward > highestReward)
                 {
                     best = t;
-                    furthest = distance;
+                    highestReward = reward;
                 }
             }
             return best;
         }
+        // if only one possible tile
         else if (possible.Count == 1)
         {
-            return possible[0];
+            float reward = AttackReward(target, possible[0]);
+            // rewards need to be high enough
+            if (reward >= 0)
+                return possible[0];
         }
-        else
-        {
-            return null;
-        }
+            
+        enemyToAttack = null;
+        // return null if reward is not high enough or if no possible tile to go to
+        return null;
     }
 
     private Tile FindNewTileAround(Tile t, Dictionary<Tile, int> possibleTiles)
@@ -310,9 +373,9 @@ public class Unit : MonoBehaviour
 
         foreach (Tile tt in aroundT.Keys)
         {
-            if (possibleTiles.ContainsKey(tt) && !tt.HasPlayer)
+            if (possibleTiles.ContainsKey(tt) && !tt.IsOccupied)
             {
-                float distance = Vector3.Distance(Character._currentTile.transform.position, tt.transform.position);
+                float distance = Vector3.Distance(t.transform.position, tt.transform.position);
                 if (newTile == null || distance < closest)
                 {
                     closest = distance;
@@ -467,15 +530,15 @@ public class Unit : MonoBehaviour
             {
                 for (int i = 0; i < t.neighbours.Count; i++)
                 {
-                    if (possibleTiles.ContainsKey(t.neighbours[i]))
+                    if (possibleTiles.ContainsKey(t.neighbours[i]) && !t.neighbours[i].IsOccupied)
                     {
                         bestTile = t.neighbours[i];
                         // when no player on the tile, break
-                        if (possibleTiles.ContainsKey(t) && possibleTiles[t] <= movementRange && !bestTile.HasPlayer)
+                        if (possibleTiles.ContainsKey(t) && possibleTiles[t] <= movementRange)
                         {
                             //highestDamage = attack.GetDamage(tilesWithEnemy[0]._character, bestTile);
-                            highestCost = AttackCost(tilesWithEnemy[0]._character, bestTile);
-                            enemyToAttack = tilesWithEnemy[0]._character;
+                            highestCost = AttackReward(t._character, bestTile);
+                            enemyToAttack = t._character;
                             bestTile = t;
                             break;
                         }
@@ -487,19 +550,19 @@ public class Unit : MonoBehaviour
             foreach (Tile t in tilesWithEnemy)
             {
                 // for each neighbour of t
-                Dictionary<Tile, int> possibleAttackingTiles = t.GetTiles(0, Stats.AttackRange);
+                Dictionary<Tile, int> possibleAttackingTiles = t.GetTiles(0, 1);
                 foreach (Tile tt in possibleAttackingTiles.Keys)
                 {
                     // if (neighbour is empty or neighbour is where we currently are) and (this neighbour is in range)
-                    if ((!tt.HasPlayer || tt._character == Character) && (possibleTiles.ContainsKey(tt) && possibleTiles[tt] <= movementRange))
+                    if ((!tt.IsOccupied || tt._character == Character) && (possibleTiles.ContainsKey(tt) && possibleTiles[tt] <= movementRange))
                     {
                         //int cost = attack.GetDamage(t._character, tt);
-                        float cost = AttackCost(t._character, tt);
+                        float cost = AttackReward(t._character, tt);
                         int rangeDistance = possibleTiles[tt];
 
                         // if this tile would do more damage, set it as best tile
                         // TODO add more conditions, like damage received?
-                        if (cost > highestCost || (bestTile != _char._currentTile && cost == highestCost && rangeDistance > possibleTiles[bestTile]))
+                        if (cost > highestCost)
                         {
                             bestTile = tt;
                             highestCost = cost;
@@ -513,15 +576,27 @@ public class Unit : MonoBehaviour
         return null;
     }
 
-    private float AttackCost(Character target, Tile goToTile)
+    /// <summary>
+    /// Calculate reward of an attack
+    /// The highest the reward, the better 
+    /// </summary>
+    private float AttackReward(Character target, Tile goToTile)
     {
         AttackAlgorithm attack = GetComponentInChildren<AttackAlgorithm>();
+        //calculate hypothetical damage done to target
         int damageDone = attack.GetDamage(target, goToTile);
+
+        // if attack would kill the target, return high cost
+        if (target.GetComponent<PokemonStats>().CurrentHealth - damageDone < 0)
+            return 1000f;
+
+        // calculate hypothetical damage received from target
         int damageReceived = target.GetComponentInChildren<AttackAlgorithm>().GetDamage(GetComponent<Character>(), target._currentTile);
 
-        float cost = damageDone - (0.5f * damageReceived);
+        // calculate reward of an attack. Emphasis on damage done over received
+        float reward = damageDone - (0.5f * damageReceived);
 
-        return cost;
+        return reward;
     }
 
     private Tile CollectibleInRange(Dictionary<Tile, int> possibleTiles)
@@ -572,6 +647,11 @@ public class Unit : MonoBehaviour
         return t._character != null && t._character.tag == "Human" && LukasIsTheBest(t.transform.position);
     }
 
+    private bool Attackable(Tile t, Tile tt)
+    {
+        return t._character != null && t._character.tag == "Human" && LukasIsTheBest2(t.transform.position, tt.transform.position);
+    }
+
     private bool LukasIsTheBest(Vector3 position)
     {
         float x = Mathf.Abs(position.x - transform.position.x);
@@ -580,6 +660,16 @@ public class Unit : MonoBehaviour
         return /*(x == Stats.AttackRange && y == 0) ||
         (y == Stats.AttackRange && x == 0) ||*/
         z + x == Stats.AttackRange;
+    }
+
+    private bool LukasIsTheBest2(Vector3 position, Vector3 position2)
+    {
+        float x = Mathf.Abs(position.x - position2.x);
+        float z = Mathf.Abs(position.z - position2.z);
+
+        return /*(x == Stats.AttackRange && y == 0) ||
+        (y == Stats.AttackRange && x == 0) ||*/
+            z + x == Stats.AttackRange;
     }
 
     private bool AttackableInRange()
@@ -604,7 +694,7 @@ public class Unit : MonoBehaviour
 
             foreach (Tile t in attackable)
             {
-                float cost = AttackCost(t._character, Character._currentTile);
+                float cost = AttackReward(t._character, Character._currentTile);
                 if (cost > highestCost)
                 {
                     bestTile = t;
@@ -617,6 +707,22 @@ public class Unit : MonoBehaviour
         if (bestTile != null)
             return true;
 
+        return false;
+    }
+
+    private bool AttackableInRange(Character c, Dictionary<Tile, int> range)
+    {
+        Dictionary<Tile, int> possibleToAttackFrom = c._currentTile.GetTiles(0, Stats.AttackRange);
+        //List<Tile> possibleEndNode = new List<Tile>();
+
+        //Union of the keys of the two dictionnary
+        foreach (Tile t in possibleToAttackFrom.Keys)
+        {
+            if (range.ContainsKey(t) && t._character == null)
+            {
+                return true;
+            }
+        }
         return false;
     }
 
