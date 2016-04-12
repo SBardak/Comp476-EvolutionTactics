@@ -137,7 +137,7 @@ public class Unit : MonoBehaviour
 
         if (nextTile == null)
         {
-            Debug.LogError("Cannot attack anybody");
+            Debug.LogWarning("Cannot attack anybody");
             nextTile = FindNewTileAround(c._currentTile, possibleTiles);
         }
 
@@ -250,7 +250,6 @@ public class Unit : MonoBehaviour
             {
                 if (!tt.IsOccupied && possibleTiles.ContainsKey(tt) && possibleTiles[tt] <= Stats.MovementRange && Attackable(t, tt))
                 {
-                    Debug.LogError(tt);
                     possible.Add(tt);
                     enemy.Add(t._character);
                 }
