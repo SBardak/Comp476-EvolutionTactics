@@ -8,7 +8,7 @@ public class HP_Tracker_UI : MonoBehaviour
     [SerializeField]
     Text _text;
     [SerializeField]
-    Image _inner;
+    Image _inner, _background;
 
     float initialW;
     RectTransform _rect;
@@ -51,6 +51,17 @@ public class HP_Tracker_UI : MonoBehaviour
 
         //rect.localPosition = p;
     }
-    
+
+    public void EnabledBackground(bool enabled)
+    {
+        Color c;
+        if (enabled)
+            c = Color.white;
+        else
+            c = new Color(0.7f, 0.7f, 0.7f, 1);
+        //c = new Color(0.37f, 0.37f, 0.37f, 1);
+        _background.color = c;
+    }
+
     #endregion Methods
 }

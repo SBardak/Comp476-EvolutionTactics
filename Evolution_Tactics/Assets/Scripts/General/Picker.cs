@@ -9,7 +9,7 @@ public class Picker : MonoBehaviour {
 	void Update () {
         if (Input.GetMouseButtonDown(0))
         {
-            if (!EventSystem.current.IsPointerOverGameObject())
+            if (!EventSystem.current.IsPointerOverGameObject() || EventSystem.current.currentSelectedGameObject == null)
                 GetClickObjects();
         }
     }

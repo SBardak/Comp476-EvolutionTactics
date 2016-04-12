@@ -74,10 +74,16 @@ public class HP_Tracker : MonoBehaviour
         if (_instantiated != null)
             _instantiated.GetComponent<HP_Tracker_UI>().SetColor(c);
     }
+    void EnabledBackground(bool enabled)
+    {
+        if (_instantiated != null)
+            _instantiated.GetComponent<HP_Tracker_UI>().EnabledBackground(enabled);
+    }
 
     public void HP_Activated()
     {
         SetColorHP(c);
+        EnabledBackground(true);
     }
     public void HP_Deactivated()
     {
@@ -86,6 +92,7 @@ public class HP_Tracker : MonoBehaviour
         var b = c.b - c.b * 0.5f;
 
         SetColorHP(new Color(r, g, b));
+        EnabledBackground(false);
     }
 
     public void SetHP()
