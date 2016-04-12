@@ -138,7 +138,9 @@ public class Unit : MonoBehaviour
         if (nextTile == null)
         {
             Debug.LogWarning("Cannot attack anybody");
+            possibleTiles = Character._currentTile.GetTiles();
             nextTile = FindNewTileAround(c._currentTile, possibleTiles);
+            Debug.LogWarning("Go to " + nextTile);
         }
 
         MoveTo(nextTile);
@@ -532,11 +534,11 @@ public class Unit : MonoBehaviour
                 {
                     if (possibleTiles.ContainsKey(t.neighbours[i]) && !t.neighbours[i].IsOccupied)
                     {
-                        bestTile = t.neighbours[i];
                         // when no player on the tile, break
                         if (possibleTiles.ContainsKey(t) && possibleTiles[t] <= movementRange)
                         {
                             //highestDamage = attack.GetDamage(tilesWithEnemy[0]._character, bestTile);
+                            bestTile = t.neighbours[i];
                             highestCost = AttackReward(t._character, bestTile);
                             enemyToAttack = t._character;
                             bestTile = t;
@@ -654,8 +656,10 @@ public class Unit : MonoBehaviour
 
     private bool LukasIsTheBest(Vector3 position)
     {
-        float x = Mathf.Abs(position.x - transform.position.x);
-        float z = Mathf.Abs(position.z - transform.position.z);
+        int x = (int)Mathf.Abs(position.x - transform.position.x);
+        int z = (int)Mathf.Abs(position.z - transform.position.z);
+
+        Debug.LogWarning("In Attackable " + (x + z));
 
         return /*(x == Stats.AttackRange && y == 0) ||
         (y == Stats.AttackRange && x == 0) ||*/
@@ -664,8 +668,8 @@ public class Unit : MonoBehaviour
 
     private bool LukasIsTheBest2(Vector3 position, Vector3 position2)
     {
-        float x = Mathf.Abs(position.x - position2.x);
-        float z = Mathf.Abs(position.z - position2.z);
+        int x = (int)Mathf.Abs(position.x - position2.x);
+        int z = (int)Mathf.Abs(position.z - position2.z);
 
         return /*(x == Stats.AttackRange && y == 0) ||
         (y == Stats.AttackRange && x == 0) ||*/
@@ -674,10 +678,11 @@ public class Unit : MonoBehaviour
 
     private bool AttackableInRange()
     {
-        Dictionary<Tile, int> possibleAttacks = Character._currentTile.GetTiles(0);
+        Dictionary<Tile, int> possibleAttacks = Character._currentTile.GetTiles(0, Stats.AttackRange);
         List<Tile> attackable = new List<Tile>();
+        Debug.LogError("ATTACKABLE IN RANGE");
 
-        float highestCost = 0;
+        float highestCost = -1;
         Tile bestTile = null;
         enemyToAttack = null;
 
@@ -685,16 +690,16 @@ public class Unit : MonoBehaviour
         {
             foreach (Tile t in possibleAttacks.Keys)
             {
-                if (Attackable(t))
+                if (t._character != null && t._character.tag == "Human")
                 {
                     attackable.Add(t);
                 }
             } 
 
-
             foreach (Tile t in attackable)
             {
                 float cost = AttackReward(t._character, Character._currentTile);
+                Debug.LogError(cost);
                 if (cost > highestCost)
                 {
                     bestTile = t;
@@ -704,6 +709,7 @@ public class Unit : MonoBehaviour
             }
         }
 
+        Debug.LogError(bestTile + " + " + highestCost + " + " + attackable.Count);
         if (bestTile != null)
             return true;
 

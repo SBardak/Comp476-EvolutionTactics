@@ -112,9 +112,7 @@ public class Character : MonoBehaviour
         if (target == null || target.gameObject == null)
             return false;
 
-        float distance = Vector3.Distance(target.transform.position, transform.position);
-
-        if (distance <= GetComponent<PokemonStats>().AttackRange)
+        if (target.GetComponent<PokemonStats>().AttackRange == GetComponent<PokemonStats>().AttackRange)
         {
             return true;
         }

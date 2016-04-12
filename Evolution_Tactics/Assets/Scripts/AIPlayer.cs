@@ -18,6 +18,7 @@ using System.Collections.Generic;
 public class AIPlayer : Player
 {
     #region Fields
+
     public int SquadCount = 3;
     public int MaxUnitCountPerSquad = 3;
 
@@ -27,9 +28,11 @@ public class AIPlayer : Player
     int _selectedSquad = 0;
 
     bool _isPlaying;
+
     #endregion Fields
 
     #region Properties
+
     public bool IsPlaying
     {
         get
@@ -37,6 +40,7 @@ public class AIPlayer : Player
             return _isPlaying;
         }
     }
+
     #endregion Properties
 
     #region Methods
@@ -54,6 +58,7 @@ public class AIPlayer : Player
         _squadList = squads;
         PrepareSquads();
     }
+
     void PrepareSquads()
     {
         // Move this somewhere else probably
@@ -152,7 +157,7 @@ public class AIPlayer : Player
     {
         return _selectedSquad >= _squadList.Count;
     }
-    
+
     #endregion Turn
 
     #endregion Methods
