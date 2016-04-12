@@ -241,7 +241,7 @@ public class Pathfinding : MonoBehaviour
                 }
                 else if (!inClosedList && !inOpenList)
                 {
-                    if (!neighbour.IsOccupied || (myType == TileStats.type.Flying && (neighbour.HasPlayer || neighbour.HasObstacle) /*&& (/*neighbour._character.tag == gameObject.tag || myType == TileStats.type.Flying)*/))
+                    if (!neighbour.IsOccupied || (myType == TileStats.type.Flying && ((neighbour.HasPlayer && neighbour._character.tag == gameObject.tag) || neighbour.HasObstacle)) || (neighbour.HasPlayer && neighbour._character.tag == gameObject.tag))
                     {
                         neighbour.costSoFar = newCost;
                         neighbour.totalEstimatedValue = neighbour.costSoFar + neighbour.heuristicValue;
