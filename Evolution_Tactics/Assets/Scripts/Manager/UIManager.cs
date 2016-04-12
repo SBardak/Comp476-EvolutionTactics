@@ -264,6 +264,7 @@ public class UIManager : MonoBehaviour
             _currentStats = c.gameObject;
             Transform canvas = GameObject.Find("Canvas").transform;
             PokemonStats stats = c.GetComponent<PokemonStats>();
+            Experience exp = c.GetComponent<Experience>();
             var n = c.name.Split("("[0]);
 
             string statsString =
@@ -272,7 +273,9 @@ public class UIManager : MonoBehaviour
                 "\n Level: " + stats.Level +
                 "\n Health: " + stats._currentHealth + "/" + stats.MaxHealth +
                 "\n Attack: " + stats.Attack +
-                "\n Defense: " + stats.Defense;
+                "\n Defense: " + stats.Defense +
+                (exp == null || exp.NextLevelXP == 0 ? "":
+                string.Format("\n EXP: {0}%", exp.experience / (float)exp.NextLevelXP * 100));
 
             InstantiatePanel(statsString, canvas);
         }
@@ -335,7 +338,7 @@ public class UIManager : MonoBehaviour
         //_panel2.GetComponentInChildren<Text>().color = new Color(1, 1, 1, 1);
         actionList.Add(action);
 
-        if (actionList.Count > 6)
+        if (actionList.Count > 8)
         {
             _panel2.GetComponentInChildren<Text>().text = "";
             for (int i = 0; i < actionList.Count; i++)

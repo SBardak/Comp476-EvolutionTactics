@@ -206,7 +206,7 @@ public class AttackAlgorithm : MonoBehaviour
         //{
         var n = target.name.Split("("[0]);
         var nn = name.Split("("[0]);
-        UIManager.Instance.AddAction(nn[0] + " attacks " + n[0] + " and do " + damage + " damage.");
+        UIManager.Instance.AddAction(nn[0] + " attacks " + n[0] + " for " + damage + " damage.");
         pokeStats.CurrentHealth = pokeStats.CurrentHealth - damage;
 
         UIManager.Instance.CreateNewDamageLabel(damage, target.transform.position);
