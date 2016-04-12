@@ -6,6 +6,7 @@ using System.Collections.Generic;
 public class MainMenu : MonoBehaviour
 {
     public GameObject logo;
+	public GameObject credits;
 	public GameObject adv, nodamage, advText, nodamageText;
     public Button[] _initialButtons;
     public Button[] _newGameButtons;
@@ -27,7 +28,12 @@ public class MainMenu : MonoBehaviour
 
         if (option == 1 || option == 2) 
         {
-            logo.gameObject.SetActive(true);
+			if (option == 1){
+				credits.gameObject.SetActive(true);
+			}else {
+				credits.gameObject.SetActive(false);
+			}
+			logo.gameObject.SetActive(true);
 			adv.gameObject.SetActive(false);
 			nodamage.gameObject.SetActive(false);
 			advText.gameObject.SetActive(false);
@@ -35,6 +41,7 @@ public class MainMenu : MonoBehaviour
         }
         else if (option == 3)
         {
+			credits.gameObject.SetActive(false);
             logo.gameObject.SetActive(false);
 			adv.gameObject.SetActive(true);
 			nodamage.gameObject.SetActive(true);
