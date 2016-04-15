@@ -25,18 +25,28 @@ public class Pathfinding : MonoBehaviour
 
     private TileStats.type myType;
     private PokemonStats stats;
+
+    [SerializeField]
     private Animator _animator;
 
     void Start()
     {
         Graph();
         stats = GetComponent<PokemonStats>();
+
+        ResetCharacterAnimator();
+
+        myType = stats.MyType;
+    }
+
+    void ResetCharacterAnimator()
+    {
+        _animator = null;
         _animator = GetComponent<Animator>();
         if (_animator == null)
         {
             _animator = GetComponentInChildren<Animator>();
         }
-        myType = stats.MyType;
     }
 
     void Graph()

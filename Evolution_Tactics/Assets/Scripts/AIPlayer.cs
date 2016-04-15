@@ -97,6 +97,13 @@ public class AIPlayer : Player
 
         _isPlaying = true;
 
+        // TODO: Find out the bug. This is a temp bugfix
+        for (int i = _squadList.Count - 1; i >= 0; --i)
+        {
+            if (_squadList[i] == null)
+                _squadList.RemoveAt(i);
+        }
+
         // Reactivate all units
         foreach (var s in _squadList)
             s.ReactivateSquad();

@@ -155,6 +155,12 @@ public class Squad : MonoBehaviour
     /// </summary>
     public void ReactivateSquad()
     {
+        for (int i = _units.Count - 1; i >= 0; --i)
+        {
+            if (_units[i] == null)
+                _units.RemoveAt(i);
+        }
+
         foreach (var u in _units)
         {
             // Reactive

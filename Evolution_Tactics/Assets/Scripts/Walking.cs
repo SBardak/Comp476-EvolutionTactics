@@ -11,9 +11,18 @@ public class Walking : MonoBehaviour {
 	void Start () {
 		anim = GetComponent<Animator>();
 	}
-	
-	// Update is called once per frame
-	void Update () {
+
+    void ResetCharacterAnimator()
+    {
+        anim = GetComponent<Animator>();
+        if (anim == null)
+        {
+            anim = GetComponentInChildren<Animator>();
+        }
+    }
+
+    // Update is called once per frame
+    void Update () {
 		vert = Input.GetAxis("Vertical");
 		if (vert > 0.1f || vert < -0.1f){
 			anim.SetBool("Walk", true);
