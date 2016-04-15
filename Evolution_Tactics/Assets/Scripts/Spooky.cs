@@ -2,6 +2,13 @@
 using System.Collections;
 using UnityEngine.UI;
 
+
+/// <summary>
+/// This is just a joke script with which we had fun. Its functionality has been disabled
+/// through the use of Destroy. To re-enable, simply comment that out.
+/// 
+/// Note: This is just testing out video files in a fun way.
+/// </summary>
 public class Spooky : MonoBehaviour {
 
     MovieTexture test;
@@ -12,12 +19,13 @@ public class Spooky : MonoBehaviour {
 
     void Start()
     {
+        // Well, it was a nice run, but this is the end. RIP Spooky.
+        Destroy(gameObject); 
+
         img = GetComponent<RawImage>();
         test = (MovieTexture)img.texture;
 
         test.loop = true;
-        //GetComponent<Renderer>().material.mainTexture = test;
-        //img.material.mainTexture = test;
 
         audio = GetComponent<AudioSource>();
         audio.clip = test.audioClip;
