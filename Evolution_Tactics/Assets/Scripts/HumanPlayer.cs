@@ -205,9 +205,9 @@ public class HumanPlayer : Player
         if (Input.GetKeyDown("q"))
             SelectNextCharacter();
 
-        if (Input.GetKeyDown("1"))
+        if (Input.GetKeyDown("8"))
             GameManager.Instance.DeadPlayer(this);
-        if (Input.GetKeyDown("2"))
+        if (Input.GetKeyDown("9"))
             GameManager.Instance.DeadAI(new AIPlayer());
     }
     void SelectNextCharacter()
