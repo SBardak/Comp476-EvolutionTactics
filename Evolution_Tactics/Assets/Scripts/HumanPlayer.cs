@@ -82,6 +82,8 @@ public class HumanPlayer : Player
     private void Character_OnDeath(Character c)
     {
         _charactersList.Remove(c);
+        if (_charactersList.Count == 0)
+            GameManager.Instance.DeadPlayer(this);
     }
 
     void Start()
@@ -177,6 +179,7 @@ public class HumanPlayer : Player
         DisablePicker();
 
         _isPlaying = false;
+        UIManager.Instance.DeleteHumanPlayerActionUI();
         GameManager.Instance.NextTurn();
     }
 
@@ -289,8 +292,10 @@ public class HumanPlayer : Player
 
     void SelectCharacter(Character c)
     {
+        UIManager.Instance.DeleteHumanPlayerActionUI();
         // Select
         SelectedCharacter = c;
+        UIManager.Instance.CreateHumanPlayerActionUI(c);
 
         // TODO: Notify UI
         Debug.Log("SELECTED MINE");
