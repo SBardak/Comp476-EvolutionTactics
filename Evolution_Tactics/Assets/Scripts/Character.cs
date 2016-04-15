@@ -114,7 +114,7 @@ public class Character : MonoBehaviour
         
         int x = (int)Mathf.Round(Mathf.Abs(target.transform.position.x - transform.position.x));
         int z = (int)Mathf.Round(Mathf.Abs(target.transform.position.z - transform.position.z));
-        bool isInRangeToCounter = (x + z) == target.GetComponent<PokemonStats>().AttackRange;
+        bool isInRangeToCounter = (x + z) == GetComponent<PokemonStats>().AttackRange;
 
         if (isInRangeToCounter)
         {
