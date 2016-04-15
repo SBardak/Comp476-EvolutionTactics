@@ -44,9 +44,9 @@ public class Evolve : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-	if (DoIEvolve==true)
-        {
+		EvolveCheck();
+		if (DoIEvolve==true){
             evolve();
-        }
+     	}
 	}
 }
