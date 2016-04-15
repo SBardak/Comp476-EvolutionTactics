@@ -153,6 +153,8 @@ public class Unit : MonoBehaviour
             Debug.LogWarning("Cannot attack anybody");
             if (c != null)
                 nextTile = FindNewTileAround(c._currentTile, possibleTiles);
+            if (nextTile == null)
+                nextTile = GoToClosestEnemy(possibleTiles);
             Debug.LogWarning("Go to " + nextTile);
         }
 
@@ -236,6 +238,40 @@ public class Unit : MonoBehaviour
     }
 
     #region Search for tile helper methods
+
+    private Tile GoToClosestEnemy(Dictionary<Tile, int> possibleTiles)
+    {
+        Debug.LogError("Closest Enemy");
+        List<Tile> tilesWithEnemy = new List<Tile>();
+
+        foreach (Tile t in possibleTiles.Keys)
+        {
+            // if t has a human player on it
+            if (t.HasPlayer && t._character.tag == "Human")
+            {
+                tilesWithEnemy.Add(t);
+            }
+        }
+
+        float closest = 5;
+        Tile closestEnemyTile = null;
+        foreach (Tile t in tilesWithEnemy)
+        {
+            float distance = Vector3.Distance(t.transform.position, transform.position);
+            if (distance < closest)
+            {
+                closest = distance;
+                closestEnemyTile = t;
+            }
+        }
+
+        if (closestEnemyTile == null)
+        {
+            return null;
+        }
+
+        return FindNewTileAround(closestEnemyTile, possibleTiles);
+    }
 
     private Tile BestRangedAttack(Dictionary<Tile, int> possibleTiles)
     {
@@ -381,7 +417,6 @@ public class Unit : MonoBehaviour
 
         foreach (Tile tt in aroundT.Keys)
         {
-            Debug.LogError(tt);
             if (possibleTiles.ContainsKey(tt) && (!tt.IsOccupied || tt == Character._currentTile))
             {
                 float distance = Vector3.Distance(t.transform.position, tt.transform.position);

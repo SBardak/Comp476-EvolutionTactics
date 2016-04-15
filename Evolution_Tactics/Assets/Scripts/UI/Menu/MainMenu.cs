@@ -24,7 +24,6 @@ public class MainMenu : MonoBehaviour
     private void Init(int option) // Option 1- menu, 2-choose map, 3-choose pokemon
     {
         currentPokemon.gameObject.SetActive(true);
-        ShowCurrentPokemon();
 
         if (option == 1 || option == 2)
         {
@@ -41,9 +40,14 @@ public class MainMenu : MonoBehaviour
             nodamage.gameObject.SetActive(false);
             advText.gameObject.SetActive(false);
             nodamageText.gameObject.SetActive(false);
+			if (option == 2)
+			{
+				ShowCurrentPokemon();
+			}
         }
         else if (option == 3)
         {
+			ShowCurrentPokemon();
             credits.gameObject.SetActive(false);
             logo.gameObject.SetActive(false);
             adv.gameObject.SetActive(true);

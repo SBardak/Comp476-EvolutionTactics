@@ -103,7 +103,7 @@ public class Character : MonoBehaviour
     {
         RotateDirectly(enemyToAttack.transform.position);
         AttackAlgorithm a = GetComponent<AttackAlgorithm>();
-        //a.GetDamage(enemyToAttack);
+
         return a.DoDamage(enemyToAttack);
     }
 
@@ -111,8 +111,12 @@ public class Character : MonoBehaviour
     {
         if (target == null || target.gameObject == null)
             return false;
+        
+        int x = (int)Mathf.Round(Mathf.Abs(target.transform.position.x - transform.position.x));
+        int z = (int)Mathf.Round(Mathf.Abs(target.transform.position.z - transform.position.z));
+        bool isInRangeToCounter = (x + z) == GetComponent<PokemonStats>().AttackRange;
 
-        if (target.GetComponent<PokemonStats>().AttackRange == GetComponent<PokemonStats>().AttackRange)
+        if (isInRangeToCounter)
         {
             return true;
         }

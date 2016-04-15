@@ -123,11 +123,12 @@ public class GameManager : Singleton<GameManager>
         StartCoroutine(Defeat());
     }
 
-	public void QuitGame(){
-		Debug.Log ("Quitting to menu");
+    public void QuitGame()
+    {
+        Debug.Log("Quitting to menu");
         _generatePlayer = true;
-        Quit ();
-	}
+        Quit();
+    }
 
     IEnumerator Victory()
     {
@@ -160,14 +161,15 @@ public class GameManager : Singleton<GameManager>
         Application.LoadLevel(0);
     }
 
-	void Quit(){
-		foreach (var p in _allPlayers)
-			for (int i = p.transform.childCount - 1; i >= 0; i--)
-				DestroyImmediate(p.transform.GetChild(i).gameObject);
-		GameManager.Instance.isPlaying = false;
+    void Quit()
+    {
+        foreach (var p in _allPlayers)
+            for (int i = p.transform.childCount - 1; i >= 0; i--)
+                DestroyImmediate(p.transform.GetChild(i).gameObject);
+        GameManager.Instance.isPlaying = false;
 		
-		Application.LoadLevel(0);
-	}
+        Application.LoadLevel(0);
+    }
 
     void Reset()
     {
@@ -321,6 +323,7 @@ public class GameManager : Singleton<GameManager>
                 System.Random random = new System.Random();
                 type = (TileStats.type)values.GetValue(Random.Range(0, values.Length));
             } while (type == TileStats.type.Obstacle);
+            //type = TileStats.type.Grass;
 
             var chars = AvailableCharacters
                 .Where(ac => ac.Type == type)

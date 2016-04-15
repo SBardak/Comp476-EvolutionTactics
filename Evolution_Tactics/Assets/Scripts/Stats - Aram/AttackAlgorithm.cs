@@ -164,8 +164,10 @@ public class AttackAlgorithm : MonoBehaviour
 
         if (initialAttack)
         {
-            float distance = Vector3.Distance(target.transform.position, transform.position);
-            bool isInRangeToCounter = distance <= target.GetComponent<PokemonStats>().AttackRange;
+
+            int x = (int)Mathf.Round(Mathf.Abs(target.transform.position.x - transform.position.x));
+            int z = (int)Mathf.Round(Mathf.Abs(target.transform.position.z - transform.position.z));
+            bool isInRangeToCounter = (x + z) == target.GetComponent<PokemonStats>().AttackRange;
 
             var n = target.name.Split("("[0]);
 
