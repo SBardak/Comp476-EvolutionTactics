@@ -6,6 +6,7 @@ public class Evolve : MonoBehaviour {
     public int Evolve_Level_Req=5;
     public GameObject NextStage;
     public bool DoIEvolve=false;
+	public bool evolved = false;
 	
 
 	void Start () {
@@ -13,7 +14,7 @@ public class Evolve : MonoBehaviour {
 	}
 	public void EvolveCheck()
     {
-        if (transform.GetComponent<PokemonStats>().Level == Evolve_Level_Req)
+        if (transform.GetComponent<PokemonStats>().Level == Evolve_Level_Req && !evolved)
         {
             evolve();
         }
