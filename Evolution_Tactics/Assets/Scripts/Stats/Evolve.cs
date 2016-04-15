@@ -36,6 +36,7 @@ public class Evolve : MonoBehaviour {
         newModel.transform.localRotation = NextStage.transform.rotation;
 
         DoIEvolve = false;
+        evolved = true;
 
         // Wait for the model to instantiate
         StartCoroutine(ResetAnimator());

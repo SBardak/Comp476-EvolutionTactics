@@ -359,8 +359,7 @@ public class HumanPlayer : Player
             {
                 if (selectableTiles != null && CanBeSelected(t) && !IsMine(t._character))
                 {
-                    if (!UIManager.Instance.created)
-                        UIManager.Instance.CreateAcceptButtonAttack(t._character);
+                    UIManager.Instance.CreateAcceptButtonAttack(t._character);
                     return;
                 }
 

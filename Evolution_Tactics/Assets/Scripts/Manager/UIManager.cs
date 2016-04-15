@@ -118,16 +118,16 @@ public class UIManager : MonoBehaviour
                     });
                 buttonList.Add(actionButton);
             }
-
-            selectedEnemy = enemy;
-
-            Character selected = _human.SelectedCharacter;
-
-            AttackAlgorithm attack = selected.GetComponent<AttackAlgorithm>();
-            damage = attack.GetDamage(enemy);
-
-            Debug.LogWarning("Press middle button to accept");
         }
+
+        selectedEnemy = enemy;
+
+        Character selected = _human.SelectedCharacter;
+
+        AttackAlgorithm attack = selected.GetComponent<AttackAlgorithm>();
+        damage = attack.GetDamage(enemy);
+
+        Debug.LogWarning("Press middle button to accept");
     }
 
     public void Attack()
